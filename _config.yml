@@ -1,0 +1,15 @@
+# GitHub Pages configuration
+# This file enables GitHub Pages to serve the site from the repository root.
+
+include: ["_pages"]
+
+# Exclude build-only files
+exclude:
+  - node_modules/
+  - vendor/
+  - README.md
+  - LICENSE
+  - .gitignore
+
+# Set default permalink (not needed for static HTML, but harmless)
+permalink: pretty

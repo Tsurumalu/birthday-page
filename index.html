@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A birthday gift website">
+    <title>Happy Birthday — Choose an edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="page-home theme-card">
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="loader-text">
+            <span class="loader-letter">L</span>
+            <span class="loader-letter">o</span>
+            <span class="loader-letter">a</span>
+            <span class="loader-letter">d</span>
+            <span class="loader-letter">i</span>
+            <span class="loader-letter">n</span>
+            <span class="loader-letter">g</span>
+        </div>
+    </div>
+
+    <!-- Theme Background -->
+    <div class="theme-bg" id="themeBg"></div>
+    <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+
+    <!-- Navigation -->
+    <nav class="nav" id="nav">
+        <a href="index.html" class="nav-brand">
+            <span class="nav-brand-mark">&#10022;</span>
+            <span class="nav-brand-text">For You</span>
+        </a>
+        <div class="nav-links">
+            <a href="card.html" class="nav-link">Card</a>
+            <a href="moments.html" class="nav-link">Moments</a>
+            <a href="message.html" class="nav-link">Letter</a>
+            <a href="wish.html" class="nav-link">Wish</a>
+        </div>
+        <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound">
+            <span class="sound-icon" id="soundIcon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                    <line x1="23" y1="9" x2="17" y2="15"/>
+                    <line x1="17" y1="9" x2="23" y2="15"/>
+                </svg>
+            </span>
+        </button>
+    </nav>
+
+    <!-- Home / Chooser -->
+    <main class="home" id="home">
+        <div class="home-layout">
+            <div class="home-info">
+                <p class="home-eyebrow reveal-up" style="--delay: 0.1s">A birthday gift</p>
+                <h1 class="home-title reveal-up" id="homeTitle" style="--delay: 0.3s">The Card</h1>
+                <p class="home-subtitle reveal-up" id="homeSubtitle" style="--delay: 0.5s">
+                    A birthday card, written just for you.
+                </p>
+            </div>
+
+            <div class="home-dial-wrap reveal-up" style="--delay: 0.7s">
+                <div class="dial-arrows">
+                    <button class="dial-arrow" id="arrowLeft" aria-label="Previous edition">&#8249;</button>
+                    <div class="dial-pointer"></div>
+                    <button class="dial-arrow" id="arrowRight" aria-label="Next edition">&#8250;</button>
+                </div>
+
+                <div class="dial" id="dial" tabindex="0" role="group" aria-label="Birthday gift edition selector">
+                    <div class="dial-rotor" id="dialRotor">
+                        <svg class="dial-segments" id="dialSegments" viewBox="0 0 360 360" aria-hidden="true"></svg>
+                        <div class="dial-labels" id="dialLabels"></div>
+                    </div>
+                    <button class="dial-hub-btn" id="dialHub" aria-label="Enter selected edition">
+                        <span class="dial-hub-label">Enter</span>
+                    </button>
+                </div>
+
+                <p class="dial-hint">Drag to turn &middot; Press hub to enter</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
