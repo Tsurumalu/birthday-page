@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A birthday letter">
+    <meta name="description" content="A letter, on a desk, inside a screen.">
     <title>The Letter — Happy Birthday</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Caveat:wght@400;500;600&family=Inter:wght@300;400;500;600&family=Press+Start+2P&family=Silkscreen:wght@400;700&family=Noto+Sans+SC:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=20261009g">
 </head>
-<body class="page-sub theme-letter">
+<body class="page-sub page-letter theme-letter">
     <div class="loader" id="loader">
         <div class="loader-text">
             <span class="loader-letter">L</span>
@@ -41,6 +41,9 @@
             <a href="moments.html" class="nav-link">Moments</a>
             <a href="message.html" class="nav-link active">Letter</a>
             <a href="wish.html" class="nav-link">Wish</a>
+            <a href="games.html" class="nav-link">Games</a>
+            <a href="musics.html" class="nav-link">Music</a>
+            <a href="cards.html" class="nav-link">Cards</a>
         </div>
         <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound">
             <span class="sound-icon" id="soundIcon">
@@ -53,34 +56,227 @@
         </button>
     </nav>
 
-    <header class="sub-hero">
-        <p class="sub-eyebrow reveal-up" style="--delay: 0.1s">Edition 03</p>
-        <h1 class="sub-title reveal-up" style="--delay: 0.3s">The Letter</h1>
-        <p class="sub-subtitle reveal-up" style="--delay: 0.5s">The things I don't say often enough.</p>
-    </header>
+    <main class="letter-page" id="letterPage">
+        <div class="room" id="room">
 
-    <main class="sub-content">
-        <div class="message-card reveal-up" style="--delay: 0.2s">
-            <div class="message-icon">&#9993;</div>
-            <h2 class="message-heading">From my heart to yours</h2>
-            <p class="message-body">
-                If I could give you one thing in life, I would give you the ability
-                to see yourself through my eyes. Only then would you realize how
-                special you are to me. Today, tomorrow, and every day after —
-                happy birthday, my love.
-            </p>
-            <div class="message-divider"></div>
-            <p class="message-footer">Made with care, just for you.</p>
+            <!-- ===================== WALL ===================== -->
+            <div class="room-wall">
+                <div class="wall-glow" id="wallGlow"></div>
+                <div class="wall-lines"></div>
+                <div class="wall-baseboard"></div>
+
+                <!-- Bookshelf -->
+                <section class="shelf" id="shelf" aria-label="Bookshelf">
+                    <div class="shelf-books" id="shelfBooks"></div>
+                    <div class="shelf-board"><span class="shelf-board-top"></span></div>
+                    <div class="shelf-bracket shelf-bracket-l"></div>
+                    <div class="shelf-bracket shelf-bracket-r"></div>
+                    <div class="shelf-tag">
+                        <span class="shelf-tag-string"></span>
+                        <span class="shelf-tag-label">SIDE A &middot; 2025</span>
+                    </div>
+                </section>
+
+                <!-- Framed print on the wall -->
+                <div class="wall-frame">
+                    <div class="wall-frame-mat"><div class="wall-frame-art"></div></div>
+                </div>
+
+                <!-- Pinned polaroid -->
+                <div class="wall-pin">
+                    <span class="pin-dot"></span>
+                    <div class="pin-photo"><div class="pin-photo-art"></div></div>
+                </div>
+            </div>
+
+            <!-- ===================== DESK ===================== -->
+            <div class="desk">
+                <div class="desk-top"></div>
+                <div class="desk-apron"><span class="desk-grain"></span></div>
+                <div class="desk-mat"></div>
+
+                <!-- Desk lamp -->
+                <button class="lamp is-on" id="lampBtn" aria-pressed="true" aria-label="Desk lamp">
+                    <span class="lamp-cone"></span>
+                    <span class="lamp-shade"></span>
+                    <span class="lamp-neck"></span>
+                    <span class="lamp-base"></span>
+                    <span class="lamp-bulb"></span>
+                </button>
+
+                <!-- ============ MONITOR ============ -->
+                <div class="monitor" id="monitor">
+                    <div class="mon-spill"></div>
+                    <div class="mon-shell">
+                        <div class="mon-front">
+                            <div class="mon-screen-wrap">
+                                <div class="screen" id="screen">
+                                    <div class="scr-ui" id="scrUi">
+                                        <div class="ui-wall">
+                                            <div class="ui-sun"></div>
+                                            <div class="ui-cloud ui-cloud-1"></div>
+                                            <div class="ui-cloud ui-cloud-2"></div>
+                                            <div class="ui-cloud ui-cloud-3"></div>
+                                            <div class="ui-hills ui-hills-3"></div>
+                                            <div class="ui-hills ui-hills-2"></div>
+                                            <div class="ui-hills ui-hills-1"></div>
+                                            <div class="ui-spark ui-spark-1"></div>
+                                            <div class="ui-spark ui-spark-2"></div>
+                                            <div class="ui-spark ui-spark-3"></div>
+                                        </div>
+
+                                        <div class="ui-menubar">
+                                            <button class="ui-logo" id="uiLogo" aria-label="System menu">&#10047;</button>
+                                            <button class="ui-menu" data-menu="file">File</button>
+                                            <button class="ui-menu" data-menu="edit">Edit</button>
+                                            <button class="ui-menu" data-menu="view">View</button>
+                                            <button class="ui-menu" data-menu="special">Special</button>
+                                            <span class="ui-menubar-gap"></span>
+                                            <span class="ui-menu ui-menu-quiet" id="uiSoundTag">&#9834;</span>
+                                            <span class="ui-menu ui-menu-quiet" id="uiSunTag">&#9728;</span>
+                                            <span class="ui-clock" id="uiClock">--:--</span>
+                                        </div>
+
+                                        <div class="ui-icons" id="uiIcons"></div>
+                                        <div class="ui-wins" id="uiWins"></div>
+
+                                        <div class="ui-dock">
+                                            <span class="ui-dock-brand">TY&#8209;OS 1.0</span>
+                                            <span class="ui-dock-hint" id="uiDockHint">double-click an icon</span>
+                                            <span class="ui-dock-grip"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="scr-boot" id="scrBoot">
+                                        <div class="boot-brand">TY<span class="boot-dot">&middot;</span>OS</div>
+                                        <div class="boot-hello">hello, ty</div>
+                                        <div class="boot-bar">
+                                            <span class="boot-cell"></span><span class="boot-cell"></span><span class="boot-cell"></span><span class="boot-cell"></span><span class="boot-cell"></span><span class="boot-cell"></span><span class="boot-cell"></span><span class="boot-cell"></span><span class="boot-cell"></span><span class="boot-cell"></span>
+                                        </div>
+                                        <div class="boot-label">LOADING&hellip;</div>
+                                    </div>
+
+                                    <div class="scr-scanlines"></div>
+                                    <div class="scr-glare"></div>
+                                    <div class="scr-off" id="scrOff"></div>
+                                </div>
+                                <div class="scr-glare-plate"></div>
+                            </div>
+
+                            <div class="mon-chin">
+                                <span class="mon-brand">FOR YOU <em>SYSTEMS</em></span>
+                                <span class="mon-model">TY-88</span>
+                                <span class="mon-vents"></span>
+                                <button class="mon-power" id="powerBtn" aria-label="Monitor power">
+                                    <span class="mon-led" id="monLed"></span>
+                                </button>
+                                <span class="mon-smiley" id="monSmiley">
+                                    <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.4" fill="#f7d774" stroke="#2b2b2b" stroke-width="1.2"/><circle cx="5.6" cy="6.4" r="1.1" fill="#2b2b2b"/><circle cx="10.4" cy="6.4" r="1.1" fill="#2b2b2b"/><path d="M4.7 9.6c1.6 2.1 4.9 2.1 6.5 0" stroke="#2b2b2b" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg>
+                                </span>
+                                <div class="mon-sticky">TO: ty<span class="mon-sticky-heart">&#9825;</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mon-stand"></div>
+                    <div class="mon-foot"></div>
+                </div>
+
+                <!-- ============ KEYBOARD ============ -->
+                <div class="kbd" id="kbd">
+                    <div class="kbd-case">
+                        <div class="kbd-keys" id="kbdKeys"></div>
+                    </div>
+                    <div class="kbd-shadow"></div>
+                </div>
+
+                <!-- ============ MOUSE ============ -->
+                <div class="mouse" id="mouse">
+                    <span class="mouse-body">
+                        <span class="mouse-btn mouse-btn-l"></span>
+                        <span class="mouse-btn mouse-btn-r"></span>
+                        <span class="mouse-g">G</span>
+                        <span class="mouse-graffiti"></span>
+                    </span>
+                    <span class="mouse-wheel"></span>
+                    <span class="mouse-led"></span>
+                    <span class="mouse-shadow"></span>
+                </div>
+
+                <!-- ============ DESK PROPS ============ -->
+                <div class="prop prop-mug">
+                    <span class="mug-steam mug-steam-1"></span>
+                    <span class="mug-steam mug-steam-2"></span>
+                    <span class="mug-steam mug-steam-3"></span>
+                    <span class="mug-body"><span class="mug-heart">&#9825;</span></span>
+                    <span class="mug-handle"></span>
+                    <span class="mug-shadow"></span>
+                </div>
+
+                <div class="prop prop-pens">
+                    <span class="pen pen-1"></span>
+                    <span class="pen pen-2"></span>
+                    <span class="pen pen-3"></span>
+                    <span class="pen-cup"></span>
+                </div>
+
+                <div class="prop prop-polaroid">
+                    <div class="polaroid-frame">
+                        <div class="polaroid-art">
+                            <span class="polaroid-car"></span>
+                            <span class="polaroid-plate">? ? ?</span>
+                        </div>
+                        <span class="polaroid-caption">guess the plate &#9825;</span>
+                    </div>
+                </div>
+
+                <div class="prop prop-notes">
+                    <span class="sticky sticky-a">car keys<br>= freedom</span>
+                    <span class="sticky sticky-b">say it<br>out loud</span>
+                </div>
+            </div>
+
+            <div class="room-vignette"></div>
+            <div class="room-grain"></div>
+        </div>
+
+        <!-- ===================== LETTER OUT OF THE SCREEN ===================== -->
+        <div class="letter-float" id="letterFloat" hidden>
+            <div class="lf-scrim" id="lfScrim"></div>
+            <div class="lf-stage">
+                <div class="lf-envelope" id="lfEnvelope">
+                    <div class="lf-env-body"></div>
+                    <div class="lf-env-flap"></div>
+                </div>
+                <article class="paper" id="paper">
+                    <header class="paper-head">
+                        <span class="paper-date">for ty &middot; 10 / 09</span>
+                        <span class="paper-stamp">&#9825;</span>
+                    </header>
+                    <h2 class="paper-title">Dear ty,</h2>
+                    <div class="paper-body">
+                        <p class="ln">If you are reading this, you already know it: I left you a letter behind a question, because the things I want to say deserve at least one small road to walk down first.</p>
+                        <p class="ln">Here is a secret. I wrote this on a desk that looks exactly like this one — the lamp too warm, the keyboard too loud, the room too quiet at 1 a.m. Somewhere in that quiet I stopped being clever and just wrote the truth.</p>
+                        <p class="ln">The truth is simple: you make ordinary days feel like a song I don't want to skip. A drive with no destination is my favourite place, as long as you're in the passenger seat picking the playlist.</p>
+                        <p class="ln">So when the year gets loud, come back to this room. The screen will still be on, the kettle will still be warm, and this letter will still say the same thing:</p>
+                        <p class="ln ln-strong">Happy birthday, ty. Thank you for being my favourite person to come home to.</p>
+                    </div>
+                    <div class="paper-sign">
+                        <span class="paper-sign-line">always yours,</span>
+                        <span class="paper-sign-name">me</span>
+                    </div>
+                    <footer class="paper-foot">
+                        <span class="paper-ps">P.S. The plate was a dead giveaway. I knew you'd get it.</span>
+                        <div class="paper-actions">
+                            <button class="paper-btn" id="paperBack">Put it back on the desk</button>
+                            <button class="paper-btn paper-btn-ghost" id="paperReply" disabled title="Reserved — wire it up in js/letter.js">Reply&hellip;</button>
+                        </div>
+                    </footer>
+                </article>
+            </div>
         </div>
     </main>
 
-    <footer class="footer">
-        <div class="footer-content">
-            <p class="footer-text">Crafted with love</p>
-            <p class="footer-sub">&#10022; For someone who deserves the stars</p>
-        </div>
-    </footer>
-
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=20261009a"></script>
+    <script src="js/letter.js?v=20261009a"></script>
 </body>
 </html>

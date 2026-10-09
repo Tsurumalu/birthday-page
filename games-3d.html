@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Arcade — 3D island preview">
+    <title>Games 3D Preview — Happy Birthday</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Archivo:wght@400;500;600;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=20261008b">
+</head>
+<body class="page-sub theme-games">
+    <div class="loader" id="loader">
+        <div class="loader-text">
+            <span class="loader-letter">L</span>
+            <span class="loader-letter">o</span>
+            <span class="loader-letter">a</span>
+            <span class="loader-letter">d</span>
+            <span class="loader-letter">i</span>
+            <span class="loader-letter">n</span>
+            <span class="loader-letter">g</span>
+        </div>
+    </div>
+
+    <div class="theme-bg" id="themeBg"></div>
+    <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+
+    <a href="index.html" class="back-btn">
+        <span class="back-btn-arrow">&#8249;</span>
+        <span>Back</span>
+    </a>
+
+    <nav class="nav" id="nav">
+        <a href="index.html" class="nav-brand">
+            <span class="nav-brand-mark">&#10022;</span>
+            <span class="nav-brand-text">For You</span>
+        </a>
+        <div class="nav-links">
+            <a href="card.html" class="nav-link">Card</a>
+            <a href="moments.html" class="nav-link">Moments</a>
+            <a href="message.html" class="nav-link">Letter</a>
+            <a href="wish.html" class="nav-link">Wish</a>
+            <a href="games.html" class="nav-link active">Games</a>
+            <a href="musics.html" class="nav-link">Music</a>
+            <a href="cards.html" class="nav-link">Cards</a>
+        </div>
+        <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound">
+            <span class="sound-icon" id="soundIcon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                    <line x1="23" y1="9" x2="17" y2="15"/>
+                    <line x1="17" y1="9" x2="23" y2="15"/>
+                </svg>
+            </span>
+        </button>
+    </nav>
+
+    <main class="games-page" id="gamesPage">
+        <header class="games-masthead reveal-up">
+            <span class="games-label">PREVIEW &middot; 3D ISLAND &middot; WORK IN PROGRESS</span>
+            <h1 class="games-title">The Island</h1>
+            <p class="games-sub">小岛的 3D 小样 &mdash; 拖动环绕，滚轮缩放，点开据点看我们的集锦。</p>
+        </header>
+
+        <!-- 3D world -->
+        <div class="world3d-stage reveal-up" style="--delay: 0.2s" id="world3dStage">
+            <div class="world3d-pins" id="world3dPins"></div>
+
+            <!-- Dive-in transition curtain -->
+            <div class="world3d-warp" id="world3dWarp" aria-hidden="true"></div>
+
+            <div class="world3d-loading" id="world3dLoading">
+                <span class="world3d-loading-dot"></span>
+                <span>GENERATING WORLD</span>
+            </div>
+
+            <div class="world3d-hint" id="world3dHint">&#10022; 拖动环绕小岛 &middot; 滚轮缩放 &middot; 点击据点</div>
+
+            <div class="world3d-controls">
+                <button type="button" data-act="reset" aria-label="复位视角">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="8" cy="8" r="2.6"/><path d="M8 1.5V4M8 12v2.5M1.5 8H4M12 8h2.5"/>
+                    </svg>
+                </button>
+                <button type="button" data-act="spin" aria-label="切换自动旋转">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M13.5 8a5.5 5.5 0 1 1-1.7-3.95"/><path d="M12.4 1.2v3.2H9.2"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- In-map roam HUD (dive mode) -->
+            <div class="world3d-roam" id="world3dRoam" hidden>
+                <div class="w3-roam-top">
+                    <span class="w3-roam-badge">
+                        <em id="w3RoamIcon">&#127919;</em>
+                        <span class="w3-roam-badge-text">
+                            <strong id="w3RoamName">VALORANT</strong>
+                            <i id="w3RoamSub">&#33258;&#30001;&#28459;&#28216;</i>
+                        </span>
+                    </span>
+                    <button type="button" class="w3-roam-exit" data-roam="exit">&#8592; &#36864;&#20986;&#22320;&#22270;</button>
+                </div>
+
+                <div class="w3-roam-hint">&#25302;&#21160;&#36716;&#35270;&#35282; &middot; WASD &#31227;&#21160; &middot; &#31354;&#26684;/Shift &#21319;&#38477; &middot; &#28378;&#36718;&#35843;&#36895;</div>
+
+                <div class="w3-roam-pad">
+                    <button type="button" class="w3-roam-btn" data-hold="fwd"   aria-label="&#21069;&#36827;">&#9650;</button>
+                    <button type="button" class="w3-roam-btn" data-hold="back"  aria-label="&#21518;&#36864;">&#9660;</button>
+                    <button type="button" class="w3-roam-btn" data-hold="up"    aria-label="&#19978;&#21319;">&#10514;</button>
+                    <button type="button" class="w3-roam-btn" data-hold="down"  aria-label="&#19979;&#38477;">&#10515;</button>
+                    <button type="button" class="w3-roam-btn w3-roam-clip" data-roam="clip" aria-label="&#30475;&#38598;&#38182;">&#127916;</button>
+                </div>
+            </div>
+
+            <div class="world3d-fallback" id="world3dFallback" hidden>
+                <strong>这台设备暂时跑不动 3D 小岛</strong>
+                <p>可能是浏览器未开启 WebGL，或显卡不支持。<a href="games.html">回到平面版地图 &rarr;</a></p>
+            </div>
+        </div>
+
+        <nav class="games-footer-nav reveal-up" style="--delay: 0.35s">
+            <span class="games-credit">PLAYER 1 &middot; PLAYER 2 &mdash; CO-OP MODE</span>
+            <a class="games-compare-link" href="games.html">&larr; 对比平面版地图</a>
+        </nav>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p class="footer-text">每一枚图钉，都是我们一起守过点的地方</p>
+            <p class="footer-sub">&#10022; GG WP &mdash; see you in the next round</p>
+        </div>
+    </footer>
+
+    <!-- Video lightbox (click a pin to open) -->
+    <div class="game-video-lightbox" id="gameVideoLightbox" aria-hidden="true" hidden>
+        <div class="game-video-scrim" id="gameVideoScrim"></div>
+        <div class="game-video-panel" id="gameVideoPanel"></div>
+        <button class="game-video-close" id="gameVideoClose" aria-label="Close (Esc)">&#10006;</button>
+    </div>
+
+    <script src="js/main.js?v=20261008a"></script>
+    <script src="assets/vendor/three.min.js"></script>
+    <script src="assets/vendor/GLTFLoader.js"></script>
+    <script src="js/games-3d.js?v=20261008h"></script>
+</body>
+</html>

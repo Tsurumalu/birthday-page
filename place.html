@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A place we've been together — postcard edition">
+    <title>Postcard — Happy Birthday</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Archivo:wght@400;500;600;700&family=Caveat:wght@500;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=20261008a">
+</head>
+<body class="page-sub theme-postcard">
+    <div class="loader" id="loader">
+        <div class="loader-text">
+            <span class="loader-letter">L</span>
+            <span class="loader-letter">o</span>
+            <span class="loader-letter">a</span>
+            <span class="loader-letter">d</span>
+            <span class="loader-letter">i</span>
+            <span class="loader-letter">n</span>
+            <span class="loader-letter">g</span>
+        </div>
+    </div>
+
+    <div class="theme-bg" id="themeBg"></div>
+    <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+
+    <a href="moments.html" class="back-btn">
+        <span class="back-btn-arrow">&#8249;</span>
+        <span>Back</span>
+    </a>
+
+    <nav class="nav" id="nav">
+        <a href="index.html" class="nav-brand">
+            <span class="nav-brand-mark">&#10022;</span>
+            <span class="nav-brand-text">For You</span>
+        </a>
+        <div class="nav-links">
+            <a href="card.html" class="nav-link">Card</a>
+            <a href="moments.html" class="nav-link active">Moments</a>
+            <a href="message.html" class="nav-link">Letter</a>
+            <a href="wish.html" class="nav-link">Wish</a>
+            <a href="games.html" class="nav-link">Games</a>
+            <a href="musics.html" class="nav-link">Music</a>
+            <a href="cards.html" class="nav-link">Cards</a>
+        </div>
+        <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound">
+            <span class="sound-icon" id="soundIcon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                    <line x1="23" y1="9" x2="17" y2="15"/>
+                    <line x1="17" y1="9" x2="23" y2="15"/>
+                </svg>
+            </span>
+        </button>
+    </nav>
+
+    <main class="place-page" id="placePage">
+        <!-- Rendered by JS as a postcard collage -->
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p class="footer-text">每一枚邮票，都是我们走过的地方</p>
+            <p class="footer-sub">&#10022; For someone who deserves the stars</p>
+        </div>
+    </footer>
+
+    <!-- Lightbox overlay (click any collage item to enlarge) -->
+    <div class="place-lightbox" id="placeLightbox" aria-hidden="true" hidden>
+        <div class="place-lightbox-scrim" id="placeLightboxScrim"></div>
+        <div class="place-lightbox-stage" id="placeLightboxStage"></div>
+        <button class="place-lightbox-close" id="placeLightboxClose" aria-label="Close (Esc)">&#10006;</button>
+    </div>
+
+    <script src="js/main.js?v=20261008a"></script>
+</body>
+</html>

@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Leave a little note on the birthday card board.">
+    <title>The Cards — Happy Birthday</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=20261008a">
+    <style>
+        /* =========================================================
+           Theme: warm scrapbook / light cork board
+           ========================================================= */
+        .theme-cards {
+            --bg-primary: #f3ead9;
+            --bg-secondary: #fbf4e6;
+            --bg-tertiary: #efe2cd;
+            --text-primary: #3a2e22;
+            --text-secondary: #6b5b48;
+            --text-muted: #9a8a72;
+            --border: rgba(58, 46, 34, 0.14);
+            --shadow: 0 20px 50px rgba(90, 70, 45, 0.18);
+            --theme-primary: #c06a4a;
+            --theme-soft: #e0a07e;
+            --theme-dim: rgba(192, 106, 74, 0.14);
+            --theme-glow: rgba(192, 106, 74, 0.3);
+            --theme-bg-start: #f6efe0;
+            --theme-bg-end: #ece0c9;
+            --theme-accent-text: #3a2e22;
+
+            --wood-dark: #6b4a32;
+            --cork: #c49a70;
+            --paper: #fdfbf5;
+            --paper-warm: #fff8e7;
+            --paper-pink: #ffd6dc;
+            --paper-blue: #d6e5ff;
+            --paper-yellow: #fff4b3;
+            --ink: #3a2e22;
+        }
+
+        .theme-cards .nav.scrolled {
+            background: rgba(243, 234, 217, 0.92);
+            border-bottom-color: rgba(58, 46, 34, 0.12);
+        }
+
+        .theme-cards .back-btn {
+            color: var(--text-secondary);
+        }
+
+        .theme-cards .back-btn:hover {
+            color: var(--theme-primary);
+        }
+
+        .theme-cards .loader {
+            background: var(--bg-primary);
+        }
+
+        .theme-cards .footer {
+            border-top-color: var(--border);
+        }
+
+        @media (max-width: 900px) {
+            .theme-cards .nav-links {
+                gap: 1.1rem;
+            }
+            .theme-cards .nav {
+                padding: 1rem 1.25rem;
+            }
+            .theme-cards .back-btn {
+                left: 1.25rem;
+                top: 1.1rem;
+            }
+        }
+
+        /* =========================================================
+           Hero & layout
+           ========================================================= */
+        .cards-hero {
+            padding: 10rem 2rem 3rem;
+        }
+
+        .cards-main {
+            padding-bottom: 4rem;
+        }
+
+        .cards-layout {
+            display: grid;
+            grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* =========================================================
+           Left: tablet input
+           ========================================================= */
+        .cards-studio {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .tablet {
+            background: #27262b;
+            border-radius: 22px;
+            padding: 13px;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .tablet-screen {
+            background: var(--paper);
+            border-radius: 14px;
+            padding: 1.25rem;
+        }
+
+        .tablet-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .tablet-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #555;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        .tablet-dot.on {
+            background: #5f5;
+            box-shadow: 0 0 10px #5f5;
+        }
+
+        .tablet-title {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--ink);
+        }
+
+        .field {
+            margin-bottom: 1rem;
+        }
+
+        .field-label {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        .cards-input,
+        .cards-textarea {
+            width: 100%;
+            border: 1px solid rgba(58, 46, 34, 0.12);
+            border-radius: 8px;
+            padding: 0.65rem 0.8rem;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            background: #fff;
+            color: var(--ink);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            resize: vertical;
+        }
+
+        .cards-input:focus,
+        .cards-textarea:focus {
+            outline: none;
+            border-color: var(--theme-primary);
+            box-shadow: 0 0 0 3px var(--theme-dim);
+        }
+
+        .avatar-select,
+        .sticker-select {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .avatar-btn,
+        .sticker-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            background: rgba(58, 46, 34, 0.06);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, border-color 0.2s, background 0.2s;
+        }
+
+        .avatar-btn:hover,
+        .sticker-btn:hover {
+            transform: scale(1.08);
+            background: rgba(58, 46, 34, 0.1);
+        }
+
+        .avatar-btn.selected,
+        .sticker-btn.selected {
+            border-color: var(--theme-primary);
+            background: var(--theme-dim);
+            transform: scale(1.1);
+        }
+
+        .sticker-btn svg {
+            width: 20px;
+            height: 20px;
+            display: block;
+        }
+
+        .print-btn {
+            width: 100%;
+            margin-top: 0.25rem;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--theme-primary);
+            color: #fff;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 14px rgba(192, 106, 74, 0.35);
+        }
+
+        .print-btn:hover:not(:disabled) {
+            background: #a9583d;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(192, 106, 74, 0.42);
+        }
+
+        .print-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .print-btn.shake {
+            animation: btnShake 0.45s ease;
+        }
+
+        @keyframes btnShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        /* Printer scene */
+        .printer-scene {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .printer-output {
+            position: relative;
+            width: 188px;
+            height: 124px;
+            margin: -8px auto 0;
+            z-index: 2;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .paper-slot {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 8px;
+            background: #15151a;
+            border-radius: 0 0 4px 4px;
+            box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.55);
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .printed-card {
+            position: absolute;
+            left: 22px;
+            top: 0;
+            width: 150px;
+            min-height: 96px;
+            padding: 0.7rem;
+            background: var(--paper);
+            border-radius: 4px;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            transform: translateY(-125%);
+            transition: transform 0.75s var(--ease-out), box-shadow 0.2s, opacity 0.2s;
+            pointer-events: auto;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .printed-card.printed {
+            transform: translateY(0);
+        }
+
+        .printed-card.card-dragging {
+            transition: none;
+            cursor: grabbing;
+            box-shadow: 0 22px 50px rgba(0, 0, 0, 0.25);
+            z-index: 9999;
+        }
+
+        .printed-avatar {
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        .printed-body {
+            font-size: 0.82rem;
+            line-height: 1.5;
+            color: var(--ink);
+            word-break: break-word;
+        }
+
+        .printed-author {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-top: auto;
+        }
+
+        .printed-sticker svg {
+            width: 22px;
+            height: 22px;
+            display: block;
+        }
+
+        .pin-it-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 26px;
+            height: 26px;
+            border: none;
+            border-radius: 50%;
+            background: var(--theme-primary);
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.2s, transform 0.2s;
+            pointer-events: auto;
+        }
+
+        .printed-card.printed:hover .pin-it-btn,
+        .printed-card.printed:focus-within .pin-it-btn {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .pin-it-btn:hover {
+            background: #a9583d;
+            transform: scale(1.1) !important;
+        }
+
+        .tablet-dot.blink {
+            animation: ledBlink 0.35s infinite alternate;
+        }
+
+        @keyframes ledBlink {
+            from { opacity: 1; }
+            to { opacity: 0.25; }
+        }
+
+        /* =========================================================
+           Right: cork board
+           ========================================================= */
+        .cards-board {
+            position: relative;
+            min-width: 0;
+        }
+
+        .board-frame {
+            border-radius: 14px;
+            padding: 14px;
+            background: var(--wood-dark) url('assets/cards/wood.png') center / cover;
+            box-shadow: 0 24px 60px rgba(70, 45, 25, 0.28),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        }
+
+        .board-cork {
+            position: relative;
+            min-height: 620px;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: var(--cork);
+            background-image:
+                radial-gradient(circle at 26% 20%, rgba(255, 255, 255, 0.08), transparent 42%),
+                radial-gradient(circle at 80% 84%, rgba(80, 50, 20, 0.20), transparent 50%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.18'/%3E%3C/svg%3E");
+            background-size: cover, cover, 220px 220px;
+            box-shadow: inset 0 2px 18px rgba(80, 50, 20, 0.35);
+        }
+
+        /* Notes */
+        .board-note {
+            position: absolute;
+            width: clamp(120px, 22%, 172px);
+            padding: 0.85rem;
+            border-radius: 3px;
+            background: var(--paper);
+            color: var(--ink);
+            box-shadow: 0 5px 14px rgba(60, 40, 20, 0.18);
+            transform: rotate(var(--rot, 0deg));
+            transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .board-note:hover {
+            transform: rotate(0deg) translateY(-4px);
+            box-shadow: 0 10px 24px rgba(60, 40, 20, 0.24);
+            z-index: 50;
+        }
+
+        .board-note.card-dragging {
+            transition: none;
+            cursor: grabbing;
+            transform: scale(1.06) rotate(0deg);
+            box-shadow: 0 18px 40px rgba(60, 40, 20, 0.32);
+            z-index: 9999;
+        }
+
+        .note-author {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.3rem;
+        }
+
+        .note-text {
+            font-size: 0.84rem;
+            line-height: 1.45;
+            word-break: break-word;
+        }
+
+        .note-yellow { background: var(--paper-yellow); }
+        .note-pink { background: var(--paper-pink); }
+        .note-blue { background: var(--paper-blue); }
+        .note-warm { background: var(--paper-warm); }
+
+        .note-polaroid {
+            background: #fff;
+            padding: 0.5rem 0.5rem 0.75rem;
+        }
+
+        .polaroid-photo {
+            aspect-ratio: 1;
+            background: #e8e0d5;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .polaroid-caption {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .note-ticket {
+            background: #1f2937;
+            color: #f5f0e8;
+            border: 1px dashed rgba(255, 255, 255, 0.22);
+            padding-bottom: 1.2rem;
+        }
+
+        .ticket-line1 {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.2rem;
+        }
+
+        .ticket-line2 {
+            font-size: 0.65rem;
+            opacity: 0.82;
+        }
+
+        .ticket-sticker {
+            position: absolute;
+            right: -12px;
+            bottom: -12px;
+            width: 40px;
+            height: auto;
+            transform: rotate(-12deg);
+            filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.45));
+            pointer-events: none;
+        }
+
+        .note-check {
+            background: var(--paper);
+            border: 1px solid rgba(58, 46, 34, 0.14);
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .note-check-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .note-check-body {
+            font-size: 0.72rem;
+            line-height: 1.55;
+        }
+
+        /* Fasteners */
+        .pushpin,
+        .tape,
+        .paperclip {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
+        .pushpin {
+            top: -7px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #c0392b;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+            z-index: 2;
+        }
+
+        .pushpin::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 9px;
+            width: 2px;
+            height: 5px;
+            background: rgba(0, 0, 0, 0.25);
+            transform: translateX(-50%);
+        }
+
+        .pushpin-blue { background: #3b82f6; }
+        .pushpin-orange { background: #f59e0b; }
+        .pushpin-red { background: #ef4444; }
+        .pushpin-green { background: #10b981; }
+
+        .tape {
+            top: -9px;
+            width: 54px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.55);
+            border: 1px dashed rgba(0, 0, 0, 0.08);
+            transform: translateX(-50%) rotate(-2deg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .paperclip {
+            top: -8px;
+            width: 28px;
+            height: 10px;
+            border: 2px solid #9ca3af;
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+            transform: translateX(-50%) rotate(-4deg);
+        }
+
+        .pin-enter {
+            animation: pinPop 0.35s var(--ease-out);
+        }
+
+        @keyframes pinPop {
+            0% { transform: translateX(-50%) scale(0); }
+            75% { transform: translateX(-50%) scale(1.25); }
+            100% { transform: translateX(-50%) scale(1); }
+        }
+
+        /* New note entrance when added to the board */
+        .board-note.note-enter {
+            animation: noteIn 0.45s var(--ease-out);
+        }
+
+        @keyframes noteIn {
+            0% { opacity: 0; transform: rotate(var(--rot, 0deg)) scale(0.82); }
+            100% { opacity: 1; transform: rotate(var(--rot, 0deg)) scale(1); }
+        }
+
+        /* Decorative SVG stickers */
+        .board-deco {
+            position: absolute;
+            pointer-events: none;
+            transform: rotate(var(--rot, 0deg));
+            filter: drop-shadow(0 3px 5px rgba(60, 40, 20, 0.25));
+        }
+
+        .board-deco svg {
+            width: 36px;
+            height: 36px;
+            display: block;
+        }
+
+        /* Drop zone */
+        .drop-zone {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 160px;
+            height: 110px;
+            border: 2px dashed rgba(255, 255, 255, 0.55);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.75rem;
+            line-height: 1.5;
+            pointer-events: none;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .drop-zone.drag-over {
+            background: rgba(255, 255, 255, 0.14);
+            border-color: #fff;
+        }
+
+        /* =========================================================
+           Responsive
+           ========================================================= */
+        @media (max-width: 1024px) {
+            .cards-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .cards-studio {
+                max-width: 420px;
+                margin: 0 auto;
+                width: 100%;
+            }
+
+            .board-cork {
+                min-height: 520px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .cards-hero {
+                padding: 8rem 1.25rem 2rem;
+            }
+
+            .cards-main {
+                padding: 0 1rem 3rem;
+            }
+
+            .tablet {
+                border-radius: 18px;
+                padding: 10px;
+            }
+
+            .tablet-screen {
+                padding: 1rem;
+            }
+
+            .printer-output {
+                width: 168px;
+                height: 108px;
+                margin: -6px auto 0;
+            }
+
+            .paper-slot {
+                width: 132px;
+            }
+
+            .printed-card {
+                left: 18px;
+                width: 132px;
+                min-height: 90px;
+                padding: 0.6rem;
+            }
+
+            .board-cork {
+                min-height: 440px;
+            }
+
+            .board-note {
+                width: clamp(100px, 32%, 140px);
+                padding: 0.65rem;
+            }
+
+            .board-deco svg {
+                width: 28px;
+                height: 28px;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .board-cork {
+                min-height: 700px;
+            }
+
+            .board-note {
+                width: clamp(130px, 18%, 190px);
+            }
+        }
+
+        @media (min-width: 1600px) {
+            .board-cork {
+                min-height: 760px;
+            }
+        }
+    </style>
+</head>
+<body class="page-sub theme-cards">
+    <div class="loader" id="loader">
+        <div class="loader-text">
+            <span class="loader-letter">L</span>
+            <span class="loader-letter">o</span>
+            <span class="loader-letter">a</span>
+            <span class="loader-letter">d</span>
+            <span class="loader-letter">i</span>
+            <span class="loader-letter">n</span>
+            <span class="loader-letter">g</span>
+        </div>
+    </div>
+
+    <div class="theme-bg" id="themeBg"></div>
+    <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+
+    <a href="index.html" class="back-btn">
+        <span class="back-btn-arrow">&#8249;</span>
+        <span>Back</span>
+    </a>
+
+    <nav class="nav" id="nav">
+        <a href="index.html" class="nav-brand">
+            <span class="nav-brand-mark">&#10022;</span>
+            <span class="nav-brand-text">For You</span>
+        </a>
+        <div class="nav-links">
+            <a href="card.html" class="nav-link">Card</a>
+            <a href="moments.html" class="nav-link">Moments</a>
+            <a href="message.html" class="nav-link">Letter</a>
+            <a href="wish.html" class="nav-link">Wish</a>
+            <a href="games.html" class="nav-link">Games</a>
+            <a href="musics.html" class="nav-link">Music</a>
+            <a href="cards.html" class="nav-link active">Cards</a>
+        </div>
+        <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound">
+            <span class="sound-icon" id="soundIcon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                    <line x1="23" y1="9" x2="17" y2="15"/>
+                    <line x1="17" y1="9" x2="23" y2="15"/>
+                </svg>
+            </span>
+        </button>
+    </nav>
+
+    <header class="sub-hero cards-hero">
+        <p class="sub-eyebrow reveal-up">Edition 05</p>
+        <h1 class="sub-title reveal-up">The Cards</h1>
+        <p class="sub-subtitle reveal-up">Leave a little note. We’ll pin it up for you.</p>
+    </header>
+
+    <main class="sub-content cards-main">
+        <div class="cards-layout reveal-up">
+            <!-- Left: tablet -->
+            <section class="cards-studio" aria-label="Leave a note">
+                <div class="tablet">
+                    <div class="tablet-screen">
+                        <div class="tablet-header">
+                            <span class="tablet-dot" id="tabletDot"></span>
+                            <span class="tablet-title">Write your note</span>
+                        </div>
+
+                        <div class="field">
+                            <label class="field-label">Pick an avatar</label>
+                            <div class="avatar-select" id="avatarSelect">
+                                <button class="avatar-btn" data-avatar="🐻" type="button" aria-label="Bear">🐻</button>
+                                <button class="avatar-btn" data-avatar="🐰" type="button" aria-label="Rabbit">🐰</button>
+                                <button class="avatar-btn selected" data-avatar="🦊" type="button" aria-label="Fox">🦊</button>
+                                <button class="avatar-btn" data-avatar="🐱" type="button" aria-label="Cat">🐱</button>
+                                <button class="avatar-btn" data-avatar="🐼" type="button" aria-label="Panda">🐼</button>
+                                <button class="avatar-btn" data-avatar="🐧" type="button" aria-label="Penguin">🐧</button>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label class="field-label" for="nameInput">Your name</label>
+                            <input type="text" id="nameInput" class="cards-input" placeholder="Alex" maxlength="20" autocomplete="off">
+                        </div>
+
+                        <div class="field">
+                            <label class="field-label" for="messageInput">Your message</label>
+                            <textarea id="messageInput" class="cards-textarea" rows="3" placeholder="Write something sweet..." maxlength="160"></textarea>
+                        </div>
+
+                        <div class="field">
+                            <label class="field-label">Add a sticker</label>
+                            <div class="sticker-select" id="stickerSelect">
+                                <button class="sticker-btn" data-sticker="heart" data-color="#ef4444" type="button" aria-label="Heart sticker">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                </button>
+                                <button class="sticker-btn" data-sticker="star" data-color="#f59e0b" type="button" aria-label="Star sticker">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                                </button>
+                                <button class="sticker-btn" data-sticker="flower" data-color="#f472b6" type="button" aria-label="Flower sticker">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5c1.5 2.5 4.5 2.5 6 0 .5 3 3.5 4 5.5 2.5-1 2.5.5 5 3 5.5-2.5 1.5-2.5 4.5 0 6-3 .5-4 3.5-2.5 5.5-2.5-1-5 .5-5.5 3-1.5-2.5-4.5-2.5-6 0-.5-3-3.5-4-5.5-2.5 1-2.5-.5-5-3-5.5 2.5-1.5 2.5-4.5 0-6 3-.5 4-3.5 2.5-5.5 2.5 1 5-.5 5.5-3z"/><circle cx="12" cy="12" r="3" fill="#6b4a32"/></svg>
+                                </button>
+                                <button class="sticker-btn selected" data-sticker="" type="button" aria-label="No sticker">—</button>
+                            </div>
+                        </div>
+
+                        <button class="print-btn" id="printBtn" type="button">Print my card</button>
+                    </div>
+                </div>
+
+                <div class="printer-output" id="printerOutput" aria-live="polite">
+                    <div class="paper-slot" aria-hidden="true"></div>
+                    <div class="printed-card" id="printedCard" hidden>
+                        <div class="printed-avatar" id="printedAvatar"></div>
+                        <div class="printed-body" id="printedBody"></div>
+                        <div class="printed-author" id="printedAuthor"></div>
+                        <div class="printed-sticker" id="printedSticker"></div>
+                        <button class="pin-it-btn" id="pinItBtn" type="button" title="Pin to board" aria-label="Pin to board">&#128204;</button>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Right: cork board -->
+            <section class="cards-board" aria-label="Message cork board">
+                <div class="board-frame">
+                    <div class="board-cork" id="boardCork">
+                        <article class="board-note note-white" style="left: 7%; top: 7%; --rot: -4deg;">
+                            <span class="pushpin"></span>
+                            <p class="note-author">— Sam</p>
+                            <p class="note-text">Hope your day is as wonderful as you are!</p>
+                        </article>
+
+                        <article class="board-note note-yellow" style="left: 37%; top: 9%; --rot: 6deg;">
+                            <span class="tape"></span>
+                            <p class="note-text">Don’t forget to make a wish! ✨</p>
+                        </article>
+
+                        <article class="board-note note-polaroid" style="left: 68%; top: 6%; --rot: -2deg;">
+                            <span class="pushpin pushpin-blue"></span>
+                            <div class="polaroid-photo"><span class="photo-icon">&#128247;</span></div>
+                            <p class="polaroid-caption">Last summer</p>
+                        </article>
+
+                        <article class="board-note note-pink" style="left: 11%; top: 42%; --rot: -3deg;">
+                            <span class="paperclip"></span>
+                            <p class="note-text">Best friend forever ♥</p>
+                        </article>
+
+                        <article class="board-note note-ticket" style="left: 36%; top: 46%; --rot: 2deg;">
+                            <span class="pushpin pushpin-orange"></span>
+                            <p class="ticket-line1">ADMIT ONE — BIRTHDAY</p>
+                            <p class="ticket-line2">Valid today only · Have fun!</p>
+                            <img class="ticket-sticker" src="assets/cards/sticker-heart.png" alt="Red heart sticker">
+                        </article>
+
+                        <article class="board-note note-blue" style="left: 66%; top: 44%; --rot: -5deg;">
+                            <span class="tape"></span>
+                            <p class="note-text">Cheers to many more adventures!</p>
+                        </article>
+
+                        <article class="board-note note-check" style="left: 7%; top: 74%; --rot: 2deg;">
+                            <span class="pushpin pushpin-red"></span>
+                            <p class="note-check-title">Guest Check</p>
+                            <p class="note-check-body">1 x Huge Hug<br>1 x Big Smile<br>1 x Best Wishes</p>
+                        </article>
+
+                        <div class="board-deco sticker-svg" style="left: 82%; top: 72%; --rot: 15deg; color: #4f5a8a;">
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        </div>
+
+                        <div class="board-deco sticker-svg" style="left: 58%; top: 78%; --rot: -10deg; color: #e05a5a;">
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        </div>
+
+                        <div class="board-deco sticker-svg" style="left: 88%; top: 30%; --rot: 10deg; color: #e874a8;">
+                            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5c1.5 2.5 4.5 2.5 6 0 .5 3 3.5 4 5.5 2.5-1 2.5.5 5 3 5.5-2.5 1.5-2.5 4.5 0 6-3 .5-4 3.5-2.5 5.5-2.5-1-5 .5-5.5 3-1.5-2.5-4.5-2.5-6 0-.5-3-3.5-4-5.5-2.5 1-2.5-.5-5-3-5.5 2.5-1.5 2.5-4.5 0-6 3-.5 4-3.5 2.5-5.5 2.5 1 5-.5 5.5-3z"/><circle cx="12" cy="12" r="3" fill="#6b4a32"/></svg>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p class="footer-text">Crafted with love</p>
+            <p class="footer-sub">&#10022; For someone who deserves the stars</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js?v=20261008a"></script>
+    <script src="js/cards.js?v=20261008a"></script>
+</body>
+</html>

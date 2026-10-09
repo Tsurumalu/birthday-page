@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="An evening drive — pick a tape, press play">
+    <title>Music — Happy Birthday</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Archivo:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=20261008e">
+</head>
+<body class="page-sub theme-music">
+    <div class="loader" id="loader">
+        <div class="loader-text">
+            <span class="loader-letter">L</span>
+            <span class="loader-letter">o</span>
+            <span class="loader-letter">a</span>
+            <span class="loader-letter">d</span>
+            <span class="loader-letter">i</span>
+            <span class="loader-letter">n</span>
+            <span class="loader-letter">g</span>
+        </div>
+    </div>
+
+    <div class="theme-bg" id="themeBg"></div>
+    <canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+
+    <a href="index.html" class="back-btn">
+        <span class="back-btn-arrow">&#8249;</span>
+        <span>Back</span>
+    </a>
+
+    <nav class="nav" id="nav">
+        <a href="index.html" class="nav-brand">
+            <span class="nav-brand-mark">&#10022;</span>
+            <span class="nav-brand-text">For You</span>
+        </a>
+        <div class="nav-links">
+            <a href="card.html" class="nav-link">Card</a>
+            <a href="moments.html" class="nav-link">Moments</a>
+            <a href="message.html" class="nav-link">Letter</a>
+            <a href="wish.html" class="nav-link">Wish</a>
+            <a href="games.html" class="nav-link">Games</a>
+            <a href="musics.html" class="nav-link active">Music</a>
+            <a href="cards.html" class="nav-link">Cards</a>
+        </div>
+        <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound">
+            <span class="sound-icon" id="soundIcon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                    <line x1="23" y1="9" x2="17" y2="15"/>
+                    <line x1="17" y1="9" x2="23" y2="15"/>
+                </svg>
+            </span>
+        </button>
+    </nav>
+
+    <main class="music-page" id="musicPage">
+        <div class="cockpit" id="cockpit">
+
+            <!-- ===== Roof / headliner ===== -->
+            <div class="roof">
+                <div class="roof-shadow"></div>
+                <button class="dome-light" id="domeLight" aria-label="Interior light">
+                    <span class="dome-bulb"></span>
+                </button>
+                <button class="sun-visor visor-left" id="visorLeft" aria-label="Sun visor"></button>
+                <button class="sun-visor visor-right" id="visorRight" aria-label="Sun visor"></button>
+            </div>
+
+            <!-- ===== Windshield ===== -->
+            <div class="windshield" id="windshield">
+                <div class="ws-frame">
+                    <div class="ws-layers" id="wsLayers">
+                        <div class="ws-layer is-active" data-scene="dusk"></div>
+                        <div class="ws-layer" data-scene="city"></div>
+                        <div class="ws-layer" data-scene="stars"></div>
+                        <div class="ws-layer ws-cover" data-scene="cover" id="wsCover"></div>
+                    </div>
+                    <div class="ws-speed" id="wsSpeed"></div>
+                    <div class="ws-tint"></div>
+                    <div class="lyric-layer" id="lyricLayer" aria-hidden="true">
+                        <div class="lyric-tint" id="lyricTint"></div>
+                        <div class="lyric-fade"></div>
+                        <div class="lyric-scroll" id="lyricScroll"></div>
+                    </div>
+                    <div class="ws-glare"></div>
+                    <div class="ws-vignette"></div>
+                </div>
+                <button class="rearview-mirror" id="mirrorBtn" aria-label="Rearview mirror (night mode)">
+                    <span class="mirror-glass"></span>
+                    <span class="mirror-stem"></span>
+                </button>
+                <div class="pillar pillar-left"></div>
+                <div class="pillar pillar-right"></div>
+                <div class="ws-edge ws-edge-bottom"></div>
+            </div>
+
+            <!-- ===== Dashboard ===== -->
+            <div class="dash">
+                <div class="dash-sheen"></div>
+                <div class="dash-stitch"></div>
+
+                <!-- instrument cluster -->
+                <div class="cluster">
+                    <div class="gauge-wrap">
+                        <svg class="gauge" id="gaugeSpeed" viewBox="0 0 200 200" aria-hidden="true"></svg>
+                        <span class="gauge-tag">KM/H</span>
+                    </div>
+                    <div class="gauge-wrap gauge-small">
+                        <svg class="gauge" id="gaugeRpm" viewBox="0 0 200 200" aria-hidden="true"></svg>
+                        <span class="gauge-tag">RPM</span>
+                    </div>
+                    <div class="odometer" id="odometer">ODO 1314.2</div>
+                </div>
+
+                <!-- center stack -->
+                <div class="center-stack">
+                    <div class="head-unit">
+                        <div class="hu-screen">
+                            <div class="hu-status">
+                                <span class="hu-src" id="huSrc">NO TAPE</span>
+                                <span class="hu-status-right">
+                                    <span class="hu-mute" id="huMute">MUTE</span>
+                                    <span class="hu-clock" id="huClock">--:--</span>
+                                </span>
+                            </div>
+                            <div class="hu-main">
+                                <div class="hu-art" id="huArt">
+                                    <svg class="hu-art-empty" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                                        <rect x="2.5" y="6" width="19" height="12" rx="1.6"/>
+                                        <circle cx="7.6" cy="12" r="2.1"/>
+                                        <circle cx="16.4" cy="12" r="2.1"/>
+                                        <line x1="9.7" y1="12" x2="14.3" y2="12"/>
+                                    </svg>
+                                </div>
+                                <div class="hu-meta">
+                                    <div class="hu-title" id="huTitle">INSERT A TAPE</div>
+                                    <div class="hu-artist" id="huArtist"> PICK ONE FROM THE RACK </div>
+                                    <div class="hu-progress" id="huProgress" role="slider" aria-label="Seek">
+                                        <div class="hu-progress-track">
+                                            <div class="hu-progress-fill" id="huFill"></div>
+                                        </div>
+                                    </div>
+                                    <div class="hu-times">
+                                        <span id="timeNow">0:00</span>
+                                        <span id="timeTotal">--:--</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="hu-controls">
+                                <span class="hu-trk" id="huTrk">TRK --/10</span>
+                                <button class="hu-btn" id="btnPrev" aria-label="Previous">
+                                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 6h2.4v12H7zM19 6l-9.2 6L19 18z"/></svg>
+                                </button>
+                                <button class="hu-btn hu-btn-play" id="btnPlay" aria-label="Play / Pause">
+                                    <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8.4 5.5v13l10.4-6.5z"/></svg>
+                                    <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><path d="M7.6 5.5h3.2v13H7.6zM13.2 5.5h3.2v13h-3.2z"/></svg>
+                                </button>
+                                <button class="hu-btn" id="btnNext" aria-label="Next">
+                                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14.6 6H17v12h-2.4zM5 6l9.2 6L5 18z"/></svg>
+                                </button>
+                                <div class="hu-eq" id="huEq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                            </div>
+                        </div>
+                        <div class="hu-glow"></div>
+                    </div>
+
+                    <!-- cassette deck -->
+                    <div class="tape-deck">
+                        <div class="deck-side">
+                            <span class="deck-led led-play" id="ledPlay"></span>
+                            <span class="deck-led led-mute" id="ledMute"></span>
+                        </div>
+                        <div class="deck-knob">
+                            <button class="knob" id="knobVol" aria-label="Volume knob">
+                                <span class="knob-index"></span>
+                            </button>
+                            <div class="knob-leds" id="volLeds"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                            <span class="knob-cap">VOL</span>
+                        </div>
+                        <div class="deck-window">
+                            <div class="deck-tape" id="deckTape">
+                                <div class="deck-label" id="deckLabel"></div>
+                                <div class="deck-reels">
+                                    <span class="deck-reel" id="reelL"></span>
+                                    <span class="deck-reel" id="reelR"></span>
+                                </div>
+                            </div>
+                            <div class="deck-empty" id="deckEmpty"></div>
+                        </div>
+                        <div class="deck-knob">
+                            <button class="knob knob-toggle" id="knobLight" aria-label="Interior light knob">
+                                <span class="knob-index"></span>
+                            </button>
+                            <div class="knob-leds knob-leds-one" id="lightLeds"><i></i></div>
+                            <span class="knob-cap">LIGHT</span>
+                        </div>
+                        <button class="deck-eject" id="btnEject" aria-label="Eject tape" disabled>
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5.5l7 7.5H5z"/><rect x="5" y="15.4" width="14" height="2.1" rx="1"/></svg>
+                        </button>
+                    </div>
+                    <div class="deck-brand"><span>SOUNDWAVE</span><span>STEREO CASSETTE</span></div>
+                </div>
+
+                <!-- tape library walls (flanking the head unit) -->
+                <div class="spine-col spine-left" id="spineLeft" aria-label="Tape library left"></div>
+                <div class="spine-col spine-right" id="spineRight" aria-label="Tape library right"></div>
+
+                <!-- passenger side -->
+                <div class="right-zone">
+                    <button class="vent" id="ventBtn" aria-label="Air vent">
+                        <span></span><span></span><span></span>
+                        <div class="vent-air" id="ventAir"><i></i><i></i><i></i></div>
+                    </button>
+                    <button class="hazard" id="hazardBtn" aria-label="Hazard lights">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
+                            <path d="M12 3.8L21.2 19.4H2.8z"/>
+                            <line x1="12" y1="9.6" x2="12" y2="14.2" stroke-width="2.2"/>
+                            <line x1="12" y1="16.6" x2="12" y2="16.9" stroke-width="2.6"/>
+                        </svg>
+                    </button>
+                    <div class="reflector"></div>
+                </div>
+            </div>
+
+            <!-- ===== Steering wheel ===== -->
+            <div class="wheel-zone">
+                <svg class="wheel" id="wheelSvg" viewBox="0 0 500 500" aria-hidden="true">
+                    <defs>
+                        <radialGradient id="rimGrad" cx="35%" cy="28%" r="80%">
+                            <stop offset="0%" stop-color="#33303c"/>
+                            <stop offset="55%" stop-color="#1d1a24"/>
+                            <stop offset="100%" stop-color="#0b0a10"/>
+                        </radialGradient>
+                        <radialGradient id="hubGrad" cx="38%" cy="30%" r="80%">
+                            <stop offset="0%" stop-color="#2c2936"/>
+                            <stop offset="100%" stop-color="#141219"/>
+                        </radialGradient>
+                        <radialGradient id="logoGrad" cx="40%" cy="32%" r="75%">
+                            <stop offset="0%" stop-color="#3a68c4"/>
+                            <stop offset="58%" stop-color="#1c3a7d"/>
+                            <stop offset="100%" stop-color="#122654"/>
+                        </radialGradient>
+                    </defs>
+                    <circle cx="250" cy="250" r="226" fill="none" stroke="url(#rimGrad)" stroke-width="42"/>
+                    <circle cx="250" cy="250" r="247" fill="none" stroke="#3c3946" stroke-width="2" opacity="0.5"/>
+                    <path d="M56 160 A 226 226 0 0 1 444 160" fill="none" stroke="#4a4658" stroke-width="5" opacity="0.45"/>
+                    <path d="M250 250 L250 476" stroke="#16131d" stroke-width="46" stroke-linecap="round"/>
+                    <path d="M250 250 L72 358" stroke="#16131d" stroke-width="44" stroke-linecap="round"/>
+                    <path d="M250 250 L428 358" stroke="#16131d" stroke-width="44" stroke-linecap="round"/>
+                    <circle cx="250" cy="250" r="74" fill="url(#hubGrad)"/>
+                    <circle cx="250" cy="250" r="52" fill="url(#logoGrad)" stroke="#aeb6c6" stroke-width="4"/>
+                    <path d="M229 226 L250 268 L271 226" fill="none" stroke="#dbe2f0" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M222 244 L238 282 L250 250 L262 282 L278 244" fill="none" stroke="#dbe2f0" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="stalk stalk-left"></div>
+                <div class="door-left">
+                    <span class="door-switch"></span>
+                    <span class="door-switch"></span>
+                    <span class="door-led"></span>
+                </div>
+            </div>
+
+            <!-- ===== Passenger seat (empty) ===== -->
+            <div class="seat-passenger">
+                <div class="seat-headrest"></div>
+                <div class="seat-back"></div>
+            </div>
+
+            <!-- ===== Windshield scene switcher ===== -->
+            <div class="scene-dots" id="sceneDots" role="group" aria-label="Windshield view">
+                <button class="scene-dot" data-scene="dusk" aria-label="Dusk highway"></button>
+                <button class="scene-dot" data-scene="city" aria-label="Neon city"></button>
+                <button class="scene-dot" data-scene="stars" aria-label="Starry coast"></button>
+                <button class="scene-dot" data-scene="cover" aria-label="Album cover view"></button>
+            </div>
+
+            <!-- ===== Cassette rack ===== -->
+            <div class="rack-wrap">
+                <div class="rack" id="rack"></div>
+            </div>
+
+            <div class="music-corner">FM 520.0 &middot; FOR YOU RADIO</div>
+
+            <!-- ambience -->
+            <div class="cabin-glow" id="cabinGlow"></div>
+            <div class="cabin-bright-layer" id="cabinBright"></div>
+            <div class="cockpit-vignette"></div>
+            <div class="grain"></div>
+        </div>
+    </main>
+
+    <script src="js/main.js?v=20261008e"></script>
+    <script src="js/music.js?v=20261008e"></script>
+</body>
+</html>

@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Places we've been together">
+    <meta name="description" content="Our journey together — a scroll-driven stamp collage">
     <title>Moments — Happy Birthday</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css?v=20261008a">
 </head>
-<body class="page-sub theme-story">
+<body class="page-sub theme-stamp">
     <div class="loader" id="loader">
         <div class="loader-text">
             <span class="loader-letter">L</span>
@@ -41,6 +41,9 @@
             <a href="moments.html" class="nav-link active">Moments</a>
             <a href="message.html" class="nav-link">Letter</a>
             <a href="wish.html" class="nav-link">Wish</a>
+            <a href="games.html" class="nav-link">Games</a>
+            <a href="musics.html" class="nav-link">Music</a>
+            <a href="cards.html" class="nav-link">Cards</a>
         </div>
         <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound">
             <span class="sound-icon" id="soundIcon">
@@ -53,125 +56,80 @@
         </button>
     </nav>
 
-    <!-- Hero -->
-    <header class="sub-hero">
-        <p class="sub-eyebrow reveal-up" style="--delay: 0.1s">Edition 02</p>
-        <h1 class="sub-title reveal-up" style="--delay: 0.3s">Moments</h1>
-        <p class="sub-subtitle reveal-up" style="--delay: 0.5s">我们一起走过的地方，每一步都算数。</p>
+    <!-- Hero (compact) -->
+    <header class="stamp-hero stamp-hero-compact">
+        <p class="stamp-eyebrow reveal-up" style="--delay: 0.1s">Edition 02 &middot; 2026</p>
+        <h1 class="stamp-title reveal-up" style="--delay: 0.25s">我们的旅程</h1>
+        <p class="stamp-subtitle reveal-up" style="--delay: 0.45s">
+            一起走过的八个地方。<br>
+            向下滚动，让它们一站站飞过来，停在右边堆叠成一张剪贴海报。
+        </p>
     </header>
 
-    <!-- Journey Timeline (Railway) -->
-    <section class="timeline-section" id="journeyTimeline">
-        <div class="timeline-container">
-            <!-- Header (shadcn-inspired bordered card) -->
-            <div class="timeline-header">
-                <span class="timeline-badge">Timeline</span>
-                <div class="timeline-header-text">
-                    <h2 class="timeline-title">我们的旅程</h2>
-                    <p class="timeline-desc">从第一座山到最远的海洋，每一站都是我们的故事。点击任意站点，打开回忆。</p>
-                </div>
-            </div>
-            <!-- Railway Timeline -->
-            <div class="railway-timeline" id="railwayTimeline">
-                <!-- Track -->
-                <div class="railway-track">
-                    <div class="rail rail-left"></div>
-                    <div class="rail rail-right"></div>
-                    <div class="railway-sleepers"></div>
-                </div>
-                <!-- Train (moves on scroll, positioned by JS) -->
-                <div class="train" id="journeyTrain">
+    <!-- Journey Stage (scroll-driven stamp collage) -->
+    <section class="journey-stage" id="journeyStage">
+        <!-- Huge poster typography in the background -->
+        <div class="journey-poster" aria-hidden="true">
+            <div class="journey-poster-line">我们的旅程</div>
+            <div class="journey-poster-line journey-poster-line-alt">OUR · JOURNEY</div>
+        </div>
+
+        <!-- Stamps fly across and stack on the right -->
+        <div class="journey-stamps" id="journeyStamps"></div>
+
+        <!-- Railway progress bar (fixed at bottom of viewport) -->
+        <div class="journey-rail-bar" id="journeyRailBar" aria-hidden="true">
+            <div class="rail-bar-line">
+                <div class="rail-bar-sleepers"></div>
+                <div class="rail-bar-train" id="railBarTrain">
                     <svg viewBox="0 0 200 62" xmlns="http://www.w3.org/2000/svg">
                         <defs>
-                            <linearGradient id="trainBody" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stop-color="#f0e8e0"/>
-                                <stop offset="45%" stop-color="#d8ccc4"/>
-                                <stop offset="100%" stop-color="#b8aca0"/>
+                            <linearGradient id="railBarBody" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#fdfbf5"/>
+                                <stop offset="45%" stop-color="#dcd2c6"/>
+                                <stop offset="100%" stop-color="#b9ab9c"/>
                             </linearGradient>
-                            <linearGradient id="trainStripe" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stop-color="#c9a06a"/>
-                                <stop offset="100%" stop-color="#b88e8a"/>
+                            <linearGradient id="railBarStripe" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#c0553f"/>
+                                <stop offset="100%" stop-color="#d98a76"/>
                             </linearGradient>
-                            <linearGradient id="trainWindow" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stop-color="rgba(180,220,255,0.35)"/>
-                                <stop offset="100%" stop-color="rgba(120,160,200,0.2)"/>
+                            <linearGradient id="railBarWindow" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="rgba(60,80,110,0.45)"/>
+                                <stop offset="100%" stop-color="rgba(40,60,90,0.28)"/>
                             </linearGradient>
                         </defs>
-                        <!-- Body -->
-                        <path d="M8,44 Q8,18 38,14 L120,11 Q160,11 175,24 L185,33 Q188,38 185,44 Z" fill="url(#trainBody)"/>
-                        <!-- Top accent stripe -->
-                        <path d="M8,20 Q8,18 38,14 L120,11 Q160,11 175,24 L175,27 Q160,15 120,15 L38,18 Q10,22 10,24 Z" fill="url(#trainStripe)" opacity="0.7"/>
-                        <!-- Window strip background -->
-                        <rect x="20" y="21" width="135" height="11" rx="2" fill="rgba(20,20,30,0.2)"/>
-                        <!-- Windows -->
-                        <rect x="23" y="23" width="18" height="7" rx="1.5" fill="url(#trainWindow)"/>
-                        <rect x="45" y="23" width="18" height="7" rx="1.5" fill="url(#trainWindow)"/>
-                        <rect x="67" y="23" width="18" height="7" rx="1.5" fill="url(#trainWindow)"/>
-                        <rect x="89" y="23" width="18" height="7" rx="1.5" fill="url(#trainWindow)"/>
-                        <rect x="111" y="23" width="18" height="7" rx="1.5" fill="url(#trainWindow)"/>
-                        <rect x="133" y="23" width="14" height="7" rx="1.5" fill="url(#trainWindow)"/>
-                        <!-- Cockpit window -->
-                        <path d="M150,21 Q163,23 175,29 L177,35 L150,35 Z" fill="url(#trainWindow)"/>
-                        <!-- Headlight -->
+                        <path d="M8,44 Q8,18 38,14 L120,11 Q160,11 175,24 L185,33 Q188,38 185,44 Z" fill="url(#railBarBody)"/>
+                        <path d="M8,20 Q8,18 38,14 L120,11 Q160,11 175,24 L175,27 Q160,15 120,15 L38,18 Q10,22 10,24 Z" fill="url(#railBarStripe)" opacity="0.75"/>
+                        <rect x="20" y="21" width="135" height="11" rx="2" fill="rgba(30,28,26,0.22)"/>
+                        <rect x="23" y="23" width="18" height="7" rx="1.5" fill="url(#railBarWindow)"/>
+                        <rect x="45" y="23" width="18" height="7" rx="1.5" fill="url(#railBarWindow)"/>
+                        <rect x="67" y="23" width="18" height="7" rx="1.5" fill="url(#railBarWindow)"/>
+                        <rect x="89" y="23" width="18" height="7" rx="1.5" fill="url(#railBarWindow)"/>
+                        <rect x="111" y="23" width="18" height="7" rx="1.5" fill="url(#railBarWindow)"/>
+                        <rect x="133" y="23" width="14" height="7" rx="1.5" fill="url(#railBarWindow)"/>
+                        <path d="M150,21 Q163,23 175,29 L177,35 L150,35 Z" fill="url(#railBarWindow)"/>
                         <circle cx="180" cy="36" r="2.5" fill="#fff8e0"/>
-                        <circle cx="180" cy="36" r="7" fill="#fff8e0" opacity="0.2"/>
-                        <!-- Bottom accent line -->
-                        <rect x="8" y="41" width="170" height="3" fill="url(#trainStripe)" opacity="0.5"/>
-                        <!-- Text -->
-                        <text x="85" y="38" font-size="3.5" fill="rgba(80,60,40,0.35)" text-anchor="middle" font-family="sans-serif">CR400AF</text>
+                        <circle cx="180" cy="36" r="7" fill="#fff8e0" opacity="0.22"/>
+                        <rect x="8" y="41" width="170" height="3" fill="url(#railBarStripe)" opacity="0.55"/>
                     </svg>
                 </div>
-                <!-- Stations (generated by JS) -->
-                <div class="stations" id="stationsList"></div>
             </div>
-            <!-- Footer cap -->
-            <div class="timeline-footer"></div>
         </div>
-    </section>
 
-    <!-- Journey Map -->
-    <section class="journey-map-section" id="journeyMapSection">
-        <div class="section-header">
-            <span class="section-number">02</span>
-            <h2 class="section-title">Map</h2>
-        </div>
-        <div class="journey-map-wrap">
-            <svg class="journey-map" id="journeyMap" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-                <defs>
-                    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                        <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
-                        <feMerge>
-                            <feMergeNode in="coloredBlur"/>
-                            <feMergeNode in="SourceGraphic"/>
-                        </feMerge>
-                    </filter>
-                    <filter id="glow-strong" x="-50%" y="-50%" width="200%" height="200%">
-                        <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
-                        <feMerge>
-                            <feMergeNode in="coloredBlur"/>
-                            <feMergeNode in="SourceGraphic"/>
-                        </feMerge>
-                    </filter>
-                </defs>
-                <!-- Journey path (drawn by JS) -->
-                <path class="journey-path" id="journeyPath" d="" fill="none" stroke="rgba(201,169,166,0.4)" stroke-width="2" stroke-dasharray="5 8" stroke-linecap="round"/>
-                <!-- Locations (generated by JS) -->
-                <g id="journeyLocations"></g>
-            </svg>
-            <p class="journey-map-hint">点击星标，打开回忆</p>
+        <!-- Scroll hint -->
+        <div class="journey-hint" id="journeyHint">
+            <span class="journey-hint-dot"></span>
+            <span class="journey-hint-text">Scroll to begin</span>
         </div>
     </section>
 
     <footer class="footer">
         <div class="footer-content">
-            <p class="footer-text">Crafted with love</p>
+            <p class="footer-text">每一枚邮票，都是我们走过的地方</p>
             <p class="footer-sub">&#10022; For someone who deserves the stars</p>
         </div>
     </footer>
 
-    <!-- Picture-in-Picture Windows Container -->
-    <div class="pip-container" id="pipContainer"></div>
-
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=20261008a"></script>
 </body>
 </html>
