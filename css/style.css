@@ -23,21 +23,36 @@
     --bg-primary: #0f0d0c;
     --bg-secondary: #181513;
     --bg-tertiary: #221e1b;
+    /* Default lens metal (each edition re-tints these) */
+    --lens-hi: #2b3543;
+    --lens-mid: #151b24;
+    --lens-lo: #080a0e;
     --text-primary: #f5f0e8;
     --text-secondary: #a89e92;
     --text-muted: #6b6358;
     --border: rgba(245, 240, 232, 0.08);
     --shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
 
-    /* Default theme (card) */
-    --theme-hue: 36;
-    --theme-primary: #d4a574;
-    --theme-soft: #e8c79a;
-    --theme-dim: rgba(212, 165, 116, 0.12);
-    --theme-glow: rgba(212, 165, 116, 0.25);
-    --theme-bg-start: #1a1510;
-    --theme-bg-end: #0f0d0c;
-    --theme-accent-text: #f5f0e8;
+    /* Default edition (Moments) — the chooser re-tints everything on turn */
+    --theme-primary: #c8614a;
+    --theme-soft: #e39179;
+    --theme-dim: rgba(200, 97, 74, 0.14);
+    --theme-glow: rgba(200, 97, 74, 0.32);
+    --theme-bg-start: #3a1410;
+    --theme-bg-mid: #1b0f0e;
+    --theme-bg-end: #0b0808;
+    --theme-accent-text: #fbf3ee;
+
+    /* Chooser display type + backdrop texture — swapped per edition */
+    --home-display: 'Cormorant Garamond', Georgia, serif;
+    --home-display-weight: 400;
+    --home-display-case: none;
+    --home-display-ls: -0.02em;
+    --home-display-lh: 0.82;
+    --home-display-scale: 1;
+    --home-display-style: normal;
+    --home-tex: none;
+    --home-tex-size: auto;
 
     /* Typography */
     --font-serif: 'Cormorant Garamond', Georgia, serif;
@@ -48,45 +63,114 @@
     --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-/* --- Theme variants --- */
-.theme-card {
-    --theme-primary: #d4a574;
-    --theme-soft: #e8c79a;
-    --theme-dim: rgba(212, 165, 116, 0.12);
-    --theme-glow: rgba(212, 165, 116, 0.25);
-    --theme-bg-start: #1a1510;
-    --theme-bg-end: #0f0d0c;
-    --theme-accent-text: #f5f0e8;
-}
+/* --- Theme variants ---
+   One edition = one accent + one tinted backdrop + one texture + one display face.
+   The chooser rotates between them; sub-pages keep their own theme class. */
 
 .theme-story {
-    --theme-primary: #c9a9a6;
-    --theme-soft: #e0c4c1;
-    --theme-dim: rgba(201, 169, 166, 0.12);
-    --theme-glow: rgba(201, 169, 166, 0.25);
-    --theme-bg-start: #1a1314;
-    --theme-bg-end: #100c0d;
-    --theme-accent-text: #f5efed;
+    --theme-primary: #c8614a;
+    --theme-soft: #e39179;
+    --theme-dim: rgba(200, 97, 74, 0.14);
+    --theme-glow: rgba(200, 97, 74, 0.32);
+    --theme-bg-start: #3a1410;
+    --theme-bg-mid: #1b0f0e;
+    --theme-bg-end: #0b0808;
+    --theme-accent-text: #fbf3ee;
+
+    /* Lens barrel + blade metal, tinted per edition so the aperture reads as
+       part of the same instrument as the outer rings */
+    --lens-hi: #3d2b26;
+    --lens-mid: #1e1512;
+    --lens-lo: #0a0706;
+
+    --home-display: 'Cormorant Garamond', Georgia, serif;
+    --home-display-weight: 300;
+    --home-display-case: none;
+    --home-display-ls: -0.05em;
+    --home-display-lh: 0.78;
+    --home-display-scale: 1.06;
+    --home-tex: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 4px);
 }
 
 .theme-letter {
-    --theme-primary: #8fb3a5;
-    --theme-soft: #a8c9bd;
-    --theme-dim: rgba(143, 179, 165, 0.12);
-    --theme-glow: rgba(143, 179, 165, 0.25);
-    --theme-bg-start: #111a17;
-    --theme-bg-end: #0a100e;
-    --theme-accent-text: #eef5f2;
+    --theme-primary: #5fb79a;
+    --theme-soft: #8fd4bb;
+    --theme-dim: rgba(95, 183, 154, 0.14);
+    --theme-glow: rgba(95, 183, 154, 0.32);
+    --theme-bg-start: #10302a;
+    --theme-bg-mid: #0d1a18;
+    --theme-bg-end: #070c0b;
+    --theme-accent-text: #eef8f4;
+
+    --lens-hi: #23372f;
+    --lens-mid: #101d18;
+    --lens-lo: #050907;
+
+    --home-display: 'Archivo', 'Inter', sans-serif;
+    --home-display-weight: 900;
+    --home-display-case: uppercase;
+    --home-display-ls: -0.055em;
+    --home-display-lh: 0.8;
+    --home-display-scale: 0.9;
+    --home-tex: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1.4px);
+    --home-tex-size: 22px 22px;
 }
 
-.theme-wish {
-    --theme-primary: #8ba4c7;
-    --theme-soft: #a8c0de;
-    --theme-dim: rgba(139, 164, 199, 0.12);
-    --theme-glow: rgba(139, 164, 199, 0.25);
-    --theme-bg-start: #10131a;
-    --theme-bg-end: #090b10;
-    --theme-accent-text: #eef2f8;
+.theme-games {
+    --theme-bg-mid: #150f1c;
+
+    --lens-hi: #2e2839;
+    --lens-mid: #16131e;
+    --lens-lo: #08070c;
+
+    --home-display: 'Space Mono', 'Courier New', monospace;
+    --home-display-weight: 700;
+    --home-display-case: uppercase;
+    --home-display-ls: -0.032em;
+    --home-display-lh: 0.86;
+    --home-display-scale: 0.95;
+    --home-tex: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.075) 0 1px, transparent 1px 7px);
+}
+
+.theme-music {
+    --lens-hi: #3b2c1e;
+    --lens-mid: #1d1610;
+    --lens-lo: #0a0805;
+
+    --home-display: 'Cormorant Garamond', Georgia, serif;
+    --home-display-weight: 300;
+    --home-display-case: none;
+    --home-display-ls: -0.04em;
+    --home-display-lh: 0.86;
+    --home-display-scale: 1.42;
+    --home-display-style: italic;
+    --home-tex: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.062) 0 1px, transparent 1px 9px);
+}
+
+/* Chooser-only palette for the Cards edition (cards.html re-declares its own
+   light stationery version of .theme-cards further down the file). */
+.theme-cards {
+    --theme-primary: #cf7f4e;
+    --theme-soft: #e8a778;
+    --theme-dim: rgba(207, 127, 78, 0.14);
+    --theme-glow: rgba(207, 127, 78, 0.32);
+    --theme-bg-start: #3a1e0d;
+    --theme-bg-mid: #1c1210;
+    --theme-bg-end: #0b0808;
+    --theme-accent-text: #fdf5ea;
+
+    --lens-hi: #3a3026;
+    --lens-mid: #1d1812;
+    --lens-lo: #0a0906;
+
+    --home-display: 'Archivo', 'Inter', sans-serif;
+    --home-display-weight: 800;
+    --home-display-case: uppercase;
+    --home-display-ls: -0.045em;
+    --home-display-lh: 0.82;
+    --home-display-scale: 0.8;
+    --home-tex: radial-gradient(rgba(255, 255, 255, 0.085) 1.2px, transparent 1.6px);
+    --home-tex-size: 30px 30px;
 }
 
 /* Light editorial "stamp collection" theme — Moments + detail pages */
@@ -104,6 +188,7 @@
     --theme-dim: rgba(192, 85, 63, 0.14);
     --theme-glow: rgba(192, 85, 63, 0.28);
     --theme-bg-start: #f8f5eb;
+    --theme-bg-mid: #f8f5eb;
     --theme-bg-end: #f2eede;
     --theme-accent-text: #1a1714;
 
@@ -128,6 +213,7 @@
     --theme-dim: rgba(192, 85, 63, 0.16);
     --theme-glow: rgba(192, 85, 63, 0.28);
     --theme-bg-start: #d4e7f3;
+    --theme-bg-mid: #d4e7f3;
     --theme-bg-end: #a3c7e3;
     --theme-accent-text: #1d2a35;
 
@@ -210,25 +296,47 @@ body {
     position: fixed;
     inset: 0;
     z-index: 0;
-    background: radial-gradient(
-        ellipse at 30% 30%,
-        var(--theme-bg-start) 0%,
-        var(--theme-bg-end) 60%
-    );
-    transition: background 0.8s var(--ease-out);
     pointer-events: none;
+    background: radial-gradient(
+        98% 68% at 50% -10%,
+        var(--theme-bg-start) 0%,
+        var(--theme-bg-mid, #14100e) 50%,
+        var(--theme-bg-end) 100%
+    );
+    transition: background 0.9s var(--ease-out);
+}
+
+/* Per-edition backdrop texture — activated on the chooser only, so the
+   sub-pages keep their own hand-built backdrops untouched. */
+.page-home .theme-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--home-tex, none);
+    background-size: var(--home-tex-size, auto);
+    -webkit-mask-image: radial-gradient(116% 100% at 50% 0%, #000 30%, transparent 88%);
+    mask-image: radial-gradient(116% 100% at 50% 0%, #000 30%, transparent 88%);
+    transition: opacity 0.6s var(--ease-out);
 }
 
 .theme-bg::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(
-        circle at 70% 70%,
-        var(--theme-dim) 0%,
-        transparent 55%
-    );
-    transition: background 0.8s var(--ease-out);
+    background:
+        radial-gradient(circle at 86% 82%, var(--theme-dim) 0%, transparent 46%),
+        radial-gradient(circle at 12% 20%, var(--theme-dim) 0%, transparent 44%);
+    transition: background 0.9s var(--ease-out);
+}
+
+/* Vignette — keeps the eye on the dial */
+.page-home::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(122% 84% at 50% 46%, transparent 46%, rgba(0, 0, 0, 0.6) 100%);
 }
 
 .confetti-canvas {
@@ -247,61 +355,70 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1.5rem 2.5rem;
+    gap: 2rem;
+    padding: 1.4rem 2.2rem;
     z-index: 1000;
-    transition: background 0.4s var(--ease-out), padding 0.4s var(--ease-out);
+    border-bottom: 1px solid transparent;
+    transition: background 0.4s var(--ease-out), padding 0.4s var(--ease-out),
+                border-color 0.4s var(--ease-out);
 }
 
 .nav.scrolled {
-    background: rgba(15, 13, 12, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    padding: 1rem 2.5rem;
-    border-bottom: 1px solid var(--border);
+    background: rgba(10, 8, 8, 0.78);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    padding: 0.9rem 2.2rem;
+    border-bottom-color: rgba(255, 255, 255, 0.07);
 }
 
 .nav-brand {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.8rem;
-    font-weight: 400;
-    letter-spacing: 0.15em;
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--text-secondary);
+    white-space: nowrap;
+    color: var(--text-primary);
     text-decoration: none;
+    flex: none;
 }
 
 .nav-brand-mark {
+    font-size: 0.8rem;
+    line-height: 1;
     color: var(--theme-primary);
-    transition: color 0.5s var(--ease-out);
+    transition: color 0.6s var(--ease-out);
 }
 
 .nav-links {
     display: flex;
-    gap: 2rem;
+    align-items: center;
+    gap: 1.5rem;
 }
 
 .nav-link {
-    font-size: 0.75rem;
-    font-weight: 400;
-    letter-spacing: 0.12em;
+    position: relative;
+    padding-bottom: 4px;
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--text-muted);
+    color: rgba(245, 240, 232, 0.42);
     text-decoration: none;
     transition: color 0.3s var(--ease-out);
-    position: relative;
 }
 
 .nav-link::after {
     content: '';
     position: absolute;
-    bottom: -4px;
     left: 0;
+    bottom: 0;
     width: 0;
     height: 1px;
     background: var(--theme-primary);
-    transition: width 0.3s var(--ease-out), background 0.5s var(--ease-out);
+    transition: width 0.35s var(--ease-out), background 0.6s var(--ease-out);
 }
 
 .nav-link:hover,
@@ -315,137 +432,301 @@ body {
 }
 
 .sound-toggle {
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
+    flex: none;
+    width: 34px;
+    height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-secondary);
     cursor: pointer;
-    color: var(--text-muted);
-    transition: color 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
+    transition: color 0.3s var(--ease-out), border-color 0.3s var(--ease-out),
+                background 0.3s var(--ease-out);
 }
 
 .sound-toggle:hover {
     color: var(--theme-primary);
     border-color: var(--theme-dim);
+    background: var(--theme-dim);
 }
 
 .sound-toggle.muted svg {
-    opacity: 0.4;
+    opacity: 0.38;
+}
+
+/* --- Chooser toolbar: keyboard hint, straight from the reference --- */
+.home-tools {
+    position: fixed;
+    top: 5.8rem;
+    right: 2.2rem;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.55rem;
+    text-align: right;
+    pointer-events: none;
+}
+
+.home-tools-line {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.58rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(245, 240, 232, 0.38);
+}
+
+.home-tools-line .k {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 0.32rem;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 4px;
+    font-size: 0.56rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary);
+}
+
+.home-tools-sep {
+    color: rgba(255, 255, 255, 0.22);
+}
+
+button.k {
+    background: none;
+    font-family: inherit;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: color 0.3s var(--ease-out), border-color 0.3s var(--ease-out),
+                background 0.3s var(--ease-out);
+}
+
+button.k:hover {
+    color: #fff;
+    border-color: var(--theme-primary);
+    background: var(--theme-dim);
 }
 
 /* --- Home Page / Chooser --- */
 .home {
     position: relative;
+    z-index: 2;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2;
-    padding: 7rem 2rem 3rem;
+    padding: 8.5rem 3rem 4rem;
 }
 
 .home-layout {
     display: grid;
-    grid-template-columns: 1fr 1.4fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
     align-items: center;
-    gap: 4rem;
+    gap: 3rem;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1320px;
 }
 
 .home-info {
     text-align: left;
 }
 
-.home-eyebrow {
-    font-size: 0.75rem;
-    font-weight: 400;
-    letter-spacing: 0.25em;
+/* Name + one-line intro block, top-left, straight out of the reference */
+.home-kicker {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 3.6rem;
+}
+
+.home-kicker-name {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 0.58rem;
+    font-weight: 600;
+    letter-spacing: 0.36em;
     text-transform: uppercase;
-    color: var(--theme-primary);
-    margin-bottom: 1rem;
-    transition: color 0.5s var(--ease-out);
+    color: var(--text-primary);
 }
 
-.home-title {
-    font-family: var(--font-serif);
-    font-size: clamp(3rem, 7vw, 6rem);
-    font-weight: 400;
-    line-height: 0.95;
-    letter-spacing: -0.02em;
-    margin-bottom: 1.25rem;
-    color: var(--theme-accent-text);
-    transition: color 0.5s var(--ease-out);
+.home-kicker-name::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    flex: none;
+    background: var(--theme-primary);
+    transition: background 0.6s var(--ease-out);
 }
 
-.home-subtitle {
-    font-size: 1rem;
+.home-kicker-text {
+    max-width: 34ch;
+    font-size: 0.7rem;
     font-weight: 300;
-    color: var(--text-secondary);
-    max-width: 320px;
-    line-height: 1.7;
+    line-height: 1.75;
+    letter-spacing: 0.04em;
+    color: rgba(245, 240, 232, 0.5);
 }
 
-/* --- Dial --- */
+/* Poster scale: huge face, hair-tight tracking, optical edge alignment.
+   The last-line descender is nudged so the block hangs off the grid on purpose. */
+.home-title {
+    font-family: var(--home-display);
+    font-weight: var(--home-display-weight);
+    font-style: var(--home-display-style, normal);
+    font-size: calc(min(clamp(3.5rem, 10.5vw, 10.4rem), 25vh) * var(--home-display-scale, 1));
+    line-height: var(--home-display-lh, 0.82);
+    letter-spacing: var(--home-display-ls);
+    text-transform: var(--home-display-case);
+    text-wrap: balance;
+    color: #fff;
+    margin-left: -0.05em;
+    margin-bottom: 1rem;
+    min-height: calc(var(--home-display-lh, 0.82) * 1em);
+}
+
+/* Chinese edition name — the poster line's quieter twin, wide-tracked */
+.home-title-cn {
+    font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-size: clamp(0.95rem, 1.6vw, 1.35rem);
+    font-weight: 500;
+    letter-spacing: 0.5em;
+    line-height: 1.5;
+    margin-left: -0.05em;
+    margin-top: -0.3rem;
+    margin-bottom: 0;
+    color: var(--theme-primary);
+    min-height: 1.5em;
+    transition: color 0.6s var(--ease-out);
+}
+
+/* The rule now lives under the Chinese line: EN poster → CN name → rule → tagline */
+.home-title-cn::after {
+    content: '';
+    display: block;
+    width: min(100%, 26rem);
+    height: 1px;
+    margin-top: 0.7rem;
+    background: linear-gradient(90deg,
+        var(--theme-primary) 0%,
+        var(--theme-dim) 44%,
+        transparent 100%);
+    transition: background 0.6s var(--ease-out);
+}
+
+.home-title-cn.swap {
+    animation: titleSwap 0.55s var(--ease-out);
+}
+
+.home-title.swap {
+    animation: titleSwap 0.55s var(--ease-out);
+}
+
+@keyframes titleSwap {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.home-tagline {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    max-width: 30rem;
+    font-size: 0.62rem;
+    font-weight: 500;
+    line-height: 1.9;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(245, 240, 232, 0.58);
+}
+
+.home-tagline::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    flex: none;
+    margin-top: 0.5em;
+    background: var(--theme-primary);
+    transition: background 0.6s var(--ease-out);
+}
+
+/* --- The dial --- */
 .home-dial-wrap {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1.25rem;
+}
+
+.dial-stage {
+    --dial-size: clamp(272px, min(38vw, calc(40vh + 110px)), 452px);
+    position: relative;
+    width: var(--dial-size);
+    height: var(--dial-size);
 }
 
 .dial-arrows {
+    position: absolute;
+    top: calc(var(--dial-size) * -0.055);
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1.15rem;
+    z-index: 8;
 }
 
 .dial-arrow {
-    width: 36px;
-    height: 36px;
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    background: rgba(15, 13, 12, 0.4);
-    color: var(--text-secondary);
-    font-size: 1.25rem;
-    line-height: 1;
-    cursor: pointer;
-    transition: color 0.3s var(--ease-out), border-color 0.3s var(--ease-out), transform 0.2s var(--ease-out);
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding-bottom: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 50%;
+    background: rgba(12, 10, 10, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: rgba(245, 240, 232, 0.7);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.3s var(--ease-out), border-color 0.3s var(--ease-out),
+                transform 0.25s var(--ease-out);
 }
 
 .dial-arrow:hover {
-    color: var(--theme-primary);
-    border-color: var(--theme-primary);
-    transform: scale(1.1);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.08);
 }
 
 .dial-arrow:active {
-    transform: scale(0.95);
+    transform: scale(0.94);
 }
 
 .dial-pointer {
     width: 0;
     height: 0;
-    border-left: 7px solid transparent;
-    border-right: 7px solid transparent;
-    border-top: 12px solid var(--theme-primary);
-    filter: drop-shadow(0 0 6px var(--theme-glow));
-    transition: border-top-color 0.5s var(--ease-out), filter 0.5s var(--ease-out);
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 11px solid #fff;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.55));
 }
 
 .dial {
     position: relative;
-    width: 340px;
-    height: 340px;
-    --label-radius: 108px;
+    width: 100%;
+    height: 100%;
     user-select: none;
     -webkit-user-select: none;
     outline: none;
@@ -456,32 +737,10 @@ body {
     border-radius: 50%;
 }
 
-/* Outer rings */
-.dial::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    z-index: 2;
-    pointer-events: none;
-}
-
-.dial::after {
-    content: '';
-    position: absolute;
-    inset: 12px;
-    border: 1px solid var(--theme-dim);
-    border-radius: 50%;
-    z-index: 2;
-    pointer-events: none;
-    transition: border-color 0.5s var(--ease-out);
-}
-
 .dial-rotor {
     position: absolute;
     inset: 0;
-    transition: transform 0.5s var(--ease-out);
+    transition: transform 0.6s var(--ease-out);
     cursor: grab;
     touch-action: none;
 }
@@ -500,16 +759,52 @@ body {
     pointer-events: none;
 }
 
-.dial-segment {
-    stroke: var(--bg-primary);
-    stroke-width: 2;
-    transition: fill 0.5s var(--ease-out), filter 0.5s var(--ease-out), opacity 0.5s var(--ease-out);
-    opacity: 0.55;
+/* Machined face: rings + a dense tick grille */
+.dial-ring {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.2);
+    stroke-width: 1;
 }
 
-.dial-segment.active {
+.dial-ring--faint {
+    stroke: rgba(255, 255, 255, 0.08);
+}
+
+.dial-disc {
+    fill: rgba(0, 0, 0, 0.42);
+}
+
+.dial-tick {
+    stroke: rgba(255, 255, 255, 0.22);
+    stroke-width: 1;
+    stroke-linecap: round;
+}
+
+.dial-tick--major {
+    stroke: rgba(255, 255, 255, 0.46);
+    stroke-width: 1.2;
+}
+
+/* Every sector keeps a whisper of its own edition colour… */
+.dial-segment {
+    stroke: rgba(255, 255, 255, 0.05);
+    stroke-width: 1;
+    fill-opacity: 0.09;
+    transition: stroke 0.5s var(--ease-out);
+}
+
+/* …and the selected one blooms in the edition accent. */
+.dial-segment-glow {
+    fill: url(#dialWedgeGrad);
+    stroke: rgba(255, 255, 255, 0.22);
+    stroke-width: 1;
+    opacity: 0;
+    filter: drop-shadow(0 0 26px var(--theme-glow));
+    transition: opacity 0.55s var(--ease-out);
+}
+
+.dial-segment-glow.active {
     opacity: 1;
-    filter: drop-shadow(0 0 20px var(--theme-glow));
 }
 
 .dial-labels {
@@ -525,124 +820,248 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    color: var(--text-primary);
+    gap: 0.34rem;
+    color: rgba(245, 240, 232, 0.9);
     text-align: center;
     pointer-events: auto;
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
-    transition: opacity 0.3s var(--ease-out), transform 0.5s var(--ease-out);
+    transition: opacity 0.35s var(--ease-out), transform 0.6s var(--ease-out);
 }
 
 .dial-label-icon {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
-    color: var(--text-primary);
-    opacity: 0.85;
-    transition: opacity 0.3s var(--ease-out);
+    font-size: 0.9rem;
+    line-height: 1;
+    color: var(--label-color, currentColor);
+    opacity: 0.72;
+    transition: opacity 0.4s var(--ease-out), transform 0.45s var(--ease-out);
 }
 
 .dial-label-text {
     font-size: 0.6rem;
-    font-weight: 500;
-    letter-spacing: 0.15em;
+    font-weight: 600;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     white-space: nowrap;
-    opacity: 0.7;
-    transition: opacity 0.3s var(--ease-out), color 0.3s var(--ease-out);
+    opacity: 0.88;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+    transition: opacity 0.35s var(--ease-out);
 }
 
-.dial-label:hover .dial-label-text,
-.dial-label.active .dial-label-text {
-    opacity: 1;
+/* Chinese edition name under the English one — smaller, wide-tracked */
+.dial-label-cn {
+    font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-size: 0.58rem;
+    font-weight: 500;
+    letter-spacing: 0.24em;
+    line-height: 1.15;
+    white-space: nowrap;
+    opacity: 0.62;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+    transition: opacity 0.35s var(--ease-out);
 }
 
 .dial-label:hover .dial-label-icon,
-.dial-label.active .dial-label-icon {
+.dial-label:hover .dial-label-text,
+.dial-label:hover .dial-label-cn,
+.dial-label.active .dial-label-icon,
+.dial-label.active .dial-label-text,
+.dial-label.active .dial-label-cn {
     opacity: 1;
 }
 
-.dial-label.inactive {
-    opacity: 0.45;
+.dial-label.active {
+    color: #fff;
 }
 
-/* Center hub button */
+.dial-label.active .dial-label-icon {
+    transform: scale(1.16);
+}
+
+.dial-label.inactive {
+    opacity: 0.86;
+}
+
+/* Centre knob — cream, knurled, with the edition counter */
 .dial-hub-btn {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 74px;
-    height: 74px;
-    border: none;
-    border-radius: 50%;
-    background: var(--bg-primary);
-    cursor: pointer;
-    z-index: 5;
+    width: 27%;
+    aspect-ratio: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.15rem;
-    transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
-    box-shadow: 0 0 0 1px var(--border), 0 0 0 6px rgba(15, 13, 12, 0.8), 0 0 30px rgba(0, 0, 0, 0.4);
+    gap: 0.12rem;
+    border: 0;
+    border-radius: 50%;
+    background: radial-gradient(125% 125% at 50% 0%, #fffdf8 0%, #efe6d4 52%, #d5c8b0 100%);
+    color: #17130f;
+    cursor: pointer;
+    z-index: 5;
+    box-shadow: 0 22px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.22),
+                0 0 46px var(--theme-glow);
+    transition: transform 0.35s var(--ease-out), box-shadow 0.5s var(--ease-out);
 }
 
 .dial-hub-btn::before {
     content: '';
     position: absolute;
-    inset: 6px;
-    border: 1px solid var(--theme-primary);
+    inset: -12%;
     border-radius: 50%;
-    opacity: 0.5;
-    transition: border-color 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+    background: repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.8) 0 0.4deg, transparent 0.4deg 3.2deg);
+    -webkit-mask-image: radial-gradient(circle, transparent 0 66%, #000 70% 100%);
+    mask-image: radial-gradient(circle, transparent 0 66%, #000 70% 100%);
+    opacity: 0.4;
+    pointer-events: none;
 }
 
 .dial-hub-btn:hover {
-    transform: translate(-50%, -50%) scale(1.06);
-    box-shadow: 0 0 0 1px var(--border), 0 0 0 6px rgba(15, 13, 12, 0.8), 0 0 40px var(--theme-glow);
-}
-
-.dial-hub-btn:hover::before {
-    transform: rotate(45deg);
-    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.05);
+    box-shadow: 0 26px 60px rgba(0, 0, 0, 0.66), 0 0 0 1px rgba(255, 255, 255, 0.32),
+                0 0 62px var(--theme-glow);
 }
 
 .dial-hub-btn:active {
     transform: translate(-50%, -50%) scale(0.97);
 }
 
-.dial-hub-label {
-    font-size: 0.55rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--theme-primary);
-    transition: color 0.5s var(--ease-out);
-}
-
 .dial-hub-btn.pulse {
-    animation: hubPulse 0.6s var(--ease-out);
+    animation: hubPulse 0.7s var(--ease-out);
 }
 
 @keyframes hubPulse {
     0% { box-shadow: 0 0 0 0 var(--theme-glow); }
-    100% { box-shadow: 0 0 0 35px transparent; }
+    100% { box-shadow: 0 0 0 46px transparent; }
 }
 
-.dial-hint {
-    font-size: 0.65rem;
-    font-weight: 400;
-    letter-spacing: 0.15em;
+/* Hub "reveal" pop — fired each time the aperture re-opens */
+.dial-hub-btn.enter-pop {
+    animation: hubEnter 0.55s var(--ease-out);
+}
+
+@keyframes hubEnter {
+    0% { transform: translate(-50%, -50%) scale(0.9); filter: brightness(1.5); }
+    60% { transform: translate(-50%, -50%) scale(1.03); }
+    100% { transform: translate(-50%, -50%) scale(1); filter: none; }
+}
+
+/* --- Lens barrel etching (static ring, sits over the rotor) --- */
+.dial-etch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 4;
+    pointer-events: none;
+}
+
+.etch-ring {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.14);
+    stroke-width: 1;
+}
+
+.etch-ring--faint {
+    stroke: rgba(255, 255, 255, 0.07);
+}
+
+.etch-text {
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 4.2px;
+    fill: rgba(245, 240, 232, 0.5);
+}
+
+.etch-cn {
+    font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+}
+
+/* Pure-Chinese line: wider tracking, lighter weight — CJK needs air */
+.etch-text--cn {
+    font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.55em;
+}
+
+/* --- Aperture iris ---
+   The blade disc covers the hub; a masked centre hole is the aperture.
+   --iris-r is registered so the hole animates with a plain transition. */
+@property --iris-r {
+    syntax: '<percentage>';
+    inherits: false;
+    initial-value: 0%;
+}
+
+.dial-iris {
+    --iris-r: 31%;
+    position: absolute;
+    inset: 25.5%;
+    z-index: 6;
+    border-radius: 50%;
+    pointer-events: none;
+    -webkit-mask-image: radial-gradient(ellipse var(--iris-r) var(--iris-r) at 50% 50%, transparent 97%, #000 100%);
+    mask-image: radial-gradient(ellipse var(--iris-r) var(--iris-r) at 50% 50%, transparent 97%, #000 100%);
+    transition: --iris-r 0.4s cubic-bezier(0.5, 0, 0.2, 1);
+}
+
+.dial-iris.is-closed {
+    --iris-r: 0%;
+    transition-duration: 0.32s;
+    transition-timing-function: cubic-bezier(0.6, 0, 0.9, 0.4);
+}
+
+.iris-blades {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.55, 0, 0.25, 1);
+}
+
+.iris-blade {
+    stroke: rgba(255, 255, 255, 0.15);
+    stroke-width: 0.8;
+}
+
+/* Blade + glass gradient stops take the edition's lens metal, so the
+   aperture shares the outer rings' colour temperature */
+.iris-stop-lo { stop-color: var(--lens-lo); }
+.iris-stop-mid { stop-color: var(--lens-mid); }
+.iris-stop-hi { stop-color: var(--lens-hi); }
+
+.dial-hub-notch {
+    width: 0;
+    height: 0;
+    margin-bottom: 0.15rem;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 6px solid #17130f;
+    opacity: 0.7;
+}
+
+.dial-hub-count {
+    font-family: 'Space Mono', 'Courier New', monospace;
+    font-size: 0.5rem;
+    letter-spacing: 0.1em;
+    opacity: 0.55;
+}
+
+.dial-hub-label {
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--text-muted);
-    opacity: 0.6;
 }
 
 /* --- Sub Pages --- */
@@ -697,7 +1116,9 @@ body {
 
 .back-btn {
     position: fixed;
-    top: 1.5rem;
+    /* Vertically centred inside the nav's content box in both nav states;
+       `body.nav-compact` tracks .nav.scrolled (set in js/main.js). */
+    top: 1.9rem;
     left: 2.5rem;
     z-index: 1001;
     display: flex;
@@ -709,7 +1130,7 @@ body {
     text-transform: uppercase;
     color: var(--text-muted);
     text-decoration: none;
-    transition: color 0.3s var(--ease-out);
+    transition: color 0.3s var(--ease-out), top 0.4s var(--ease-out);
 }
 
 .back-btn:hover {
@@ -719,6 +1140,18 @@ body {
 .back-btn-arrow {
     font-size: 1.1rem;
     line-height: 1;
+}
+
+/* Sub-pages: the fixed ‹ Back button shares the nav's left corner. Give the
+   brand room so the two read as one cluster instead of sitting on top of each
+   other. */
+.page-sub .nav-brand {
+    margin-left: 5.6rem;
+}
+
+/* Nav shrinks when scrolled — keep the button centred with the brand. */
+body.nav-compact .back-btn {
+    top: 1.4rem;
 }
 
 /* --- Flip Card --- */
@@ -1691,6 +2124,12 @@ body {
     background: rgba(242, 238, 222, 0.92);
 }
 
+/* The default link colour is a near-white for dark bars; on this light bar the
+   inactive links would be invisible. Dim ink instead. */
+.theme-stamp .nav-link {
+    color: rgba(26, 23, 20, 0.45);
+}
+
 .theme-stamp .loader {
     background: #f2eede;
 }
@@ -1890,64 +2329,260 @@ body {
     filter: blur(2px);
 }
 
-.journey-stamps {
+/* --- Polaroid clothesline: prints pegged to a sagging string --- */
+.pl-line {
     position: fixed;
     inset: 0;
     z-index: 3;
+    overflow: hidden;
+    outline: none;
+    cursor: grab;
+    opacity: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: pan-y;
+}
+
+.pl-line[data-drag='1'] { cursor: grabbing; }
+/* Faded out (before / after the journey) — let clicks pass through. */
+.pl-line[data-idle='1'] { pointer-events: none; }
+.pl-line:focus-visible { box-shadow: inset 0 0 0 2px var(--theme-primary); }
+
+.pl-string {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+}
+
+.pl-string path {
+    stroke: var(--text-muted);
+    stroke-width: 1.4;
+}
+
+.pl-cards {
+    position: absolute;
+    inset: 0;
     pointer-events: none;
 }
 
-.stamp-anim {
+.pl-card {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 268px;
+    left: 0;
+    top: 0;
+    width: var(--pl-cw);
+    transform-origin: 50% 0;
+    will-change: transform;
     pointer-events: auto;
+    display: block;
     text-decoration: none;
     color: inherit;
-    --rot: 0deg;
-    --x: 0vw;
-    --y: 0px;
-    --scale: 1;
-    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) rotate(var(--rot)) scale(var(--scale));
-    will-change: transform, opacity;
-    filter: drop-shadow(0 14px 28px rgba(20, 18, 14, 0.24));
-    transition: filter 0.35s var(--ease-out);
-    opacity: 0;
+    cursor: inherit;
+    visibility: hidden;
 }
 
-.stamp-anim:hover,
-.stamp-anim:focus-visible {
-    filter: drop-shadow(0 32px 52px rgba(20, 18, 14, 0.36));
-    outline: none;
+.pl-print {
+    margin-top: 10px;
+    background: #fdfbf5;
+    padding: 10px 10px 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 18px 30px -16px rgba(90, 75, 55, 0.45);
+    transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1),
+                filter 0.5s ease,
+                box-shadow 0.35s var(--ease-out);
 }
 
-/* Lift animation lives on the inner card so the scroll-driven transform on
-   .stamp-anim stays instant while the hover feels springy. */
-.stamp-anim .stamp-inner {
-    --lift: 0px;
-    --lift-scale: 1;
-    --lift-rot: 0deg;
-    transform-origin: 50% 92%;
-    transform: translateY(var(--lift)) scale(var(--lift-scale)) rotate(var(--lift-rot));
-    transition: transform 0.5s cubic-bezier(0.32, 0.72, 0.28, 1);
+/* The prints drop onto the string the first time the line scrolls into view.
+   `backwards` only: the drop-in must not stick and shadow the [data-on] scale. */
+.pl-line[data-ready='1'] .pl-print {
+    animation: pl-drop 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    animation-delay: calc(var(--i) * 80ms);
 }
 
-.stamp-anim.stacked {
+.pl-card[data-on='0'] .pl-print {
+    transform: scale(0.9);
+    filter: saturate(0.72) brightness(0.97);
+}
+
+.pl-card:hover .pl-print,
+.pl-card:focus-visible .pl-print {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 30px 46px -18px rgba(90, 75, 55, 0.5);
+    filter: saturate(1.05);
+}
+
+.pl-card:focus-visible { outline: none; }
+
+@keyframes pl-drop {
+    from { transform: translateY(-18px) scale(0.94); opacity: 0; }
+    to   { transform: none; opacity: 1; }
+}
+
+.pl-shot {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: var(--bg-tertiary);
+}
+
+.pl-shot img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+}
+
+.pl-note {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    font-family: var(--cjk), ui-serif, Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 13px;
+    line-height: 1.1;
+    color: #5b5449;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pl-peg {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 10px;
+    height: 26px;
+    margin-left: -5px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #c9a67a, #e3c9a1 45%, #b8915f);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.25);
+    pointer-events: none;
+}
+
+.pl-peg::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 8px;
+    width: 2px;
+    height: 7px;
+    background: rgba(80, 60, 30, 0.45);
+    border-radius: 1px;
+}
+
+.pl-bar {
+    position: absolute;
+    left: clamp(16px, 4vw, 56px);
+    right: clamp(16px, 4vw, 56px);
+    /* sits above the railway progress bar pinned to the bottom */
+    bottom: clamp(84px, 13vh, 124px);
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 2vw, 24px);
+    cursor: default;
+    pointer-events: auto;
+}
+
+.pl-cap {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    padding-bottom: 0.15em;
+}
+
+.pl-cap > * {
+    display: block;
+    animation: pl-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.pl-title {
+    font-family: var(--cjk), var(--font-display), sans-serif;
+    font-weight: 600;
+    font-size: clamp(20px, 2.4vw, 30px);
+    line-height: 1.15;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pl-sub {
+    margin-top: 4px;
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.pl-count {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.pl-count b { color: var(--theme-primary); font-weight: 700; }
+
+.pl-btn {
+    appearance: none;
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: inherit;
+    display: grid;
+    place-items: center;
     cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
-.stamp-anim.stacked:hover .stamp-inner,
-.stamp-anim.stacked:focus-visible .stamp-inner {
-    --lift: -54px;
-    --lift-scale: 1.08;
-    --lift-rot: -1.8deg;
-    transition: transform 0.52s cubic-bezier(0.34, 1.56, 0.64, 1);
+.pl-btn:hover {
+    background: var(--theme-primary);
+    color: var(--bg-secondary);
+}
+
+.pl-btn:focus-visible { outline: 2px solid var(--theme-primary); outline-offset: 2px; }
+
+.pl-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+@keyframes pl-in {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: none; opacity: 1; }
+}
+
+@media (max-width: 640px) {
+    .pl-sub { font-size: 11.5px; }
+    .pl-btn { width: 34px; height: 34px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pl-cap > * { animation: none; }
+    .pl-print { animation: none; transition: none; }
 }
 
 .journey-hint {
     position: fixed;
-    bottom: 2rem;
+    /* clear of the railway progress bar pinned to the bottom */
+    bottom: 3.6rem;
     left: 50%;
     transform: translateX(-50%);
     z-index: 4;
@@ -2828,20 +3463,69 @@ body.theme-postcard::before {
 @media (max-width: 900px) {
     .home-layout {
         grid-template-columns: 1fr;
+        justify-items: center;
         text-align: center;
-        gap: 2.5rem;
+        gap: 2.25rem;
     }
 
     .home-info {
         text-align: center;
     }
 
-    .home-subtitle {
+    .home-kicker {
+        align-items: center;
+        margin-bottom: 1.75rem;
+    }
+
+    .home-kicker-text {
         margin: 0 auto;
     }
 
+    .home-tagline {
+        justify-content: center;
+        margin: 0 auto;
+    }
+
+    .home-title {
+        margin-left: 0;
+    }
+
+    .home-title::after {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
     .home {
-        padding-top: 8rem;
+        padding: 7.5rem 1.5rem 2rem;
+    }
+
+    .dial-stage {
+        --dial-size: min(78vw, 340px);
+    }
+
+    .home-tools {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-title {
+        font-size: calc(clamp(2.8rem, 17vw, 5rem) * var(--home-display-scale, 1));
+    }
+
+    .dial-stage {
+        --dial-size: min(84vw, 300px);
+    }
+}
+
+/* Short viewports (laptops held sideways, small windows) */
+@media (max-height: 780px) and (min-width: 901px) {
+    .home {
+        padding: 6.5rem 2.5rem 2.5rem;
+    }
+
+    .home-kicker {
+        margin-bottom: 1.75rem;
     }
 }
 
@@ -2863,24 +3547,43 @@ body.theme-postcard::before {
 }
 
 @media (max-width: 768px) {
-    .nav {
-        padding: 1rem 1.5rem;
+    /* Two-row nav so the 5 edition links never push the sound button off-screen */
+    .nav,
+    .nav.scrolled {
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.6rem 1rem;
+        padding: 0.9rem 1.15rem;
+    }
+
+    .nav-brand {
+        order: 1;
+    }
+
+    .sound-toggle {
+        order: 2;
+        margin-left: auto;
     }
 
     .nav-links {
-        gap: 1rem;
+        order: 3;
+        width: 100%;
+        justify-content: space-between;
+        gap: 0.5rem;
     }
 
     .nav-link {
-        font-size: 0.6rem;
+        font-size: 0.56rem;
+        letter-spacing: 0.12em;
     }
 
     .nav-brand-text {
         display: none;
     }
 
-    .stamp-anim {
-        width: 202px;
+    /* Narrow: the back button moves closer in, so the brand needs less room. */
+    .page-sub .nav-brand {
+        margin-left: 4.7rem;
     }
 
     .journey-poster {
@@ -2895,9 +3598,10 @@ body.theme-postcard::before {
         padding: 0 1.5rem 5rem;
     }
 
+    /* Narrow nav keeps one padding in both states, so the button is fixed too. */
     .back-btn {
         left: 1.5rem;
-        top: 1.25rem;
+        top: 1.4rem;
     }
 
     .message-card {
@@ -3073,10 +3777,6 @@ body.theme-postcard::before {
     .dial-arrow {
         width: 32px;
         height: 32px;
-    }
-
-    .home-title {
-        font-size: clamp(2.5rem, 12vw, 4rem);
     }
 
     .journey-map {
@@ -3959,6 +4659,106 @@ body.theme-postcard::before {
     padding: 0.08em 0.4em;
 }
 
+/* 解析不出链接时的提示 */
+.game-video-warn {
+    color: #ffb4a2 !important;
+    border-left: 2px solid rgba(255, 120, 90, 0.55);
+    padding-left: 0.8rem;
+    text-align: left;
+}
+
+/* 竖版视频（抖音等手机竖屏片段）：高度定死，宽度按比例反推。
+   下限 576px = 抖音播放器所需最小宽 324px × 16/9，再矮会被裁掉右侧 UI */
+.game-video-body.is-portrait {
+    aspect-ratio: 9 / 16;
+    height: clamp(576px, 76vh, 640px);
+    width: auto;
+    max-width: 100%;
+    margin-inline: auto;
+}
+
+/* 封面懒加载：先出封面 + 播放按钮，点了才建播放器 */
+.game-video-cover {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    cursor: pointer;
+    background-color: #120d18;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.45s ease, filter 0.45s ease;
+}
+
+.game-video-cover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.5));
+}
+
+.game-video-cover:hover,
+.game-video-cover:focus-visible {
+    transform: scale(1.02);
+    filter: brightness(1.06);
+    outline: none;
+}
+
+.game-video-play {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 62px;
+    height: 62px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: rgba(18, 13, 24, 0.5);
+    border: 1.5px solid rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(4px);
+    z-index: 1;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.game-video-play::before {
+    content: '';
+    position: absolute;
+    left: 54%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-left: 17px solid #fff;
+    border-top: 11px solid transparent;
+    border-bottom: 11px solid transparent;
+    transition: border-left-color 0.3s ease;
+}
+
+.game-video-cover:hover .game-video-play,
+.game-video-cover:focus-visible .game-video-play {
+    background: rgba(255, 255, 255, 0.92);
+    transform: translate(-50%, -50%) scale(1.08);
+}
+
+.game-video-cover:hover .game-video-play::before,
+.game-video-cover:focus-visible .game-video-play::before {
+    border-left-color: #120d18;
+}
+
+.game-video-cover-hint {
+    position: absolute;
+    left: 50%;
+    bottom: 1.05rem;
+    transform: translateX(-50%);
+    z-index: 1;
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
+}
+
 /* --- Responsive --- */
 @media (max-width: 720px) {
     .games-page {
@@ -4019,6 +4819,23 @@ body.theme-postcard::before {
 /* ============================================
    Games — 3D island preview (games-3d.html)
    ============================================ */
+
+/* games-3d 专属：展示窗口放大——放宽页面容器，
+   舞台宽度占满的同时受视口高度反推约束（保住 16:9 且一屏能看全） */
+.page-island3d .games-page {
+    max-width: 1780px;
+    padding: 6.5rem clamp(1rem, 2vw, 2rem) 2.5rem;
+}
+.page-island3d .games-masthead {
+    margin-bottom: 1.4rem;
+}
+.page-island3d .games-title {
+    font-size: clamp(2rem, 4.6vh, 3.4rem);
+}
+.page-island3d .world3d-stage {
+    max-width: 1760px;
+    width: min(100%, calc((100vh - 264px) * 16 / 9));
+}
 
 .world3d-stage {
     position: relative;
@@ -4122,16 +4939,38 @@ body.theme-postcard::before {
     color: var(--pin-color, #e8d9ff);
 }
 
-/* Pins that hold a walkable map get an "enter" affordance */
-.world3d-pin.is-dive .w3-pin-tag::after {
-    content: '\2935 进入地图';
-    display: block;
-    margin-top: 0.1rem;
+/* Pins that hold a walkable map get a real "enter" button.
+   The pin circle itself opens the highlight video — only this button dives. */
+.w3-pin-dive {
+    display: none;
+    align-items: center;
+    gap: 0.25em;
+    margin-top: 0.15rem;
+    padding: 0.22rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid rgba(242, 196, 147, 0.55);
+    background: rgba(38, 24, 16, 0.86);
     font-family: var(--font-body);
-    font-size: 0.55rem;
+    font-size: 0.56rem;
     font-weight: 700;
     letter-spacing: 0.12em;
     color: #f2c493;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    transition: background 0.22s ease, color 0.22s ease, transform 0.22s ease;
+}
+
+.world3d-pin.is-dive .w3-pin-dive {
+    display: inline-flex;
+}
+
+.w3-pin-dive:hover,
+.w3-pin-dive:focus-visible {
+    background: #f2c493;
+    color: #241509;
+    transform: translateY(1px);
+    outline: none;
 }
 
 .world3d-pin.is-dive .w3-pin-head {
@@ -4179,11 +5018,96 @@ body.theme-postcard::before {
     50% { opacity: 1; transform: scale(1.15); }
 }
 
+/* 地图按需加载进度条：点「进入地图」才下载，这里给反馈 */
+.w3-mapload {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 22;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    min-width: 268px;
+    padding: 0.85rem 1.15rem;
+    border-radius: 14px;
+    background: rgba(14, 10, 20, 0.86);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 180, 150, 0.28);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+    animation: mapLoadIn 0.28s ease both;
+}
+
+@keyframes mapLoadIn {
+    from { opacity: 0; transform: translate(-50%, calc(-50% + 8px)) scale(0.97); }
+    to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.w3-mapload-ring {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 200, 170, 0.25);
+    border-top-color: #ff8b7a;
+    animation: w3Spin 0.85s linear infinite;
+}
+
+@keyframes w3Spin { to { transform: rotate(360deg); } }
+
+.w3-mapload-text {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    min-width: 0;
+}
+
+.w3-mapload-name {
+    font-family: var(--font-body);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.92);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.w3-mapload-bar {
+    display: block;
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    overflow: hidden;
+}
+
+.w3-mapload-bar i {
+    display: block;
+    height: 100%;
+    width: 1%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #ff6b5c, #ffb08a);
+    transition: width 0.25s ease;
+}
+
+.w3-mapload-pct {
+    flex: none;
+    min-width: 2.6em;
+    text-align: right;
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #ffb08a;
+    font-variant-numeric: tabular-nums;
+}
+
 /* Hint + controls */
 .world3d-hint {
     position: absolute;
     left: 50%;
-    bottom: 20px;
+    bottom: 58px;           /* 给群岛导航条让位 */
     transform: translateX(-50%);
     z-index: 15;
     font-family: var(--font-body);
@@ -4415,6 +5339,67 @@ body.theme-postcard::before {
     width: 44px;
     background: rgba(242, 196, 147, 0.22);
     border-color: rgba(242, 196, 147, 0.42);
+}
+
+/* --- 群岛导航：一键飞到某座岛 --- */
+.w3-isle-nav {
+    position: absolute;
+    left: 50%;
+    bottom: 0.9rem;
+    transform: translateX(-50%);
+    z-index: 12;
+    display: flex;
+    gap: 0.3rem;
+    padding: 0.28rem;
+    border-radius: 999px;
+    background: rgba(14, 10, 22, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    max-width: calc(100% - 2rem);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.w3-isle-nav::-webkit-scrollbar {
+    display: none;
+}
+
+.w3-isle-btn {
+    flex: 0 0 auto;
+    padding: 0.34rem 0.8rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.24s ease, color 0.24s ease;
+}
+
+.w3-isle-btn em {
+    font-family: var(--font-body);
+    font-style: normal;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    color: rgba(255, 255, 255, 0.6);
+    transition: color 0.24s ease;
+}
+
+.w3-isle-btn:hover em {
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.w3-isle-btn.active {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.w3-isle-btn.active em {
+    color: #17101f;
+}
+
+.w3-isle-btn:focus-visible {
+    outline: 2px solid var(--theme-soft, #a48cc4);
+    outline-offset: 2px;
 }
 
 /* WebGL fallback */
@@ -6271,13 +7256,16 @@ body.theme-postcard::before {
    ============================================ */
 
 .theme-letter {
-    /* pixel display face — Silkscreen Bold is the chunky one */
-    --px: 'Silkscreen', 'Press Start 2P', 'Share Tech Mono', monospace;
-    --term: 'Share Tech Mono', 'Courier New', monospace;
+    /* pixel display face — Silkscreen Bold is the chunky one.
+       'Ark Pixel' (self-hosted, OFL) renders the CJK so the Chinese
+       desktop keeps the pixel look; Latin still comes from Silkscreen
+       because it is listed first. */
+    --px: 'Silkscreen', 'Ark Pixel', 'Press Start 2P', 'Share Tech Mono', monospace;
+    --term: 'Share Tech Mono', 'Ark Pixel', 'Courier New', monospace;
     --serif2: 'Cormorant Garamond', Georgia, serif;
-    --hand: 'Caveat', cursive;
-    /* CJK — falls back to a real bold system face even offline */
-    --cjk: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    --hand: 'Caveat', 'Ma Shan Zheng', cursive;
+    /* CJK — pixel first, real bold system face as offline fallback */
+    --cjk: 'Ark Pixel', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
 
     /* room + light */
     --lamp: #ffcf95;
@@ -6328,10 +7316,18 @@ body.theme-postcard::before {
     /* One knob drives the whole monitor */
     /* the screen tracks BOTH axes: vh keeps it big, vw stops it
        outgrowing a narrow window (monitor = glass-w + 68px) */
-    --glass-h: clamp(220px, min(calc(72vh - 250px), calc((54vw - 68px) / 1.6)), 620px);
+    --glass-h: clamp(280px, min(calc(74vh - 232px), calc((55vw - 60px) / 1.6)), 640px);
     --glass-w: calc(var(--glass-h) * 1.6);
-    /* shelf unit — vw term keeps the 12 spines inside a narrow window */
-    --u: min(1.42vh, 1.1vw);
+    --mon-w: calc(var(--glass-w) + 68px);
+    /* where the monitor shell starts (its right offset is 10% above 1240px, 7% below) */
+    --mon-left: calc(90vw - var(--mon-w));
+    /* the 12 spines + gaps ≈ 27.5u wide; grow the unit to fit the wall but keep
+       a clear gap to the monitor. Without this the shelf was vh-bound and stayed
+       tiny on short laptops even though there was 150–300px of spare wall. */
+    --u-fit: calc((var(--mon-left) - 4vw - 90px) / 27.5);
+    /* the vh term only caps how tall the spines may get; on short laptops the
+       width term above is what lets the shelf grow instead of shrinking to ~7px text */
+    --u: min(1.95vh, var(--u-fit));
 
     background:
         radial-gradient(54% 40% at 10% 76%, rgba(255, 191, 122, 0.20) 0%, rgba(255, 168, 88, 0.06) 44%, transparent 74%),
@@ -6741,8 +7737,10 @@ body.theme-postcard::before {
 
 .wall-pin {
     position: absolute;
-    left: 31%;
-    top: 17vh;
+    /* pinned photo — sits under the shelf on the empty wall left of the frame.
+       (the spines can reach 34vh tall, so anything higher gets covered) */
+    left: 9%;
+    top: 39vh;
     z-index: 4;
 }
 
@@ -6865,64 +7863,67 @@ body.theme-postcard::before {
     width: 260%;
     height: 200%;
     pointer-events: none;
-    background: radial-gradient(46% 48% at 26% 44%, rgba(255, 202, 138, 0.30) 0%, rgba(255, 176, 96, 0.10) 42%, transparent 74%);
+    /* the pool of light hangs off the lit mouth, not off the middle of the shade */
+    background: radial-gradient(32% 28% at 13% 71%, rgba(255, 214, 158, 0.30) 0%, rgba(255, 182, 104, 0.10) 46%, transparent 78%);
     opacity: 1;
     transition: opacity 0.7s ease;
 }
 
 .lamp-shade {
     position: absolute;
-    left: 2%;
-    top: 1%;
-    width: 60%;
-    height: 33%;
-    border-radius: 4px 4px 2px 2px;
-    background: linear-gradient(100deg, #faf0da 0%, #e6d6b1 44%, #a68f68 100%);
-    clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
-    filter: drop-shadow(0 9px 16px rgba(0, 0, 0, 0.5));
-    transform: rotate(-11deg);
-    transform-origin: 76% 96%;
+    left: 6%;
+    top: 2%;
+    width: 58%;
+    height: 31%;
+    background: linear-gradient(102deg, #fdf7e8 0%, #f0e0be 34%, #cbb188 68%, #8e7752 100%);
+    clip-path: polygon(24% 0%, 76% 0%, 100% 100%, 0% 100%);
+    filter: drop-shadow(0 7px 13px rgba(0, 0, 0, 0.48));
+    transform: rotate(-9deg);
+    transform-origin: 78% 100%;
 }
 
 .lamp-bulb {
+    /* the lit mouth of the shade: an ellipse straddling the shade's bottom edge */
     position: absolute;
-    left: 13%;
-    top: 29%;
-    width: 26%;
-    height: 9%;
+    left: 6.5%;
+    top: 29.5%;
+    width: 57%;
+    height: 11%;
     border-radius: 50%;
-    background: radial-gradient(circle at 45% 42%, #fff3d4 0%, #ffcf8c 55%, rgba(255, 200, 130, 0.1) 100%);
-    filter: blur(0.4px);
-    opacity: 1;
+    transform: rotate(-9deg);
+    transform-origin: 50% 0;
+    background: radial-gradient(58% 118% at 50% 14%, #fff8e6 0%, #ffd99f 44%, rgba(255, 195, 124, 0.35) 76%, rgba(255, 190, 118, 0) 100%);
+    filter: blur(0.8px);
+    opacity: 0.95;
     transition: opacity 0.5s ease;
 }
 
 .lamp-neck {
     position: absolute;
-    left: 32%;
-    top: 26%;
-    width: 6%;
-    height: 52%;
-    border-radius: 4px;
-    background: linear-gradient(90deg, #7a6547, #d9c8a4 45%, #6b573c);
-    transform: rotate(9deg);
+    left: 35%;
+    top: 34%;
+    width: 5%;
+    height: 58%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #6d5a3f, #dccaa6 42%, #665239);
+    transform: rotate(11deg);
     transform-origin: top center;
 }
 
 .lamp-base {
     position: absolute;
-    left: 10%;
-    bottom: 2%;
-    width: 80%;
-    height: 11%;
+    left: 26%;
+    bottom: 3%;
+    width: 44%;
+    height: 9%;
     border-radius: 50%;
-    background: linear-gradient(180deg, #cbb994 0%, #8c7857 55%, #4e402c 100%);
-    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.55);
+    background: radial-gradient(56% 130% at 40% 20%, #ddcda8 0%, #a08c66 46%, #4a3e2b 100%);
+    box-shadow: 0 7px 13px rgba(0, 0, 0, 0.55);
 }
 
-.lamp:not(.is-on) .lamp-bulb { opacity: 0.12; }
+.lamp:not(.is-on) .lamp-bulb { opacity: 0.16; filter: blur(1.6px) grayscale(0.45); }
 .lamp:not(.is-on) .lamp-cone { opacity: 0; }
-.lamp:not(.is-on) .lamp-shade { filter: brightness(0.62) saturate(0.7); }
+.lamp:not(.is-on) .lamp-shade { filter: brightness(0.6) saturate(0.72) drop-shadow(0 7px 13px rgba(0, 0, 0, 0.48)); }
 
 .room.lamp-off .wall-glow { opacity: 0.12; }
 .room.lamp-off .desk-top { filter: brightness(0.72); }
@@ -7027,11 +8028,15 @@ body.theme-postcard::before {
     left: 33%;
     bottom: 68%;
     z-index: 11;
+    /* one width unit drives the card, its white band and the handwriting size,
+       so the caption can never run off the card */
+    --pw: clamp(58px, min(10.5vh, 6.6vw), 124px);
 }
 
 .polaroid-frame {
-    width: clamp(58px, min(10.5vh, 6.6vw), 124px);
-    padding: 7% 7% 20%;
+    position: relative;
+    width: var(--pw);
+    padding: calc(var(--pw) * 0.06) calc(var(--pw) * 0.06) calc(var(--pw) * 0.22);
     background: linear-gradient(170deg, #f7f2e6, #e2d9c6);
     box-shadow: 0 14px 26px rgba(0, 0, 0, 0.5);
     transform: rotate(-7deg);
@@ -7050,50 +8055,85 @@ body.theme-postcard::before {
     overflow: hidden;
 }
 
+/* a car whose plate you cannot read — the teaser for the question that locks the letter */
+.polaroid-art::before {
+    content: '';
+    position: absolute;
+    left: 13%;
+    right: 13%;
+    bottom: 19%;
+    height: 8%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(0, 0, 0, 0.5), transparent 80%);
+    filter: blur(2px);
+}
+
 .polaroid-car {
     position: absolute;
-    left: 12%;
-    right: 12%;
-    bottom: 24%;
-    height: 26%;
-    border-radius: 6px 6px 3px 3px / 40% 40% 12% 12%;
-    background: linear-gradient(180deg, #f0e6d5, #b9aa93);
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+    left: 8%;
+    right: 8%;
+    bottom: 26%;
+    height: 19%;
+    border-radius: 26% 26% 16% 16% / 62% 62% 26% 26%;
+    background: linear-gradient(180deg, #f4ecdc 0%, #d8cbb3 56%, #a89b83 100%);
+    box-shadow: inset 0 -2px 4px rgba(70, 62, 48, 0.32), 0 4px 7px rgba(0, 0, 0, 0.35);
+}
+
+.polaroid-car::before {
+    /* cabin */
+    content: '';
+    position: absolute;
+    left: 26%;
+    right: 26%;
+    bottom: 88%;
+    height: 92%;
+    border-radius: 46% 46% 10% 10% / 78% 78% 16% 16%;
+    background: linear-gradient(180deg, rgba(238, 243, 240, 0.95) 0%, rgba(150, 166, 160, 0.78) 62%, rgba(96, 112, 108, 0.72) 100%);
+    border: 1px solid rgba(46, 56, 53, 0.35);
 }
 
 .polaroid-car::after {
+    /* both wheels, one pseudo */
     content: '';
     position: absolute;
-    left: 18%;
-    right: 18%;
-    top: -42%;
-    height: 60%;
-    border-radius: 50% 50% 6px 6px / 70% 70% 20% 20%;
-    background: linear-gradient(180deg, rgba(240, 230, 213, 0.85), rgba(190, 178, 158, 0.5));
-    border: 1.5px solid rgba(60, 55, 45, 0.4);
+    left: -4%;
+    right: -4%;
+    bottom: -30%;
+    height: 46%;
+    background:
+        radial-gradient(circle closest-side at 20% 50%, #1e2426 0 100%, transparent 100%),
+        radial-gradient(circle closest-side at 80% 50%, #1e2426 0 100%, transparent 100%);
 }
 
 .polaroid-plate {
-    position: relative;
-    margin-top: 34%;
+    position: absolute;
+    left: 50%;
+    top: 64.5%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
     font-family: var(--px); font-weight: 700;
-    font-size: clamp(5px, 0.95vh, 10px);
-    letter-spacing: 0.12em;
+    font-size: calc(var(--pw) * 0.072);
+    letter-spacing: 0.1em;
     color: #efe6d2;
-    background: rgba(20, 28, 26, 0.7);
-    padding: 2px 5px;
+    background: rgba(20, 28, 26, 0.72);
+    padding: 2px 4px;
     border-radius: 1px;
 }
 
 .polaroid-caption {
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 6%;
+    left: 4%;
+    right: 4%;
+    bottom: calc(var(--pw) * 0.055);
     text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
     font-family: var(--hand);
-    font-size: clamp(11px, 1.9vh, 20px);
-    line-height: 1;
+    /* 0.105 keeps the whole line inside the 4%..4% band even at the widest
+       --pw; line-height 1.25 because the heart glyph's descent is taller than
+       the 1.0 line box and was shaving 2px off the bottom of the text */
+    font-size: calc(var(--pw) * 0.105);
+    line-height: 1.25;
     color: #4b4136;
 }
 
@@ -7151,7 +8191,10 @@ body.theme-postcard::before {
     left: 44%;
     bottom: 65%;
     width: calc(var(--glass-w) * 0.6);
-    --ku: calc(var(--glass-w) * 0.6 / 16.8);
+    /* 17.8, not 16.8: every key row is 16.3ku wide by design (15ku of caps +
+       1.3ku of gaps), and the case eats 1.4ku of padding — at 16.8 the last
+       cap of each row hung ~24px past the case edge. */
+    --ku: calc(var(--glass-w) * 0.6 / 17.8);
     z-index: 24;
 }
 
@@ -7164,24 +8207,6 @@ body.theme-postcard::before {
         inset 0 2px 0 rgba(255, 255, 255, 0.7),
         inset 0 -3px 8px rgba(120, 105, 80, 0.35),
         0 22px 34px rgba(0, 0, 0, 0.55);
-}
-
-.kbd-case::after {
-    /* the checker strip at the top-left of the reference board */
-    content: '';
-    position: absolute;
-    left: calc(var(--ku) * -0.55);
-    top: calc(var(--ku) * 0.5);
-    width: calc(var(--ku) * 0.42);
-    height: calc(var(--ku) * 3.4);
-    border-radius: 2px;
-    background-image:
-        linear-gradient(45deg, rgba(35, 38, 42, 0.85) 25%, transparent 25%, transparent 75%, rgba(35, 38, 42, 0.85) 75%),
-        linear-gradient(45deg, rgba(35, 38, 42, 0.85) 25%, transparent 25%, transparent 75%, rgba(35, 38, 42, 0.85) 75%);
-    background-size: 50% 50%;
-    background-position: 0 0, 25% 25%;
-    background-color: #efe7d7;
-    opacity: 0.9;
 }
 
 .kbd-keys {
@@ -7211,7 +8236,7 @@ body.theme-postcard::before {
     align-items: center;
     justify-content: center;
     font-family: var(--px); font-weight: 700;
-    font-size: calc(var(--ku) * 0.22);
+    font-size: calc(var(--ku) * 0.28);
     line-height: 1;
     color: #5f5748;
     cursor: pointer;
@@ -7225,7 +8250,7 @@ body.theme-postcard::before {
 
 .key.is-special {
     background: linear-gradient(180deg, #efe6d2 0%, #ded2b8 62%, #c3b69b 100%);
-    font-size: calc(var(--ku) * 0.19);
+    font-size: calc(var(--ku) * 0.24);
     letter-spacing: -0.02em;
 }
 
@@ -7247,9 +8272,9 @@ body.theme-postcard::before {
 
 .key-legend {
     position: absolute;
-    left: 0.18em;
-    top: 0.12em;
-    font-size: 0.84em;
+    left: 0.16em;
+    top: 0.1em;
+    font-size: 0.92em;
     line-height: 1;
     color: #4d5357;
 }
@@ -7467,6 +8492,7 @@ body.theme-postcard::before {
     height: 625px;
     transform: scale(var(--ui-scale));
     transform-origin: 0 0;
+    --ui-fs: 1; /* font compensation for small screens — set by letter.js */
     font-family: var(--term);
     color: var(--ui-ink);
     user-select: none;
@@ -7477,7 +8503,7 @@ body.theme-postcard::before {
     inset: 0;
     z-index: 12;
     pointer-events: none;
-    opacity: 0.34;
+    opacity: 0.26;
     mix-blend-mode: multiply;
     background: repeating-linear-gradient(180deg, rgba(20, 30, 32, 0.5) 0px, rgba(20, 30, 32, 0.5) 1px, transparent 1px, transparent 3px);
 }
@@ -7844,7 +8870,7 @@ body.theme-postcard::before {
     border: 0;
     background: none;
     font-family: var(--px); font-weight: 700;
-    font-size: 10px;
+    font-size: calc(10px * var(--ui-fs, 1));
     line-height: 1;
     color: var(--ui-ink);
     padding: 6px 8px;
@@ -7852,7 +8878,7 @@ body.theme-postcard::before {
     cursor: pointer;
 }
 
-.ui-logo { font-size: 14px; color: var(--ui-teal-deep); padding: 3px 8px; }
+.ui-logo { font-size: calc(14px * var(--ui-fs, 1)); color: var(--ui-teal-deep); padding: 3px 8px; }
 
 .ui-menu:hover,
 .ui-logo:hover,
@@ -7864,7 +8890,7 @@ body.theme-postcard::before {
 
 .ui-clock {
     font-family: var(--px); font-weight: 700;
-    font-size: 9px;
+    font-size: calc(9px * var(--ui-fs, 1));
     letter-spacing: 0.06em;
     padding: 6px 6px 6px 10px;
     color: var(--ui-ink);
@@ -7893,7 +8919,7 @@ body.theme-postcard::before {
     border: 0;
     background: none;
     font-family: var(--term);
-    font-size: 15px;
+    font-size: calc(15px * var(--ui-fs, 1));
     color: var(--ui-ink);
     padding: 6px 8px;
     cursor: pointer;
@@ -7944,7 +8970,7 @@ body.theme-postcard::before {
 
 .ui-icon-label {
     font-family: var(--px); font-weight: 700;
-    font-size: 8px;
+    font-size: calc(8px * var(--ui-fs, 1));
     line-height: 1.6;
     text-align: center;
     color: #23333a;
@@ -8030,7 +9056,7 @@ body.theme-postcard::before {
     flex: 1 1 auto;
     text-align: center;
     font-family: var(--px); font-weight: 700;
-    font-size: 9px;
+    font-size: calc(9px * var(--ui-fs, 1));
     letter-spacing: 0.04em;
     white-space: nowrap;
     overflow: hidden;
@@ -8065,7 +9091,7 @@ body.theme-postcard::before {
     background: var(--ui-cream);
     border-top: 2px solid var(--ui-ink);
     font-family: var(--px); font-weight: 700;
-    font-size: 8px;
+    font-size: calc(8px * var(--ui-fs, 1));
     letter-spacing: 0.08em;
     color: var(--ui-ink);
     z-index: 6;
@@ -8135,10 +9161,12 @@ body.theme-postcard::before {
 .lock-glyph { width: 74px; height: 82px; }
 
 .lock-q {
-    font-family: var(--px), var(--cjk);
-    font-size: 16px;
+    /* Chinese-led sentence — lead with the CJK bold so the latin bit ("ty")
+       doesn't switch to the pixel face mid-sentence */
+    font-family: var(--cjk);
+    font-size: 17px;
     font-weight: 700;
-    line-height: 1.95;
+    line-height: 1.85;
     color: var(--ui-ink);
     max-width: 26em;
 }
@@ -8182,7 +9210,7 @@ body.theme-postcard::before {
     min-height: 24px;
     margin-top: 14px;
     text-align: center;
-    font-family: var(--term), var(--cjk);
+    font-family: var(--cjk);
     font-size: 15px;
     font-weight: 700;
     color: #6f7780;
@@ -8197,7 +9225,7 @@ body.theme-postcard::before {
     border: 0;
     background: none;
     padding: 0;
-    font-family: var(--term), var(--cjk);
+    font-family: var(--cjk);
     font-size: 15px;
     font-weight: 700;
     color: var(--ui-teal-deep);
@@ -8206,7 +9234,7 @@ body.theme-postcard::before {
 }
 
 .lock-hint-line {
-    font-family: var(--term), var(--cjk);
+    font-family: var(--cjk);
     font-size: 15px;
     font-weight: 700;
     color: #6f7780;
@@ -8487,13 +9515,13 @@ body.theme-postcard::before {
 
 .ui-note-h {
     font-family: var(--px); font-weight: 700;
-    font-size: 9px;
+    font-size: calc(9px * var(--ui-fs, 1));
     color: var(--ui-teal);
 }
 
 .ui-note-t {
     font-family: var(--hand);
-    font-size: 22px;
+    font-size: calc(22px * var(--ui-fs, 1));
     line-height: 1.2;
     color: #3b352a;
 }
@@ -8509,7 +9537,7 @@ body.theme-postcard::before {
     border-radius: 3px;
     box-shadow: 6px 7px 0 rgba(26, 38, 42, 0.2);
     font-family: var(--term);
-    font-size: 15px;
+    font-size: calc(15px * var(--ui-fs, 1));
     line-height: 1.4;
     color: var(--ui-ink);
     opacity: 0;
@@ -8525,18 +9553,22 @@ body.theme-postcard::before {
 
 /* 901px+ keeps the side-by-side room, so the shelf has to stay
    clear of the monitor — cap it against vw as well as vh */
-@media (min-width: 901px) and (max-width: 1240px) {
-    .room { --u: min(1.3vh, 1.05vw); }
-}
-
-@media (min-width: 901px) and (max-width: 1080px) {
-    .room { --u: min(1.25vh, 1.05vw); }
-}
-
+/* below 1240px the monitor sits closer to the right edge, so the shelf
+   gets less wall — recompute its share from the new monitor position */
 @media (max-width: 1240px) {
+    .room { --mon-left: calc(93vw - var(--mon-w)); }
     .monitor { right: 7%; }
     .wall-frame { left: 30%; top: 42vh; }
     .mon-sticky { font-size: 13px; }
+
+    /* smaller glass → the CRT dressing eats more of the picture.
+       fade the scanlines + glare back so the UI stays legible */
+    .scr-scanlines { opacity: 0.15; }
+    .scr-glare {
+        background:
+            linear-gradient(124deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.03) 20%, transparent 44%),
+            radial-gradient(130% 118% at 50% 50%, transparent 66%, rgba(0, 0, 0, 0.18) 100%);
+    }
 }
 
 @media (max-width: 1080px) {
@@ -8660,20 +9692,22 @@ body.theme-postcard::before {
         width: 100%;
         height: 100%;
         transform: none !important;
+        /* phone layout: fonts are set in absolute px below, no compensation */
+        --ui-fs: 1 !important;
     }
 
     .ui-menubar { height: 26px; padding: 0 6px; }
-    .ui-menu { font-size: 8px; padding: 4px 5px; }
-    .ui-logo { font-size: 11px; padding: 2px 5px; }
-    .ui-clock { font-size: 7px; padding: 4px 4px; }
+    .ui-menu { font-size: 9.5px; padding: 4px 5px; }
+    .ui-logo { font-size: 12.5px; padding: 2px 5px; }
+    .ui-clock { font-size: 8.5px; padding: 4px 4px; }
     .ui-drop { top: 26px; min-width: 150px; }
-    .ui-drop-item { font-size: 13px; }
-    .ui-dock { height: 20px; font-size: 6px; }
+    .ui-drop-item { font-size: 14.5px; }
+    .ui-dock { height: 20px; font-size: 7.5px; }
     .ui-dock-hint { display: none; }
-    .ui-icons { top: 38px; left: 8px; width: 62px; gap: 2px; }
-    .ui-icon { width: 62px; padding: 4px 2px; gap: 2px; }
-    .ui-icon-art { width: 30px; height: 28px; }
-    .ui-icon-label { font-size: 6px; }
+    .ui-icons { top: 38px; left: 8px; width: 68px; gap: 2px; }
+    .ui-icon { width: 68px; padding: 4px 2px; gap: 2px; }
+    .ui-icon-art { width: 34px; height: 31px; }
+    .ui-icon-label { font-size: 7.5px; }
     .ui-icon-badge { right: 4px; width: 7px; height: 7px; }
     .ui-hills-3 { height: 120px; }
     .ui-hills-2 { height: 90px; }
@@ -8710,7 +9744,7 @@ body.theme-postcard::before {
         bottom: auto;
         width: 76%;
         max-width: 420px;
-        --ku: calc(min(76vw, 420px) / 17);
+        --ku: calc(min(76vw, 420px) / 17.8);
         margin: 116px auto 0;
     }
 
@@ -8728,7 +9762,9 @@ body.theme-postcard::before {
     .page-letter .nav { padding: 0.85rem 1rem; }
     .page-letter .nav-links { gap: 0.52rem; }
     .page-letter .nav-link { font-size: 0.52rem; letter-spacing: 0.08em; }
+    /* No back button here, so the brand keeps its place. */
     .page-letter .back-btn { display: none; }
+    .page-letter .nav-brand { margin-left: 0; }
 }
 
 @media (max-width: 560px) {
@@ -8744,7 +9780,7 @@ body.theme-postcard::before {
 @media (max-height: 800px) {
     .page-letter .nav { padding: 0.5rem 1.4rem; }
     .page-letter .nav-link { font-size: 0.6rem; letter-spacing: 0.06em; }
-    .page-letter .back-btn { width: 30px; height: 30px; }
+    .page-letter .back-btn { width: 30px; height: 30px; top: 0.65rem; }
 }
 
 .room-grain {
@@ -8755,4 +9791,507 @@ body.theme-postcard::before {
     opacity: 0.055;
     mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ============================================
+   QUIZ — the TY-OS quiz app
+   "how well do you know ty?" · message.html
+   registered from js/quiz.js via LetterDesk
+   ============================================ */
+
+/* the font compensation can push the quiz content past the fixed window —
+   let the window scroll instead of clipping the last question */
+.ui-win[data-app="quiz"] .ui-win-body { overflow-y: auto; overscroll-behavior: contain; }
+
+.qz {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+.qz-kicker {
+    font-family: var(--px); font-weight: 700;
+    font-size: calc(8px * var(--ui-fs, 1));
+    letter-spacing: 0.14em;
+    color: var(--ui-teal);
+}
+
+.qz-title {
+    font-family: var(--px); font-weight: 700;
+    font-size: calc(15px * var(--ui-fs, 1));
+    line-height: 1.55;
+    color: var(--ui-ink);
+    margin: 0 0 6px;
+}
+
+.qz-title.is-sm { font-size: calc(13px * var(--ui-fs, 1)); }
+
+.qz-sub {
+    font-size: calc(15px * var(--ui-fs, 1));
+    line-height: 1.6;
+    color: var(--ui-ink-soft);
+    margin: 0 0 4px;
+}
+
+.qz-form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.qz-name {
+    width: 230px;
+    max-width: 100%;
+    font-family: var(--term);
+    font-size: calc(16px * var(--ui-fs, 1));
+    letter-spacing: 0.03em;
+    color: var(--ui-ink);
+    background: #fff;
+    border: 2px solid var(--ui-ink);
+    border-radius: 3px;
+    padding: 8px 10px;
+    outline: none;
+}
+
+.qz-name:focus { box-shadow: 0 0 0 3px rgba(79, 168, 155, 0.35); }
+.qz-name::placeholder { color: #a7acb3; }
+
+.qz-fine {
+    font-size: calc(13px * var(--ui-fs, 1));
+    line-height: 1.55;
+    color: var(--ui-ink-soft);
+    margin: 0;
+}
+
+/* ---------- question phase ---------- */
+
+.qz-hdr {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.qz-count {
+    font-family: var(--px); font-weight: 700;
+    font-size: calc(9px * var(--ui-fs, 1));
+    letter-spacing: 0.08em;
+    color: var(--ui-ink);
+}
+
+.qz-diff {
+    font-family: var(--px); font-weight: 700;
+    font-size: calc(8px * var(--ui-fs, 1));
+    letter-spacing: 0.1em;
+    padding: 2px 6px;
+    border: 2px solid var(--ui-ink);
+    border-radius: 2px;
+    color: var(--ui-ink);
+    background: var(--ui-cream);
+}
+
+.qz-diff.is-d1 { background: var(--ui-teal); border-color: var(--ui-teal-deep); color: #fff; }
+.qz-diff.is-d2 { background: var(--ui-yellow); }
+.qz-diff.is-d3 { background: var(--ui-pink); }
+
+.qz-streak {
+    font-family: var(--px); font-weight: 700;
+    font-size: calc(8px * var(--ui-fs, 1));
+    letter-spacing: 0.08em;
+    color: var(--ui-teal-deep);
+}
+
+.qz-score {
+    margin-left: auto;
+    font-family: var(--px); font-weight: 700;
+    font-size: calc(10px * var(--ui-fs, 1));
+    color: var(--ui-ink);
+}
+
+.qz-bar {
+    height: 10px;
+    border: 2px solid var(--ui-ink);
+    border-radius: 2px;
+    background: #fff;
+    overflow: hidden;
+}
+
+.qz-bar-fill {
+    display: block;
+    height: 100%;
+    background: var(--ui-teal);
+    transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.qz-q {
+    font-size: calc(19px * var(--ui-fs, 1));
+    line-height: 1.5;
+    font-weight: 400;
+    color: var(--ui-ink);
+    margin: 2px 0 0;
+}
+
+.qz-opts {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.qz-opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    text-align: left;
+    font-family: var(--term);
+    font-size: calc(16px * var(--ui-fs, 1));
+    line-height: 1.35;
+    color: var(--ui-ink);
+    background: #fff;
+    border: 2px solid var(--ui-ink);
+    border-radius: 3px;
+    padding: 9px 12px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 rgba(26, 38, 42, 0.22);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.2s ease;
+}
+
+.qz-opt:hover { background: #f4eee0; }
+.qz-opt:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(26, 38, 42, 0.22); }
+
+.qz-key {
+    flex: 0 0 auto;
+    width: 19px;
+    height: 19px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--px); font-weight: 700;
+    font-size: calc(8px * var(--ui-fs, 1));
+    color: var(--ui-ink);
+    background: var(--ui-cream);
+    border: 2px solid var(--ui-ink);
+    border-radius: 2px;
+}
+
+.qz-opt-t { flex: 1 1 auto; }
+
+.qz-opt.is-ok {
+    background: var(--ui-teal);
+    border-color: var(--ui-teal-deep);
+    color: #fff;
+    pointer-events: none;
+}
+
+.qz-opt.is-ok .qz-key { background: var(--ui-cream); color: var(--ui-ink); border-color: var(--ui-cream); }
+
+.qz-opt.is-bad {
+    background: #e8615c;
+    border-color: #b23b37;
+    color: #fff;
+    pointer-events: none;
+}
+
+.qz-opt.is-bad .qz-key { background: var(--ui-cream); color: var(--ui-ink); border-color: var(--ui-cream); }
+
+.qz-opt.is-dim { opacity: 0.45; pointer-events: none; }
+
+.qz-reveal {
+    min-height: 56px;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.qz-reveal.is-on { opacity: 1; transform: translateY(0); }
+
+.qz-reveal-line {
+    font-family: var(--px); font-weight: 700;
+    font-size: calc(11px * var(--ui-fs, 1));
+    line-height: 1.5;
+    color: var(--ui-ink);
+}
+
+.qz-reveal-a { color: var(--ui-teal-deep); }
+.qz-reveal-b { color: #d2504b; }
+
+.qz-fact {
+    font-family: var(--hand);
+    font-size: calc(21px * var(--ui-fs, 1));
+    line-height: 1.25;
+    color: #3b352a;
+    margin-top: 3px;
+}
+
+.qz-foot {
+    font-size: calc(12px * var(--ui-fs, 1));
+    letter-spacing: 0.06em;
+    color: var(--ui-ink-soft);
+    margin: 0;
+}
+
+/* ---------- result phase ---------- */
+
+.qz-res-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.qz-ring { flex: 0 0 auto; width: 104px; }
+.qz-ring svg { width: 100%; height: auto; display: block; }
+
+.qz-ring-bg {
+    fill: none;
+    stroke: rgba(38, 41, 46, 0.12);
+    stroke-width: 10;
+}
+
+.qz-ring-fg {
+    fill: none;
+    stroke: var(--ui-teal);
+    stroke-width: 10;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 60px 60px;
+    transition: stroke-dasharray 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.qz-ring-num {
+    font-family: var(--px); font-weight: 700;
+    font-size: calc(22px * var(--ui-fs, 1));
+    fill: var(--ui-ink);
+    text-anchor: middle;
+}
+
+.qz-res-meta { flex: 1 1 auto; min-width: 0; }
+
+.qz-tier {
+    display: inline-block;
+    font-family: var(--px); font-weight: 700;
+    font-size: calc(12px * var(--ui-fs, 1));
+    letter-spacing: 0.1em;
+    padding: 5px 10px;
+    border: 2px solid var(--ui-ink);
+    border-radius: 2px;
+    margin: 2px 0 8px;
+    color: var(--ui-ink);
+    background: var(--ui-cream);
+    box-shadow: 3px 3px 0 rgba(26, 38, 42, 0.22);
+}
+
+.qz-tier.is-t5 { background: var(--ui-pink); }
+.qz-tier.is-t4 { background: var(--ui-yellow); }
+.qz-tier.is-t3 { background: var(--ui-teal); border-color: var(--ui-teal-deep); color: #fff; }
+.qz-tier.is-t2 { background: var(--ui-blue); }
+.qz-tier.is-t1 { background: #dfe4e6; }
+.qz-tier.is-t0 { background: #e8615c; color: #fff; }
+
+.qz-line {
+    font-family: var(--hand);
+    font-size: calc(22px * var(--ui-fs, 1));
+    line-height: 1.25;
+    color: #3b352a;
+    margin: 0;
+}
+
+.qz-stats {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.qz-stat {
+    flex: 1 1 0;
+    min-width: 72px;
+    text-align: center;
+    background: #fff;
+    border: 2px solid var(--ui-ink);
+    border-radius: 3px;
+    padding: 6px 6px 5px;
+}
+
+.qz-stat-v {
+    display: block;
+    font-family: var(--px); font-weight: 700;
+    font-size: calc(13px * var(--ui-fs, 1));
+    color: var(--ui-ink);
+}
+
+.qz-stat-k {
+    display: block;
+    font-size: calc(11px * var(--ui-fs, 1));
+    letter-spacing: 0.08em;
+    color: var(--ui-ink-soft);
+    margin-top: 3px;
+}
+
+.qz-review {
+    max-height: 118px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: #fff;
+    border: 2px solid var(--ui-ink);
+    border-radius: 3px;
+    padding: 2px 10px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(38, 41, 46, 0.35) transparent;
+}
+
+.qz-review::-webkit-scrollbar { width: 8px; }
+.qz-review::-webkit-scrollbar-track { background: transparent; }
+.qz-review::-webkit-scrollbar-thumb { background: rgba(38, 41, 46, 0.3); border-radius: 4px; }
+
+.qz-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px dashed rgba(38, 41, 46, 0.16);
+    font-size: calc(14px * var(--ui-fs, 1));
+    line-height: 1.35;
+}
+
+.qz-row:last-child { border-bottom: 0; }
+
+.qz-row-i {
+    flex: 0 0 auto;
+    width: 18px;
+    font-family: var(--px); font-weight: 700;
+    font-size: calc(8px * var(--ui-fs, 1));
+    color: var(--ui-ink-soft);
+}
+
+.qz-row-mark { flex: 0 0 auto; width: 12px; font-weight: 700; }
+.qz-row.is-ok .qz-row-mark { color: var(--ui-teal-deep); }
+.qz-row.is-bad .qz-row-mark { color: #d2504b; }
+
+.qz-row-a { flex: 1 1 auto; min-width: 0; color: var(--ui-ink); }
+
+.qz-row-y { flex: 0 0 auto; font-size: calc(13px * var(--ui-fs, 1)); color: var(--ui-ink-soft); }
+
+.qz-row-c {
+    flex: 0 0 auto;
+    margin-left: auto;
+    font-family: var(--px); font-weight: 700;
+    font-size: calc(8px * var(--ui-fs, 1));
+    color: var(--ui-ink-soft);
+}
+
+/* ---------- leaderboard phase ---------- */
+
+.qz-board {
+    max-height: 210px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(38, 41, 46, 0.35) transparent;
+}
+
+.qz-board::-webkit-scrollbar { width: 8px; }
+.qz-board::-webkit-scrollbar-track { background: transparent; }
+.qz-board::-webkit-scrollbar-thumb { background: rgba(38, 41, 46, 0.3); border-radius: 4px; }
+
+.qz-brow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 8px;
+    border-bottom: 2px solid rgba(38, 41, 46, 0.08);
+    font-size: calc(15px * var(--ui-fs, 1));
+}
+
+.qz-brow:last-child { border-bottom: 0; }
+
+.qz-brow.is-you {
+    background: rgba(79, 168, 155, 0.16);
+    border-radius: 2px;
+}
+
+.qz-brank {
+    flex: 0 0 auto;
+    width: 22px;
+    font-family: var(--px); font-weight: 700;
+    font-size: calc(10px * var(--ui-fs, 1));
+    color: var(--ui-teal-deep);
+}
+
+.qz-bname {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--ui-ink);
+}
+
+.qz-btier {
+    flex: 0 0 auto;
+    font-family: var(--px); font-weight: 700;
+    font-size: calc(8px * var(--ui-fs, 1));
+    letter-spacing: 0.08em;
+    color: var(--ui-ink-soft);
+}
+
+.qz-bacc {
+    flex: 0 0 auto;
+    width: 42px;
+    text-align: right;
+    font-size: calc(13px * var(--ui-fs, 1));
+    color: var(--ui-ink-soft);
+}
+
+.qz-bscore {
+    flex: 0 0 auto;
+    width: 38px;
+    text-align: right;
+    font-family: var(--px); font-weight: 700;
+    font-size: calc(12px * var(--ui-fs, 1));
+    color: var(--ui-ink);
+}
+
+/* off-screen helper for the copy fallback */
+.qz-clip {
+    position: fixed;
+    left: -9999px;
+    top: 0;
+}
+
+/* ---------- quiz responsive (windows become full panels ≤900px) ---------- */
+
+@media (max-width: 900px) {
+    .qz { gap: 10px; }
+    .qz-kicker { font-size: 9.5px; }
+    .qz-title { font-size: 14px; }
+    .qz-q { font-size: 18px; }
+    .qz-sub { font-size: 14.5px; }
+    .qz-fine { font-size: 14.5px; }
+    .qz-count { font-size: 10.5px; }
+    .qz-diff { font-size: 9.5px; }
+    .qz-streak { font-size: 9.5px; }
+    .qz-score { font-size: 11.5px; }
+    .qz-opt { font-size: 15.5px; padding: 8px 10px; }
+    .qz-key { font-size: 9.5px; }
+    .qz-reveal-line { font-size: 12.5px; }
+    .qz-foot { font-size: 13.5px; }
+    .qz-tier { font-size: 13.5px; }
+    .qz-name { width: 100%; }
+    .qz-ring { width: 92px; }
+    .qz-res-top { gap: 12px; }
+    .qz-line { font-size: 19px; }
+    .qz-fact { font-size: 19px; }
+    .qz-review { max-height: 104px; }
+    .qz-board { max-height: 40vh; }
+    .qz-stat-v { font-size: 12px; }
+    .qz-stat-k { font-size: 12.5px; }
+    .qz-row { font-size: 15.5px; }
+    .qz-row-i { font-size: 9.5px; }
+    .qz-row-y { font-size: 14.5px; }
+    .qz-row-c { font-size: 9.5px; }
+    .qz-brank { font-size: 11.5px; }
+    .qz-btier { font-size: 9.5px; }
+    .qz-bacc { font-size: 14.5px; }
+    .qz-bscore { font-size: 13.5px; }
 }

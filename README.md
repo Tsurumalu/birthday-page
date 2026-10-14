@@ -22,16 +22,18 @@ A personalized birthday gift website with a multi-edition segmented dial, inspir
 
 ```
 birthday-gift/
-├── index.html          # Home page with segmented dial chooser
-├── card.html           # The Card edition (flip card)
-├── moments.html        # Moments edition (timeline)
-├── message.html        # The Letter edition (message card)
-├── wish.html           # The Wish edition (clickable wish cards)
+├── index.html          # Home page — the edition dial (per-edition colour, texture, display type)
+├── moments.html        # Moments edition (journey map / stamp collage)
+├── message.html        # The Letter edition (desk room + locked letter)
+├── games.html          # Games edition (arcade map)  → games-3d.html (3D island)
+├── musics.html         # Music edition (in-car cassette player)
+├── cards.html          # The Cards edition (leave a note)
+├── place.html          # Detail page for a single moment (?place=<id>)
 ├── css/
-│   └── style.css       # All styling + four theme variants
+│   └── style.css       # All styling + one theme block per edition
 ├── js/
 │   └── main.js         # Dial logic, page interactions, sound, particles
-├── assets/             # Place images, photos, or audio here
+├── assets/             # Images, models, audio
 ├── .gitignore
 ├── LICENSE
 ├── README.md
@@ -91,27 +93,47 @@ Edit `js/main.js` — find the `editions` array near the top:
 
 ```js
 var editions = [
-    { id: 'card', label: 'The Card', subtitle: '...', page: 'card.html', theme: 'theme-card', icon: '&#9825;', color: '#c9a06a', angle: 0 },
+    {
+        id: 'story',
+        label: 'Moments',
+        subtitle: 'The chapters of us, from the beginning.',
+        page: 'moments.html',
+        theme: 'theme-story',
+        color: '#c8614a',          // wedge + label + particle tint on the dial
+        icon: iconSvg('<rect .../>')
+    },
     // ...
 ];
 ```
 
-You can change labels, subtitles, icons, and colors here.
+You can change labels, subtitles, icons, and colors here. The dial spreads the
+editions evenly around the ring (order = clockwise from the top marker).
 
 ### Change Theme Colors
 
-Edit `css/style.css` — modify the theme blocks:
+Edit `css/style.css` — each edition owns one block. Alongside the palette it
+carries the chooser's display type and backdrop texture:
 
 ```css
-.theme-card {
-    --theme-primary: #d4a574;
-    --theme-soft: #e8c79a;
-    --theme-dim: rgba(212, 165, 116, 0.12);
-    --theme-glow: rgba(212, 165, 116, 0.25);
-    --theme-bg-start: #1a1510;
-    --theme-bg-end: #0f0d0c;
+.theme-story {
+    --theme-primary: #c8614a;
+    --theme-soft: #e39179;
+    --theme-dim: rgba(200, 97, 74, 0.14);
+    --theme-glow: rgba(200, 97, 74, 0.32);
+    --theme-bg-start: #3a1410;
+    --theme-bg-mid: #1b0f0e;
+    --theme-bg-end: #0b0808;
+
+    --home-display: 'Cormorant Garamond', Georgia, serif;
+    --home-display-weight: 400;
+    --home-display-case: none;
+    --home-tex: repeating-linear-gradient(0deg, rgba(255,255,255,.032) 0 1px, transparent 1px 4px);
 }
 ```
+
+### Chooser Keyboard Shortcuts
+
+`←` `→` turn the dial · `↵` enter the selected edition · `R` randomise.
 
 ### Add or Remove Editions
 

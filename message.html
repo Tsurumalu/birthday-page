@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="A letter, on a desk, inside a screen.">
     <title>The Letter — Happy Birthday</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Caveat:wght@400;500;600&family=Inter:wght@300;400;500;600&family=Press+Start+2P&family=Silkscreen:wght@400;700&family=Noto+Sans+SC:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=20261009g">
+    <link rel="stylesheet" href="css/fonts.css?v=20261014c">
+    <link rel="stylesheet" href="css/style.css?v=20261014g">
 </head>
 <body class="page-sub page-letter theme-letter">
     <div class="loader" id="loader">
@@ -37,10 +35,8 @@
             <span class="nav-brand-text">For You</span>
         </a>
         <div class="nav-links">
-            <a href="card.html" class="nav-link">Card</a>
             <a href="moments.html" class="nav-link">Moments</a>
             <a href="message.html" class="nav-link active">Letter</a>
-            <a href="wish.html" class="nav-link">Wish</a>
             <a href="games.html" class="nav-link">Games</a>
             <a href="musics.html" class="nav-link">Music</a>
             <a href="cards.html" class="nav-link">Cards</a>
@@ -126,11 +122,11 @@
                                         </div>
 
                                         <div class="ui-menubar">
-                                            <button class="ui-logo" id="uiLogo" aria-label="System menu">&#10047;</button>
-                                            <button class="ui-menu" data-menu="file">File</button>
-                                            <button class="ui-menu" data-menu="edit">Edit</button>
-                                            <button class="ui-menu" data-menu="view">View</button>
-                                            <button class="ui-menu" data-menu="special">Special</button>
+                                            <button class="ui-logo" id="uiLogo" aria-label="系统菜单">&#10047;</button>
+                                            <button class="ui-menu" data-menu="file">文件</button>
+                                            <button class="ui-menu" data-menu="edit">编辑</button>
+                                            <button class="ui-menu" data-menu="view">显示</button>
+                                            <button class="ui-menu" data-menu="special">特别</button>
                                             <span class="ui-menubar-gap"></span>
                                             <span class="ui-menu ui-menu-quiet" id="uiSoundTag">&#9834;</span>
                                             <span class="ui-menu ui-menu-quiet" id="uiSunTag">&#9728;</span>
@@ -142,18 +138,18 @@
 
                                         <div class="ui-dock">
                                             <span class="ui-dock-brand">TY&#8209;OS 1.0</span>
-                                            <span class="ui-dock-hint" id="uiDockHint">double-click an icon</span>
+                                            <span class="ui-dock-hint" id="uiDockHint">双击图标打开</span>
                                             <span class="ui-dock-grip"></span>
                                         </div>
                                     </div>
 
                                     <div class="scr-boot" id="scrBoot">
                                         <div class="boot-brand">TY<span class="boot-dot">&middot;</span>OS</div>
-                                        <div class="boot-hello">hello, ty</div>
+                                        <div class="boot-hello">你好，ty</div>
                                         <div class="boot-bar">
                                             <span class="boot-cell"></span><span class="boot-cell"></span><span class="boot-cell"></span><span class="boot-cell"></span><span class="boot-cell"></span><span class="boot-cell"></span><span class="boot-cell"></span><span class="boot-cell"></span><span class="boot-cell"></span><span class="boot-cell"></span>
                                         </div>
-                                        <div class="boot-label">LOADING&hellip;</div>
+                                        <div class="boot-label">加载中&hellip;</div>
                                     </div>
 
                                     <div class="scr-scanlines"></div>
@@ -167,7 +163,7 @@
                                 <span class="mon-brand">FOR YOU <em>SYSTEMS</em></span>
                                 <span class="mon-model">TY-88</span>
                                 <span class="mon-vents"></span>
-                                <button class="mon-power" id="powerBtn" aria-label="Monitor power">
+                                <button class="mon-power" id="powerBtn" aria-label="显示器电源">
                                     <span class="mon-led" id="monLed"></span>
                                 </button>
                                 <span class="mon-smiley" id="monSmiley">
@@ -276,7 +272,8 @@
         </div>
     </main>
 
-    <script src="js/main.js?v=20261009a"></script>
-    <script src="js/letter.js?v=20261009a"></script>
+    <script src="js/main.js?v=20261014b"></script>
+    <script src="js/letter.js?v=20261014c"></script>
+    <script src="js/quiz.js?v=20261014b"></script>
 </body>
 </html>

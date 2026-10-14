@@ -39,7 +39,8 @@ GLB 文件（约 16MB，Draco + KTX2 压缩）。想复刻那种质感，
 2. 刷新即可 —— 找得到文件就替换占位水晶，找不到就保留水晶
 
 当前 8 个据点的 id：
-`cs2` `valorant` `hok` `pubg` `apex` `roco` `repo` `fishing`
+`cs2` `valorant` `hok`(王昭君) `shouyue`(百里守约，在 `kings/` 子目录) `pubg` `apex` `repo` `fishing`
+（`roco` 洛克王国已于 2026-10-13 移除）
 
 据点模型可选参数（写在 `js/games-3d.js` 的 spots 对应项里）：
 

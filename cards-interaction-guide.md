@@ -18,7 +18,7 @@
 | `data/cards.json` | 访客钉入的便签持久化文件（首次运行自动创建，初始为 `[]`） |
 | `assets/cards/wood.png` | AI 生成的木纹边框纹理（木框） |
 | `assets/cards/sticker-heart.png` | AI 生成的心形模切贴纸，用于深色入场券上 |
-| `index.html` / `card.html` / `moments.html` / `message.html` / `wish.html` / `games.html` / `games-3d.html` / `place.html` / `musics.html` | 顶部导航新增 **Cards** 入口 |
+| `index.html` / `moments.html` / `message.html` / `games.html` / `games-3d.html` / `place.html` / `musics.html` | 顶部导航 **Cards** 入口（原 Card / Wish 两个入口与其页面已下线） |
 
 > **软木板纹理无 AI 水印**：`board-cork` 已改为纯 CSS + SVG 噪声（`feTurbulence`）生成的程序化软木纹理，**不再引用任何 AI 图片**，因此右下角不再有 AI 生成水印。木框仍使用 `assets/cards/wood.png`；若木框上也出现水印，可同样改为程序化纹理。
 

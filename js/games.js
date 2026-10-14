@@ -66,15 +66,6 @@
             video: { type: 'none' }
         },
         {
-            id: 'roco',
-            name: 'ROCO',
-            zh: '洛克王国',
-            icon: '\uD83D\uDC3E',
-            color: '#8f7bd6',
-            x: 40, y: 74,
-            video: { type: 'none' }
-        },
-        {
             id: 'repo',
             name: 'REPO',
             zh: 'R.E.P.O.',
@@ -374,29 +365,8 @@
     var panel = document.getElementById('gameVideoPanel');
 
     function videoBodyHtml(spot) {
-        var v = spot.video || { type: 'none' };
-
-        if (v.type === 'file' && v.src) {
-            return '<video class="game-video-player" src="' + v.src + '" controls playsinline></video>';
-        }
-        if (v.type === 'bilibili' && v.src) {
-            return '<iframe class="game-video-player" src="' + v.src + '" scrolling="no" frameborder="0" allowfullscreen></iframe>';
-        }
-        if (v.type === 'youtube' && v.src) {
-            return '<iframe class="game-video-player" src="' + v.src + '" frameborder="0" allowfullscreen></iframe>';
-        }
-
-        // Placeholder — video not ready yet
-        return (
-            '<div class="game-video-placeholder">' +
-                '<span class="game-video-placeholder-icon">\uD83C\uDFAC</span>' +
-                '<strong>' + spot.name + ' 的精彩集锦还在路上</strong>' +
-                '<p>把视频文件放到 <code>assets/videos/' + spot.id + '.mp4</code>，' +
-                '然后在 <code>js/games.js</code> 里把这项的 video 改成 ' +
-                '<code>{ type: "file", src: "assets/videos/' + spot.id + '.mp4" }</code>；' +
-                '或者直接填入 B 站 / YouTube 的嵌入链接。</p>' +
-            '</div>'
-        );
+        if (window.VideoSource) return window.VideoSource.bodyHtml(spot);
+        return '<div class="game-video-placeholder"><strong>' + spot.name + ' 的集锦还在路上</strong></div>';
     }
 
     function openSpot(spot) {

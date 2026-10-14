@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Our journey together — a scroll-driven stamp collage">
     <title>Moments — Happy Birthday</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=20261008a">
+    <link rel="stylesheet" href="css/fonts.css?v=20261014c">
+    <link rel="stylesheet" href="css/style.css?v=20261014g">
 </head>
 <body class="page-sub theme-stamp">
     <div class="loader" id="loader">
@@ -37,10 +35,8 @@
             <span class="nav-brand-text">For You</span>
         </a>
         <div class="nav-links">
-            <a href="card.html" class="nav-link">Card</a>
             <a href="moments.html" class="nav-link active">Moments</a>
             <a href="message.html" class="nav-link">Letter</a>
-            <a href="wish.html" class="nav-link">Wish</a>
             <a href="games.html" class="nav-link">Games</a>
             <a href="musics.html" class="nav-link">Music</a>
             <a href="cards.html" class="nav-link">Cards</a>
@@ -62,11 +58,11 @@
         <h1 class="stamp-title reveal-up" style="--delay: 0.25s">我们的旅程</h1>
         <p class="stamp-subtitle reveal-up" style="--delay: 0.45s">
             一起走过的八个地方。<br>
-            向下滚动，让它们一站站飞过来，停在右边堆叠成一张剪贴海报。
+            向下滚动，照片会沿着绳子一张张滑过来。
         </p>
     </header>
 
-    <!-- Journey Stage (scroll-driven stamp collage) -->
+    <!-- Journey Stage (scroll-driven polaroid clothesline) -->
     <section class="journey-stage" id="journeyStage">
         <!-- Huge poster typography in the background -->
         <div class="journey-poster" aria-hidden="true">
@@ -74,8 +70,29 @@
             <div class="journey-poster-line journey-poster-line-alt">OUR · JOURNEY</div>
         </div>
 
-        <!-- Stamps fly across and stack on the right -->
-        <div class="journey-stamps" id="journeyStamps"></div>
+        <!-- Prints pegged to a sagging string; scroll slides the whole line -->
+        <div class="pl-line" id="polaroidLine" tabindex="0" role="region"
+             aria-roledescription="carousel" aria-label="我们的旅程">
+            <svg class="pl-string" id="plString" aria-hidden="true">
+                <path id="plStringPath" fill="none" stroke-linecap="round" />
+            </svg>
+            <div class="pl-cards" id="plCards"></div>
+            <div class="pl-bar">
+                <div class="pl-cap" id="plCap" aria-hidden="true"></div>
+                <span class="pl-count" id="plCount" aria-hidden="true"></span>
+                <button type="button" class="pl-btn" id="plPrev" aria-label="Previous station">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.4" />
+                    </svg>
+                </button>
+                <button type="button" class="pl-btn" id="plNext" aria-label="Next station">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="m6 3 5 5-5 5" stroke="currentColor" stroke-width="1.4" />
+                    </svg>
+                </button>
+            </div>
+            <div class="pl-sr" id="plSr" aria-live="polite"></div>
+        </div>
 
         <!-- Railway progress bar (fixed at bottom of viewport) -->
         <div class="journey-rail-bar" id="journeyRailBar" aria-hidden="true">
@@ -130,6 +147,6 @@
         </div>
     </footer>
 
-    <script src="js/main.js?v=20261008a"></script>
+    <script src="js/main.js?v=20261014b"></script>
 </body>
 </html>

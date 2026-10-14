@@ -2,6 +2,9 @@
 node_modules/
 /vendor/
 
+# WorkBuddy working files (含模型备份，体积大且不属于站点)
+.workbuddy/
+
 # OS files
 .DS_Store
 Thumbs.db

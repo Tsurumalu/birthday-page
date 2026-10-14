@@ -166,6 +166,7 @@
         boardCork.appendChild(note);
         setupBoardNoteDrag(note, false);
         state.noteCount++;
+        updateWallCount();
         syncCardToServer(note, x, y, data);
         resetPrinter();
     }
@@ -279,9 +280,12 @@
     document.addEventListener('pointerup', onPointerUp);
 
     /* ---------- Build a board note ---------- */
+    var NOTE_COLORS = ['note-warm', 'note-yellow', 'note-pink', 'note-blue', 'note-mint', 'note-lavender', 'note-coral', 'note-peach'];
+
     function createBoardNote(data, x, y, id) {
         var note = document.createElement('article');
-        note.className = 'board-note note-warm note-enter';
+        var colorCls = NOTE_COLORS[Math.floor(Math.random() * NOTE_COLORS.length)];
+        note.className = 'board-note ' + colorCls + ' note-enter';
         note.style.left = x + 'px';
         note.style.top = y + 'px';
         note.style.setProperty('--rot', (Math.random() * 6 - 3).toFixed(1) + 'deg');
@@ -377,6 +381,7 @@
         var note = createBoardNote(data, x, y, card.id);
         boardCork.appendChild(note);
         setupBoardNoteDrag(note, false);
+        updateWallCount();
     }
 
     function moveCard(card) {
@@ -417,6 +422,11 @@
     initCloud();
 
     /* ---------- Utilities ---------- */
+    function updateWallCount() {
+        var el = document.querySelector('.board-badge .count');
+        if (el) el.textContent = boardCork.querySelectorAll('.board-note').length;
+    }
+
     function nameFromAuthor(text) {
         return String(text || '').replace(/^—\s*/, '');
     }

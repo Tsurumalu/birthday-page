@@ -26,6 +26,10 @@
     var scrUi = $('scrUi');
     var UI_W = 1000;
     var UI_H = 625;
+    /* below this scale the pixel chrome turns to mush on small windows —
+       font sizes get compensated back up (see fitDesktop) */
+    var MIN_READ = 0.62;
+    var FS_MAX = 1.35;
 
     /* ============================================================
        1 · the lock
@@ -34,8 +38,8 @@
     var PASSWORD = 'TS669';
     var QUESTION = '\u5982\u679C\u53EF\u4EE5\u81EA\u5DF1\u6311\u9009\u8F66\u724C\uFF0Cty \u4F1A\u6311\u9009\u4EC0\u4E48\uFF1F';
     var HINTS = [
-        'Two letters, three digits. Both letters are someone you know by heart.',
-        'The letters are her initials. The numbers are the luckiest kind.'
+        '\u4E24\u4E2A\u5B57\u6BCD\uFF0C\u4E09\u4E2A\u6570\u5B57\u3002\u5B57\u6BCD\u662F\u4F60\u523B\u5728\u5FC3\u91CC\u7684\u90A3\u4E2A\u4EBA\u3002',
+        '\u5B57\u6BCD\u662F\u5979\u7684\u540D\u5B57\u7F29\u5199\uFF0C\u6570\u5B57\u662F\u6700\u62DB\u8D22\u7684\u90A3\u79CD\u3002'
     ];
 
     /* ============================================================
@@ -140,7 +144,7 @@
 
         shelfNote.querySelector('.shelf-note-title').textContent = b.t;
         shelfNote.querySelector('.shelf-note-line').textContent = '\u201C' + b.q + '\u201D';
-        shelfNote.querySelector('.shelf-note-tag').textContent = b.tag + ' \u00B7 KEEP FOREVER';
+        shelfNote.querySelector('.shelf-note-tag').textContent = b.tag + ' \u00B7 \u6C38\u4E45\u73CD\u85CF';
         shelfNote.style.left = (el.offsetLeft + el.offsetWidth / 2) + 'px';
         shelfNote.classList.add('is-on');
     }
@@ -219,9 +223,11 @@
                 key.textContent = k.l;
                 if (k.w) key.style.setProperty('--w', k.w);
 
-                /* the reference board mixes cream caps with silver butterfly caps;
-                   those caps keep a small legend in the corner, like the real set */
-                if (r > 0 && r < 5 && !k.cls && ((r * 2 + c) % 3 !== 0)) {
+                /* the reference board mixes cream caps with silver butterfly caps.
+                   Scatter a handful of them instead of covering the board, so the
+                   set reads as 蝶恋花 rather than as noise; those caps keep a small
+                   legend in the corner, like the real set */
+                if (r > 0 && r < 5 && !k.cls && ((r + c) % 4 === 2)) {
                     key.classList.add('is-fly');
                     key.innerHTML = '<span class="key-legend">' + k.l + '</span>';
                 }
@@ -322,34 +328,34 @@
 
     var DESKTOP_APPS = [
         {
-            id: 'letter', label: 'Letter', type: 'letter', title: 'Letter \u2014 sealed',
+            id: 'letter', label: '\u4FE1\u4EF6', type: 'letter', title: '\u4FE1\u4EF6 \u2014 \u672A\u542F\u5C01',
             icon: ICONS.letter, w: 700, h: 470, locked: true,
             render: renderLetterApp
         },
         {
-            id: 'arcade', label: 'Arcade', type: 'placeholder', title: 'Arcade',
+            id: 'arcade', label: '\u8857\u673A', type: 'placeholder', title: '\u8857\u673A',
             icon: ICONS.arcade, w: 560, h: 320,
-            note: 'Reserved for a small game.',
-            detail: 'Drop a game in later: register an app with <code>type:"minigame"</code> and a <code>mount(el)</code> function in <code>js/letter.js</code> \u2014 the window shell is already handled.',
-            tip: 'Ideas: snake, 2048, a memory match with our photos.'
+            note: '\u7559\u7ED9\u4E00\u4E2A\u5C0F\u6E38\u620F\u3002',
+            detail: '\u4EE5\u540E\u53EF\u4EE5\u628A\u6E38\u620F\u653E\u8FDB\u6765\uFF1A\u5728 <code>js/letter.js</code> \u91CC\u7528 <code>type:"minigame"</code> \u52A0\u4E00\u4E2A <code>mount(el)</code> \u51FD\u6570\u6CE8\u518C app\u2014\u2014\u7A97\u53E3\u5916\u58F3\u5DF2\u7ECF\u73B0\u6210\u3002',
+            tip: '\u70B9\u5B50\uFF1A\u8D2A\u5403\u86C7\u30012048\u3001\u7528\u6211\u4EEC\u7684\u7167\u7247\u73A9\u8BB0\u5FC6\u914D\u5BF9\u3002'
         },
         {
-            id: 'links', label: 'Links', type: 'links', title: 'Links',
+            id: 'links', label: '\u94FE\u63A5', type: 'links', title: '\u94FE\u63A5',
             icon: ICONS.links, w: 620, h: 360
         },
         {
-            id: 'notes', label: 'Notes', type: 'notes', title: 'Notes',
+            id: 'notes', label: '\u4FBF\u7B7E', type: 'notes', title: '\u4FBF\u7B7E',
             icon: ICONS.notes, w: 520, h: 330
         },
         {
-            id: 'trash', label: 'Trash', type: 'placeholder', title: 'Trash',
+            id: 'trash', label: '\u5E9F\u7EB8\u7BD3', type: 'placeholder', title: '\u5E9F\u7EB8\u7BD3',
             icon: ICONS.trash, w: 480, h: 240,
-            note: 'Nothing in here.',
-            detail: 'Everything worth keeping is already on the desk.',
-            tip: 'Empty. The way we like it.'
+            note: '\u91CC\u9762\u4EC0\u4E48\u90FD\u6CA1\u6709\u3002',
+            detail: '\u503C\u5F97\u7559\u4E0B\u7684\uFF0C\u90FD\u5DF2\u7ECF\u5728\u684C\u4E0A\u4E86\u3002',
+            tip: '\u7A7A\u7684\u3002\u5C31\u50CF\u6211\u4EEC\u559C\u6B22\u7684\u90A3\u6837\u3002'
         },
         {
-            id: 'welcome', label: 'Welcome', type: 'welcome', title: 'Welcome',
+            id: 'welcome', label: '\u6B22\u8FCE', type: 'welcome', title: '\u6B22\u8FCE\u4F7F\u7528 TY-OS',
             hidden: true, w: 640, h: 330, render: renderWelcomeApp
         }
     ];
@@ -359,39 +365,39 @@
 
     /* short notes shown in Notes.app */
     var NOTES = [
-        { h: '01', t: 'buy more sticky notes' },
-        { h: '02', t: 'the plate is not a secret' },
-        { h: '03', t: 'ask her about the song at 1:04' }
+        { h: '01', t: '\u518D\u4E70\u4E00\u6C93\u4FBF\u5229\u8D34' },
+        { h: '02', t: '\u8F66\u724C\u4E0D\u662F\u4EC0\u4E48\u79D8\u5BC6' },
+        { h: '03', t: '\u95EE\u95EE\u5979\u90A3\u9996 1:04 \u7684\u6B4C' }
     ];
 
     var MENUS = [
         { id: 'logo', label: '\u273F', items: [
-            { label: 'About TY-OS\u2026', act: showAbout },
+            { label: '\u5173\u4E8E TY-OS\u2026', act: showAbout },
             { sep: true },
-            { label: 'Open the letter', act: function () { openApp('letter'); } },
-            { label: 'Show desktop', act: closeAll },
+            { label: '\u6253\u5F00\u4FE1\u4EF6', act: function () { openApp('letter'); } },
+            { label: '\u663E\u793A\u684C\u9762', act: closeAll },
             { sep: true },
-            { label: 'Shut down', act: powerOff }
+            { label: '\u5173\u673A', act: powerOff }
         ] },
-        { id: 'file', label: 'File', items: [
-            { label: 'Open the letter', act: function () { openApp('letter'); } },
-            { label: 'New note', act: function () { openApp('notes'); } },
+        { id: 'file', label: '\u6587\u4EF6', items: [
+            { label: '\u6253\u5F00\u4FE1\u4EF6', act: function () { openApp('letter'); } },
+            { label: '\u65B0\u5EFA\u4FBF\u7B7E', act: function () { openApp('notes'); } },
             { sep: true },
-            { label: 'Close window', act: closeTop }
+            { label: '\u5173\u95ED\u7A97\u53E3', act: closeTop }
         ] },
-        { id: 'edit', label: 'Edit', items: [
-            { label: 'Undo', disabled: true },
-            { label: 'Cut', disabled: true },
-            { label: 'Copy', disabled: true },
-            { label: 'Paste', disabled: true }
+        { id: 'edit', label: '\u7F16\u8F91', items: [
+            { label: '\u64A4\u9500', disabled: true },
+            { label: '\u526A\u5207', disabled: true },
+            { label: '\u590D\u5236', disabled: true },
+            { label: '\u7C98\u8D34', disabled: true }
         ] },
-        { id: 'view', label: 'View', items: [
-            { label: 'Zoom window', act: zoomTop },
-            { label: 'Show desktop', act: closeAll }
+        { id: 'view', label: '\u663E\u793A', items: [
+            { label: '\u7F29\u653E\u7A97\u53E3', act: zoomTop },
+            { label: '\u663E\u793A\u684C\u9762', act: closeAll }
         ] },
-        { id: 'special', label: 'Special', items: [
-            { label: 'Empty trash', disabled: true },
-            { label: 'Restart TY-OS', act: function () { location.reload(); } }
+        { id: 'special', label: '\u7279\u522B', items: [
+            { label: '\u6E05\u7A7A\u5E9F\u7EB8\u7BD3', disabled: true },
+            { label: '\u91CD\u542F TY-OS', act: function () { location.reload(); } }
         ] }
     ];
 
@@ -412,7 +418,14 @@
         if (!screenEl || !scrUi) return;
         var w = screenEl.clientWidth;
         if (!w) return;
-        scrUi.style.setProperty('--ui-scale', (w / UI_W).toFixed(4));
+        var s = w / UI_W;
+        scrUi.style.setProperty('--ui-scale', s.toFixed(4));
+        /* the screen shrinks with the window, but the pixel chrome and the
+           quiz text must stay legible — scale fonts back up (capped at
+           FS_MAX) instead of letting them shrink with everything else.
+           Letter prose keeps its own tighter scale via .wz/.lock overrides. */
+        var fs = Math.min(FS_MAX, Math.max(1, MIN_READ / s));
+        scrUi.style.setProperty('--ui-fs', fs.toFixed(3));
     }
 
     /* ---------- icons ---------- */
@@ -462,8 +475,8 @@
         win.innerHTML =
             '<div class="ui-win-bar">' +
                 '<span class="ui-win-dots">' +
-                    '<button class="ui-dot ui-dot-close" type="button" aria-label="Close"></button>' +
-                    '<button class="ui-dot ui-dot-zoom" type="button" aria-label="Zoom"></button>' +
+                    '<button class="ui-dot ui-dot-close" type="button" aria-label="\u5173\u95ED"></button>' +
+                    '<button class="ui-dot ui-dot-zoom" type="button" aria-label="\u7F29\u653E"></button>' +
                 '</span>' +
                 '<span class="ui-win-title">' + (app.title || app.label) + '</span>' +
             '</div>' +
@@ -500,7 +513,7 @@
         return '<div class="wz"><div class="wz-art">' +
             (app.icon || ICONS.arcade) +
             '</div><div class="wz-text">' +
-            '<div class="wz-h">' + (app.note || 'Coming soon') + '</div>' +
+            '<div class="wz-h">' + (app.note || '\u656C\u8BF7\u671F\u5F85') + '</div>' +
             '<p>' + (app.detail || '') + '</p>' +
             '<p class="ui-tip">' + (app.tip || '') + '</p>' +
             '</div></div>';
@@ -662,12 +675,12 @@
         var win = openWins.about;
         if (win) { bringToFront(win); return; }
         var app = {
-            id: 'about', title: 'About TY-OS', w: 420, h: 200,
+            id: 'about', title: '\u5173\u4E8E TY-OS', w: 420, h: 200,
             render: function (body) {
                 body.innerHTML =
-                    '<p><strong>TY-OS 1.0</strong> \u2014 built on a desk in a quiet room.</p>' +
-                    '<p class="ui-tip">One screen, five icons, one sealed envelope.<br>' +
-                    'Turn the lamp off. The screen stays warm.</p>';
+                    '<p><strong>TY-OS 1.0</strong> \u2014 \u5728\u4E00\u95F4\u5B89\u9759\u623F\u95F4\u7684\u4E66\u684C\u4E0A\u642D\u6210\u3002</p>' +
+                    '<p class="ui-tip">\u4E00\u5757\u5C4F\u5E55\uFF0C\u51E0\u4E2A\u56FE\u6807\uFF0C\u4E00\u4E2A\u5C01\u7740\u7684\u4FE1\u5C01\u3002<br>' +
+                    '\u628A\u53F0\u706F\u5173\u6389\u5427\uFF0C\u5C4F\u5E55\u4F1A\u4E00\u76F4\u6696\u7740\u3002</p>';
             }
         };
         DESKTOP_APPS.push(app);
@@ -677,23 +690,23 @@
     function powerOff() {
         closeAll();
         room.classList.add('screen-off');
-        toast('Good night \u2014 press the power button to come back.');
+        toast('\u665A\u5B89\u2014\u2014\u6309\u7535\u6E90\u952E\u56DE\u6765\u3002');
     }
 
     /* ---------- app renderers ---------- */
 
     function renderWelcomeApp(body, win) {
-        win.querySelector('.ui-win-title').textContent = 'Welcome to TY-OS';
+        win.querySelector('.ui-win-title').textContent = '\u6B22\u8FCE\u4F7F\u7528 TY-OS';
         body.innerHTML =
             '<div class="wz">' +
                 '<div class="wz-art">' + WIZ_ART + '</div>' +
                 '<div class="wz-text">' +
-                    '<div class="wz-h">Welcome to TY-OS.</div>' +
-                    '<p>There is one thing on this machine that matters: an envelope in <strong>Letter</strong>. It is sealed, and it only opens if you answer the question on the card.</p>' +
-                    '<p class="ui-tip">Click any desktop icon to open it. Drag the title bars. Everything else is a placeholder for later.</p>' +
+                    '<div class="wz-h">\u6B22\u8FCE\u4F7F\u7528 TY-OS\u3002</div>' +
+                    '<p>\u8FD9\u53F0\u673A\u5668\u4E0A\u53EA\u6709\u4E00\u4EF6\u8981\u7D27\u7684\u4E8B\uFF1A<strong>\u4FE1\u4EF6</strong>\u91CC\u7684\u90A3\u4E2A\u4FE1\u5C01\u3002\u5B83\u5C01\u7740\uFF0C\u7B54\u5BF9\u5361\u7247\u4E0A\u7684\u95EE\u9898\u624D\u4F1A\u6253\u5F00\u3002</p>' +
+                    '<p class="ui-tip">\u70B9\u684C\u9762\u4E0A\u7684\u56FE\u6807\u5C31\u80FD\u6253\u5F00\uFF0C\u6807\u9898\u680F\u53EF\u4EE5\u62D6\u7740\u8D70\u3002\u5176\u4ED6\u7684\u90FD\u53EA\u662F\u7559\u7ED9\u4EE5\u540E\u7684\u5360\u4F4D\u7B26\u3002</p>' +
                     '<div class="wz-actions">' +
-                        '<button class="ui-btn is-primary" type="button" data-act="open-letter">Open the letter</button>' +
-                        '<button class="ui-btn" type="button" data-act="later">Later</button>' +
+                        '<button class="ui-btn is-primary" type="button" data-act="open-letter">\u6253\u5F00\u4FE1\u4EF6</button>' +
+                        '<button class="ui-btn" type="button" data-act="later">\u5F85\u4E00\u4F1A\u513F</button>' +
                     '</div>' +
                 '</div>' +
             '</div>';
@@ -708,20 +721,20 @@
     function renderLetterApp(body, win) {
         if (unlocked) return renderLetterOpened(body, win);
 
-        win.querySelector('.ui-win-title').textContent = 'Letter \u2014 sealed';
+        win.querySelector('.ui-win-title').textContent = '\u4FE1\u4EF6 \u2014 \u672A\u542F\u5C01';
         body.innerHTML =
             '<div class="lock-top">' +
                 '<span class="lock-glyph">' + LOCK_GLYPH_LOCKED + '</span>' +
                 '<p class="lock-q">' + QUESTION + '</p>' +
             '</div>' +
             '<form class="lock-form">' +
-                '<input class="lock-input" type="text" maxlength="10" autocomplete="off" spellcheck="false" placeholder="\u00B7\u00B7\u00B7\u00B7\u00B7" aria-label="answer">' +
-                '<button class="ui-btn is-primary" type="submit">Unlock</button>' +
+                '<input class="lock-input" type="text" maxlength="10" autocomplete="off" spellcheck="false" placeholder="\u00B7\u00B7\u00B7\u00B7\u00B7" aria-label="\u7B54\u6848">' +
+                '<button class="ui-btn is-primary" type="submit">\u89E3\u9501</button>' +
             '</form>' +
-            '<p class="lock-msg">Type the answer and press enter.</p>' +
-            '<div class="lock-hints"><button class="lock-hint-btn" type="button">need a hint?</button>' +
+            '<p class="lock-msg">\u8F93\u5165\u7B54\u6848\uFF0C\u6309\u56DE\u8F66\u3002</p>' +
+            '<div class="lock-hints"><button class="lock-hint-btn" type="button">\u8981\u4E2A\u63D0\u793A\uFF1F</button>' +
             '<div class="lock-hint-list"></div></div>' +
-            '<span class="lock-stamp">SEALED BY HAND</span>';
+            '<span class="lock-stamp">\u4EB2\u624B\u5C01\u4E0A</span>';
 
         var input = body.querySelector('.lock-input');
         var msg = body.querySelector('.lock-msg');
@@ -732,7 +745,7 @@
             if (hintIndex >= HINTS.length) { hintIndex = 0; hintList.innerHTML = ''; return; }
             hintList.appendChild(make('div', 'lock-hint-line', HINTS[hintIndex]));
             hintIndex += 1;
-            this.textContent = hintIndex >= HINTS.length ? 'hide hints' : 'another hint?';
+            this.textContent = hintIndex >= HINTS.length ? '\u6536\u8D77\u63D0\u793A' : '\u518D\u6765\u4E00\u6761\uFF1F';
         });
 
         body.querySelector('form').addEventListener('submit', function (e) {
@@ -764,7 +777,7 @@
             input.readOnly = true;
             if (msg) {
                 msg.className = 'lock-msg is-ok';
-                msg.textContent = 'Unlocked. The envelope is opening\u2026';
+                msg.textContent = '\u89E3\u9501\u4E86\u3002\u4FE1\u5C01\u6B63\u5728\u6253\u5F00\u2026';
             }
             var glyph = document.querySelector('.lock-glyph');
             if (glyph) glyph.innerHTML = LOCK_GLYPH_OPEN;
@@ -775,7 +788,7 @@
                 if (badge) badge.parentNode.removeChild(badge);
             }
             var dockHint = $('uiDockHint');
-            if (dockHint) dockHint.textContent = 'unlocked \u00B7 the letter is on the desk';
+            if (dockHint) dockHint.textContent = '\u5DF2\u89E3\u9501 \u00B7 \u4FE1\u5728\u684C\u4E0A';
             heartPop();
             setTimeout(function () {
                 closeWindow(win);
@@ -788,8 +801,8 @@
         if (msg) {
             msg.className = 'lock-msg is-bad';
             msg.textContent = attempts === 1
-                ? 'Not that one. Try again.'
-                : 'Still not it \u2014 ' + attempts + ' tries. The hint button is right there.';
+                ? '\u4E0D\u662F\u8FD9\u4E2A\u3002\u518D\u8BD5\u8BD5\u3002'
+                : '\u8FD8\u4E0D\u5BF9\u2014\u2014\u5DF2\u7ECF ' + attempts + ' \u6B21\u4E86\u3002\u63D0\u793A\u6309\u94AE\u5C31\u5728\u90A3\u513F\u3002';
         }
         input.classList.remove('is-bad');
         void input.offsetWidth;
@@ -798,17 +811,17 @@
     }
 
     function renderLetterOpened(body, win) {
-        win.querySelector('.ui-win-title').textContent = 'Letter \u2014 for ty';
+        win.querySelector('.ui-win-title').textContent = '\u4FE1\u4EF6 \u2014 \u7ED9 ty';
         body.innerHTML =
             '<div class="wz">' +
                 '<div class="wz-art">' + ICONS.letter + '</div>' +
                 '<div class="wz-text">' +
-                    '<div class="wz-h">Delivered.</div>' +
-                    '<p>The paper is out of the envelope and lying on the desk. Read it again whenever you like \u2014 it will say the same thing.</p>' +
-                    '<p class="ui-tip">Sealed by hand on a Tuesday, opened by you.</p>' +
+                    '<div class="wz-h">\u9001\u5230\u4E86\u3002</div>' +
+                    '<p>\u4FE1\u7EB8\u4ECE\u4FE1\u5C01\u91CC\u51FA\u6765\uFF0C\u8EBA\u5728\u684C\u4E0A\u4E86\u3002\u968F\u65F6\u53EF\u4EE5\u518D\u8BFB\u4E00\u904D\u2014\u2014\u5B83\u8BF4\u7684\u8FD8\u662F\u540C\u4E00\u4EF6\u4E8B\u3002</p>' +
+                    '<p class="ui-tip">\u4E00\u4E2A\u5468\u4E8C\u4EB2\u624B\u5C01\u4E0A\uFF0C\u88AB\u4F60\u6253\u5F00\u3002</p>' +
                     '<div class="wz-actions">' +
-                        '<button class="ui-btn is-primary" type="button" data-act="read">Read it again</button>' +
-                        '<button class="ui-btn" type="button" data-act="close">Put it away</button>' +
+                        '<button class="ui-btn is-primary" type="button" data-act="read">\u518D\u8BFB\u4E00\u904D</button>' +
+                        '<button class="ui-btn" type="button" data-act="close">\u6536\u8D77\u6765</button>' +
                     '</div>' +
                 '</div>' +
             '</div>';
@@ -819,10 +832,10 @@
     function renderLinksApp(body, win) {
         if (!LINKS.length) {
             body.innerHTML =
-                '<div class="wz-h">No links yet.</div>' +
-                '<p>This window is a real hyperlink list \u2014 it just needs entries.</p>' +
-                '<p class="ui-tip">Add them in <code class="ui-code">js/letter.js</code>: ' +
-                '<code class="ui-code">LINKS = [{ label: "our playlist", url: "https://\u2026" }]</code></p>';
+                '<div class="wz-h">\u8FD8\u6CA1\u6709\u94FE\u63A5\u3002</div>' +
+                '<p>\u8FD9\u4E2A\u7A97\u53E3\u662F\u4E00\u4E2A\u771F\u6B63\u7684\u8D85\u94FE\u63A5\u5217\u8868\u2014\u2014\u53EA\u5DEE\u5185\u5BB9\u3002</p>' +
+                '<p class="ui-tip">\u5728 <code class="ui-code">js/letter.js</code> \u91CC\u52A0\uFF1A' +
+                '<code class="ui-code">LINKS = [{ label: "\u6211\u4EEC\u7684\u6B4C\u5355", url: "https://\u2026" }]</code></p>';
             return;
         }
         body.innerHTML = '<div class="wz-h">Links</div><div class="ui-linklist">' +
@@ -833,12 +846,12 @@
     }
 
     function renderNotesApp(body, win) {
-        body.innerHTML = '<div class="wz-h">Notes to self</div><div class="ui-notelist">' +
+        body.innerHTML = '<div class="wz-h">\u5199\u7ED9\u81EA\u5DF1</div><div class="ui-notelist">' +
             NOTES.map(function (n) {
                 return '<div class="ui-note"><span class="ui-note-h">' + n.h + '</span>' +
                     '<span class="ui-note-t">' + n.t + '</span></div>';
             }).join('') + '</div>' +
-            '<p class="ui-tip">Edit <code class="ui-code">NOTES</code> in js/letter.js.</p>';
+            '<p class="ui-tip">\u5728 js/letter.js \u91CC\u7F16\u8F91 <code class="ui-code">NOTES</code>\u3002</p>';
     }
 
     /* ---------- clock + toast ---------- */
@@ -847,12 +860,10 @@
         var el = $('uiClock');
         if (!el) return;
         var d = new Date();
-        var days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+        var days = ['\u5468\u65E5', '\u5468\u4E00', '\u5468\u4E8C', '\u5468\u4E09', '\u5468\u56DB', '\u5468\u4E94', '\u5468\u516D'];
         var h = d.getHours();
-        var ampm = h >= 12 ? 'PM' : 'AM';
-        h = h % 12; if (h === 0) h = 12;
         var m = d.getMinutes();
-        el.textContent = days[d.getDay()] + ' ' + h + ':' + (m < 10 ? '0' + m : m) + ' ' + ampm;
+        el.textContent = days[d.getDay()] + ' ' + h + ':' + (m < 10 ? '0' + m : m);
     }
 
     var toastTimer = null;
@@ -948,7 +959,7 @@
         var reply = $('paperReply');
         if (reply) {
             reply.addEventListener('click', function () {
-                toast('Reply is reserved \u2014 wire it up in js/letter.js');
+                toast('\u56DE\u590D\u529F\u80FD\u7559\u7ED9\u4EE5\u540E\u2014\u2014\u5728 js/letter.js \u91CC\u63A5\u4E0A\u3002');
             });
         }
     }

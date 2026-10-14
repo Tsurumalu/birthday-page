@@ -6,67 +6,81 @@
 (function () {
     'use strict';
 
+    // --- Edition icons (thin line art, tinted by the edition colour) ---
+    function iconSvg(paths) {
+        return '<svg viewBox="0 0 24 24" width="100%" height="100%" fill="none" stroke="currentColor"' +
+            ' stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">' + paths + '</svg>';
+    }
+
     // --- Editions config ---
+    // Five editions around the dial. Order = clockwise from the top marker.
     var editions = [
-        {
-            id: 'card',
-            label: 'The Card',
-            subtitle: 'A birthday card, written just for you.',
-            page: 'card.html',
-            theme: 'theme-card',
-            icon: '&#9825;',
-            color: '#c9a06a',
-            angle: 0
-        },
         {
             id: 'story',
             label: 'Moments',
+            labelCn: '时光',
             subtitle: 'The chapters of us, from the beginning.',
             page: 'moments.html',
             theme: 'theme-story',
-            icon: '&#10022;',
-            color: '#b88e8a',
-            angle: 60
+            color: '#c8614a',
+            icon: iconSvg(
+                '<rect x="3" y="7.5" width="15" height="12.5" rx="2"/>' +
+                '<path d="M7 7.5V5.6A1.6 1.6 0 0 1 8.6 4H19a2 2 0 0 1 2 2v10.6"/>' +
+                '<path d="M3.6 17l3.9-3.2 3 2.6 3.2-3.2 4.3 3.6"/>'
+            )
         },
         {
             id: 'letter',
             label: 'The Letter',
+            labelCn: '信笺',
             subtitle: 'Words I want you to keep.',
             page: 'message.html',
             theme: 'theme-letter',
-            icon: '&#9993;',
-            color: '#7a9d90',
-            angle: 120
-        },
-        {
-            id: 'wish',
-            label: 'The Wish',
-            subtitle: 'Hopes for every year ahead.',
-            page: 'wish.html',
-            theme: 'theme-wish',
-            icon: '&#9734;',
-            color: '#7a94b8',
-            angle: 180
+            color: '#5fb79a',
+            icon: iconSvg(
+                '<rect x="3" y="5.5" width="18" height="13" rx="2.2"/>' +
+                '<path d="M3.6 7 12 13.2 20.4 7"/>'
+            )
         },
         {
             id: 'games',
             label: 'Games',
+            labelCn: '小游戏',
             subtitle: 'Our little arcade — drop a pin, press play.',
             page: 'games.html',
             theme: 'theme-games',
-            icon: '&#127918;',
             color: '#a48cc4',
-            angle: 240
+            icon: iconSvg(
+                '<path d="M12 21.5s6.6-6.3 6.6-11.1a6.6 6.6 0 1 0-13.2 0C5.4 15.2 12 21.5 12 21.5Z"/>' +
+                '<circle cx="12" cy="10.2" r="2.4"/>'
+            )
         },
         {
             id: 'music',
             label: 'Music',
+            labelCn: '行车音乐',
             subtitle: 'An evening drive — pick a tape, press play.',
             page: 'musics.html',
             theme: 'theme-music',
-            icon: '&#9835;',
-            color: '#d98a56',
-            angle: 300
+            color: '#e59a62',
+            icon: iconSvg(
+                '<path d="M9.2 18V5.6l10-2.1v12"/>' +
+                '<circle cx="6.6" cy="18" r="2.6"/>' +
+                '<circle cx="16.6" cy="15.5" r="2.6"/>'
+            )
+        },
+        {
+            id: 'cards',
+            label: 'The Cards',
+            labelCn: '留言板',
+            subtitle: 'Leave a little note. We\u2019ll pin it up for you.',
+            page: 'cards.html',
+            theme: 'theme-cards',
+            color: '#cf7f4e',
+            icon: iconSvg(
+                '<rect x="4" y="3.8" width="16" height="16.4" rx="2.6"/>' +
+                '<path d="M8.2 9.4h7.6M8.2 13h5.2"/>'
+            )
         }
     ];
 
@@ -88,17 +102,21 @@
     // --- Navigation ---
     var nav = document.getElementById('nav');
 
+    // `nav-compact` mirrors .nav.scrolled on <body> so anything anchored to the
+    // nav (the ‹ Back button) can follow it while it shrinks.
+    function setNavCompact(on) {
+        if (!nav) return;
+        nav.classList.toggle('scrolled', on);
+        document.body.classList.toggle('nav-compact', on);
+    }
+
     function updateNavScroll() {
         if (!nav) return;
-        if (window.scrollY > 40) {
-            nav.classList.add('scrolled');
-        } else {
-            nav.classList.remove('scrolled');
-        }
+        setNavCompact(window.scrollY > 40);
     }
 
     if (nav && !isHome) {
-        nav.classList.add('scrolled');
+        setNavCompact(true);
     }
 
     // --- Sound Toggle ---
@@ -217,8 +235,16 @@
             canvas.height = canvas.offsetHeight;
         }
 
+        // Fine dust drifting across the backdrop, tinted by the current edition
+        function themeAccentColors() {
+            var cs = getComputedStyle(document.body);
+            var primary = (cs.getPropertyValue('--theme-primary') || '').trim() || '#d4a574';
+            var soft = (cs.getPropertyValue('--theme-soft') || '').trim() || '#e8c79a';
+            return [primary, soft, 'rgba(255, 255, 255, 0.72)'];
+        }
+
         function createParticle() {
-            var colors = ['#d4a574', '#e8c79a', '#f5f0e8', '#c9a06a', '#b88e8a', '#7a9d90', '#7a94b8'];
+            var colors = themeAccentColors();
             return {
                 x: Math.random() * canvas.width,
                 y: -10,
@@ -234,7 +260,7 @@
 
         function initParticles() {
             particles = [];
-            var count = Math.min(45, Math.floor(canvas.width / 30));
+            var count = Math.min(34, Math.floor(canvas.width / 42));
             for (var i = 0; i < count; i++) {
                 var p = createParticle();
                 p.y = Math.random() * canvas.height;
@@ -309,77 +335,240 @@
         var dialSegments = document.getElementById('dialSegments');
         var dialLabels = document.getElementById('dialLabels');
         var dialHub = document.getElementById('dialHub');
+        var dialCount = document.getElementById('dialCount');
         var arrowLeft = document.getElementById('arrowLeft');
         var arrowRight = document.getElementById('arrowRight');
+        var randomBtn = document.getElementById('randomBtn');
         var homeTitle = document.getElementById('homeTitle');
-        var homeSubtitle = document.getElementById('homeSubtitle');
+        var homeTitleCn = document.getElementById('homeTitleCn');
+        var homeTagline = document.getElementById('homeTagline');
+
+        var SVGNS = 'http://www.w3.org/2000/svg';
+
+        // Dial geometry — the SVG viewBox is 400 x 400, centred on 200,200
+        var CX = 200;
+        var CY = 200;
+        var R_RING = 197;
+        var R_WEDGE_OUT = 195;
+        var R_WEDGE_IN = 58;
 
         var dialRotation = 0;
         var isDragging = false;
         var dragStartAngle = 0;
         var dragStartRotation = 0;
+        var lastIndex = -1;
 
-        // Generate SVG segments
-        function polarToCartesian(cx, cy, radius, angleInDegrees) {
-            var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
-            return {
-                x: cx + (radius * Math.cos(angleInRadians)),
-                y: cy + (radius * Math.sin(angleInRadians))
-            };
+        function polar(r, angleDeg) {
+            var a = (angleDeg - 90) * Math.PI / 180;
+            return { x: CX + r * Math.cos(a), y: CY + r * Math.sin(a) };
         }
 
-        function describeArc(x, y, radius, startAngle, endAngle) {
-            var start = polarToCartesian(x, y, radius, endAngle);
-            var end = polarToCartesian(x, y, radius, startAngle);
-            var largeArcFlag = endAngle - startAngle <= 180 ? '0' : '1';
-            return [
-                'M', start.x, start.y,
-                'A', radius, radius, 0, largeArcFlag, 0, end.x, end.y
-            ].join(' ');
+        function sectorPath(rIn, rOut, startAngle, endAngle) {
+            var large = (endAngle - startAngle) > 180 ? 1 : 0;
+            var o1 = polar(rOut, startAngle);
+            var o2 = polar(rOut, endAngle);
+            var i2 = polar(rIn, endAngle);
+            var i1 = polar(rIn, startAngle);
+            return 'M' + o1.x.toFixed(2) + ' ' + o1.y.toFixed(2) +
+                'A' + rOut + ' ' + rOut + ' 0 ' + large + ' 1 ' + o2.x.toFixed(2) + ' ' + o2.y.toFixed(2) +
+                'L' + i2.x.toFixed(2) + ' ' + i2.y.toFixed(2) +
+                'A' + rIn + ' ' + rIn + ' 0 ' + large + ' 0 ' + i1.x.toFixed(2) + ' ' + i1.y.toFixed(2) + 'Z';
         }
 
-        function createSegmentPath(cx, cy, innerR, outerR, startAngle, endAngle) {
-            var outerArc = describeArc(cx, cy, outerR, startAngle, endAngle);
-            var innerArc = describeArc(cx, cy, innerR, endAngle, startAngle);
-            var innerStart = polarToCartesian(cx, cy, innerR, endAngle);
-            return outerArc + ' L ' + innerStart.x + ' ' + innerStart.y + ' ' + innerArc + ' Z';
+        function svgEl(name, attrs) {
+            var node = document.createElementNS(SVGNS, name);
+            for (var k in attrs) {
+                if (Object.prototype.hasOwnProperty.call(attrs, k)) {
+                    node.setAttribute(k, attrs[k]);
+                }
+            }
+            return node;
+        }
+
+        // One path per tick band — keeps the rotor cheap to composite
+        function tickBand(count, rFrom, rTo, everyMajor, rMajor) {
+            var d = '';
+            for (var i = 0; i < count; i++) {
+                var a = i * (360 / count);
+                var major = everyMajor && (i % everyMajor === 0);
+                var p1 = polar(rFrom, a);
+                var p2 = polar(major ? rMajor : rTo, a);
+                d += 'M' + p1.x.toFixed(2) + ' ' + p1.y.toFixed(2) +
+                    'L' + p2.x.toFixed(2) + ' ' + p2.y.toFixed(2);
+            }
+            return d;
         }
 
         function renderDial() {
             if (!dialSegments || !dialLabels) return;
+            dialSegments.innerHTML = '';
 
-            var cx = 180;
-            var cy = 180;
-            var outerR = 170;
-            var innerR = 62;
-            var segmentSpan = SEGMENT;
-            var gap = 2;
+            // The selected wedge is painted with this gradient (re-tinted per edition)
+            var defs = svgEl('defs');
+            var grad = svgEl('radialGradient', {
+                id: 'dialWedgeGrad',
+                gradientUnits: 'userSpaceOnUse',
+                cx: CX, cy: CY, r: 196
+            });
+            var offsets = [0, 0.5, 0.8, 1];
+            var alphas = [0.04, 0.3, 0.8, 1];
+            offsets.forEach(function (offset, i) {
+                grad.appendChild(svgEl('stop', {
+                    offset: offset,
+                    'stop-color': editions[0].color,
+                    'stop-opacity': alphas[i]
+                }));
+            });
+            defs.appendChild(grad);
+            dialSegments.appendChild(defs);
 
+            // Machined face — sunk disc, tick grilles, hairline rings.
+            // The centre band is left empty: the static lens etching (r 100-124)
+            // and the aperture disc (r ~98) cover it. Kept sparse on purpose:
+            // two tick bands + four hairlines, the barrel does the talking.
+            dialSegments.appendChild(svgEl('circle', { class: 'dial-disc', cx: CX, cy: CY, r: R_WEDGE_OUT }));
+            dialSegments.appendChild(svgEl('path', { class: 'dial-tick', d: tickBand(45, 128, 152, 0, 0) }));
+            dialSegments.appendChild(svgEl('path', { class: 'dial-tick dial-tick--major', d: tickBand(30, 160, 172, 3, 184) }));
+            [152, 172].forEach(function (r) {
+                dialSegments.appendChild(svgEl('circle', { class: 'dial-ring', cx: CX, cy: CY, r: r }));
+            });
+            dialSegments.appendChild(svgEl('circle', { class: 'dial-ring', cx: CX, cy: CY, r: R_WEDGE_OUT }));
+            dialSegments.appendChild(svgEl('circle', { class: 'dial-ring', cx: CX, cy: CY, r: R_RING }));
+
+            var gapHalf = 0.9;
             editions.forEach(function (edition, i) {
-                var startAngle = edition.angle - segmentSpan / 2 + gap / 2;
-                var endAngle = edition.angle + segmentSpan / 2 - gap / 2;
+                var angle = i * SEGMENT;
+                var d = sectorPath(R_WEDGE_IN, R_WEDGE_OUT, angle - SEGMENT / 2 + gapHalf, angle + SEGMENT / 2 - gapHalf);
 
-                // Segment
-                var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                path.setAttribute('class', 'dial-segment');
-                path.setAttribute('data-section', edition.id);
-                path.setAttribute('d', createSegmentPath(cx, cy, innerR, outerR, startAngle, endAngle));
-                path.setAttribute('fill', edition.color);
-                dialSegments.appendChild(path);
+                // Whisper of the edition colour…
+                dialSegments.appendChild(svgEl('path', {
+                    class: 'dial-segment',
+                    'data-section': edition.id,
+                    d: d,
+                    fill: edition.color
+                }));
 
-                // Label
+                // …and the bloom that fires when it is selected
+                dialSegments.appendChild(svgEl('path', {
+                    class: 'dial-segment-glow',
+                    'data-section': edition.id,
+                    d: d
+                }));
+            });
+
+            // Labels ride on two alternating radii so the ring reads as scattered
+            editions.forEach(function (edition) {
                 var label = document.createElement('div');
                 label.className = 'dial-label';
                 label.setAttribute('data-section', edition.id);
-                label.style.setProperty('--angle', edition.angle + 'deg');
+                label.style.setProperty('--label-color', edition.color);
                 label.innerHTML =
                     '<span class="dial-label-icon">' + edition.icon + '</span>' +
-                    '<span class="dial-label-text">' + edition.label + '</span>';
+                    '<span class="dial-label-text">' + edition.label + '</span>' +
+                    '<span class="dial-label-cn">' + edition.labelCn + '</span>';
                 dialLabels.appendChild(label);
             });
         }
 
         renderDial();
+
+        /* --- Aperture blades ---
+           8 spiral blades on a glass disc; the centre hole is punched by the
+           CSS mask on .dial-iris (--iris-r), the disc itself just rotates. */
+        var dialIris = document.getElementById('dialIris');
+        var irisBlades = document.getElementById('irisBlades');
+
+        function irisPolar(r, angleDeg) {
+            var a = angleDeg * Math.PI / 180;
+            return { x: 100 + r * Math.cos(a), y: 100 + r * Math.sin(a) };
+        }
+
+        function bladePath() {
+            var rIn = 25, rOut = 97;
+            var a = irisPolar(rIn, 0);
+            var b = irisPolar(rOut, 34);
+            var c = irisPolar(rOut, 108);
+            var d = irisPolar(rIn, 74);
+            function dir(p, angleDeg, len, sign) {
+                var r = angleDeg * Math.PI / 180;
+                return {
+                    x: p.x + sign * len * Math.cos(r),
+                    y: p.y + sign * len * Math.sin(r)
+                };
+            }
+            var cp1 = dir(a, 90, 44, 1);
+            var cp2 = dir(b, 124, 50, -1);
+            var cp3 = dir(c, 198, 50, 1);
+            var cp4 = dir(d, -16, 44, -1);
+            var f = function (p) { return p.x.toFixed(2) + ' ' + p.y.toFixed(2); };
+            return 'M' + f(a) +
+                'C' + f(cp1) + ' ' + f(cp2) + ' ' + f(b) +
+                'A' + rOut + ' ' + rOut + ' 0 0 1 ' + f(c) +
+                'C' + f(cp3) + ' ' + f(cp4) + ' ' + f(d) +
+                'A' + rIn + ' ' + rIn + ' 0 0 0 ' + f(a) + 'Z';
+        }
+
+        function buildIris() {
+            if (!irisBlades) return;
+            var defs = svgEl('defs');
+
+            var glass = svgEl('radialGradient', { id: 'irisGlass', cx: '50%', cy: '50%', r: '50%' });
+            [['0%', 'iris-stop-hi'], ['55%', 'iris-stop-mid'], ['100%', 'iris-stop-lo']].forEach(function (s) {
+                glass.appendChild(svgEl('stop', { offset: s[0], class: s[1] }));
+            });
+            defs.appendChild(glass);
+
+            var metal = svgEl('radialGradient', { id: 'irisMetal', cx: '50%', cy: '50%', r: '50%' });
+            [['0%', 'iris-stop-lo'], ['62%', 'iris-stop-mid'], ['100%', 'iris-stop-hi']].forEach(function (s) {
+                metal.appendChild(svgEl('stop', { offset: s[0], class: s[1] }));
+            });
+            defs.appendChild(metal);
+
+            var sheen = svgEl('linearGradient', { id: 'irisSheen', x1: '0%', y1: '0%', x2: '100%', y2: '100%' });
+            [['0%', 0.1], ['38%', 0.02], ['62%', 0]].forEach(function (s) {
+                sheen.appendChild(svgEl('stop', { offset: s[0], 'stop-color': '#ffffff', 'stop-opacity': s[1] }));
+            });
+            defs.appendChild(sheen);
+            irisBlades.appendChild(defs);
+
+            // Glass base
+            irisBlades.appendChild(svgEl('circle', { cx: 100, cy: 100, r: 96.5, fill: 'url(#irisGlass)' }));
+
+            var d = bladePath();
+            for (var i = 0; i < 8; i++) {
+                irisBlades.appendChild(svgEl('path', {
+                    class: 'iris-blade',
+                    d: d,
+                    fill: 'url(#irisMetal)',
+                    transform: 'rotate(' + (i * 45) + ' 100 100)'
+                }));
+            }
+
+            // Theme-tinted reflection arc over the blades (re-colours per edition)
+            irisBlades.appendChild(svgEl('circle', {
+                cx: 100, cy: 100, r: 76, fill: 'none',
+                style: 'stroke: var(--theme-soft)',
+                'stroke-width': 2.5, opacity: 0.34,
+                'stroke-dasharray': '118 360',
+                transform: 'rotate(-38 100 100)'
+            }));
+
+            // Coating sheen + barrel lip
+            irisBlades.appendChild(svgEl('circle', { cx: 100, cy: 100, r: 96.5, fill: 'url(#irisSheen)' }));
+            irisBlades.appendChild(svgEl('circle', { cx: 100, cy: 100, r: 96.5, fill: 'none', stroke: 'rgba(255,255,255,0.16)', 'stroke-width': 1 }));
+            irisBlades.appendChild(svgEl('circle', { cx: 100, cy: 100, r: 92, fill: 'none', stroke: 'rgba(255,255,255,0.08)', 'stroke-width': 1 }));
+        }
+
+        buildIris();
+
+        var glowEls = dialSegments ? dialSegments.querySelectorAll('.dial-segment-glow') : [];
+        var labelEls = dialLabels ? dialLabels.querySelectorAll('.dial-label') : [];
+        var gradStops = dialSegments ? dialSegments.querySelectorAll('#dialWedgeGrad stop') : [];
+
+        function labelRadius(index) {
+            var size = dialEl ? dialEl.offsetWidth : 340;
+            return size * (index % 2 === 0 ? 0.365 : 0.43);
+        }
 
         function getSelectedIndex(rotation) {
             var snapped = Math.round(rotation / SEGMENT) * SEGMENT;
@@ -387,45 +576,60 @@
             return ((Math.round(-snapped / SEGMENT) % n) + n) % n;
         }
 
-        function updateTheme(index) {
+        function applyTheme(index) {
             var edition = editions[index];
 
-            // Update body theme class
+            // Re-tint the whole page: backdrop, glow, hairlines
             var themeClasses = editions.map(function (e) { return e.theme; });
             document.body.classList.remove.apply(document.body.classList, themeClasses);
             document.body.classList.add(edition.theme);
 
-            // Update home text
-            if (homeTitle) {
-                homeTitle.textContent = edition.label;
-            }
-            if (homeSubtitle) {
-                homeSubtitle.textContent = edition.subtitle;
-            }
-
-            // Update active segment
-            var segments = document.querySelectorAll('.dial-segment');
-            segments.forEach(function (seg, i) {
-                if (i === index) {
-                    seg.classList.add('active');
-                } else {
-                    seg.classList.remove('active');
+            // Masthead copy + hub counter (only when the edition actually changed)
+            if (index !== lastIndex) {
+                if (homeTitle) {
+                    homeTitle.textContent = edition.label;
+                    homeTitle.classList.remove('swap');
+                    void homeTitle.offsetWidth;
+                    homeTitle.classList.add('swap');
                 }
-            });
-
-            // Update active label
-            var labels = document.querySelectorAll('.dial-label');
-            labels.forEach(function (label, i) {
-                if (i === index) {
-                    label.classList.add('active');
-                    label.classList.remove('inactive');
-                } else {
-                    label.classList.remove('active');
-                    label.classList.add('inactive');
+                if (homeTitleCn) {
+                    homeTitleCn.textContent = edition.labelCn;
+                    homeTitleCn.classList.remove('swap');
+                    void homeTitleCn.offsetWidth;
+                    homeTitleCn.classList.add('swap');
                 }
-            });
+                if (homeTagline) {
+                    homeTagline.textContent = edition.subtitle;
+                }
+                if (dialCount) {
+                    dialCount.textContent = ('0' + (index + 1)).slice(-2) + ' / 0' + editions.length;
+                }
+                lastIndex = index;
+            }
 
-            // Update nav active
+            // Re-colour the selected wedge gradient
+            for (var s = 0; s < gradStops.length; s++) {
+                gradStops[s].setAttribute('stop-color', edition.color);
+            }
+
+            // Selected wedge bloom
+            for (var g = 0; g < glowEls.length; g++) {
+                if (g === index) glowEls[g].classList.add('active');
+                else glowEls[g].classList.remove('active');
+            }
+
+            // Active label
+            for (var l = 0; l < labelEls.length; l++) {
+                if (l === index) {
+                    labelEls[l].classList.add('active');
+                    labelEls[l].classList.remove('inactive');
+                } else {
+                    labelEls[l].classList.remove('active');
+                    labelEls[l].classList.add('inactive');
+                }
+            }
+
+            // Nav active
             var navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(function (link) {
                 link.classList.remove('active');
@@ -435,7 +639,63 @@
             });
         }
 
-        function updateDial(rotation, animate) {
+        /* --- Aperture ceremony ---
+           Deliberate edition switches shut the iris, swap the theme in the
+           dark, then re-open onto the ENTER hub. Dragging swaps instantly —
+           the ceremony only fires once the dial has settled. */
+        var irisBusy = false;
+        var irisPending = -1;
+        var irisAngle = 0;
+
+        function hubPop() {
+            if (!dialHub) return;
+            dialHub.classList.remove('enter-pop');
+            void dialHub.offsetWidth;
+            dialHub.classList.add('enter-pop');
+        }
+
+        function irisOpen() {
+            if (!dialIris) return;
+            irisAngle += 30;
+            if (irisBlades) irisBlades.style.transform = 'rotate(' + irisAngle + 'deg)';
+            dialIris.classList.remove('is-closed');
+            hubPop();
+        }
+
+        function irisRun() {
+            irisBusy = true;
+            irisAngle += 24;
+            if (irisBlades) irisBlades.style.transform = 'rotate(' + irisAngle + 'deg)';
+            dialIris.classList.add('is-closed');
+            setTimeout(function () {
+                if (irisPending >= 0) applyTheme(irisPending);
+                setTimeout(function () {
+                    irisOpen();
+                    setTimeout(function () {
+                        irisBusy = false;
+                        var next = irisPending;
+                        if (next >= 0 && next !== lastIndex) {
+                            irisPending = next;
+                            irisRun();
+                        } else {
+                            irisPending = -1;
+                        }
+                    }, 520);
+                }, 90);
+            }, 340);
+        }
+
+        function updateTheme(index, instant) {
+            if (!dialIris || instant) {
+                applyTheme(index);
+                return;
+            }
+            if (index === lastIndex) return;
+            irisPending = index;
+            if (!irisBusy) irisRun();
+        }
+
+        function updateDial(rotation, animate, instant) {
             dialRotation = rotation;
 
             if (dialRotor) {
@@ -447,38 +707,66 @@
                 dialRotor.style.transform = 'rotate(' + rotation + 'deg)';
             }
 
-            // Keep labels upright by counter-rotating
-            var labels = document.querySelectorAll('.dial-label');
-            labels.forEach(function (label, i) {
-                if (animate) {
-                    label.style.transition = 'opacity 0.3s var(--ease-out), transform 0.5s var(--ease-out)';
-                } else {
-                    label.style.transition = 'none';
-                }
-                var angle = editions[i].angle;
-                var radius = parseFloat(getComputedStyle(dialEl).getPropertyValue('--label-radius')) || 108;
+            // Keep every label upright by counter-rotating it
+            for (var i = 0; i < labelEls.length; i++) {
+                var label = labelEls[i];
+                label.style.transition = animate
+                    ? 'opacity 0.35s var(--ease-out), transform 0.6s var(--ease-out)'
+                    : 'none';
+                var angle = i * SEGMENT;
+                var radius = labelRadius(i);
                 label.style.transform =
                     'translate(-50%, -50%) ' +
                     'rotate(' + angle + 'deg) ' +
                     'translateY(-' + radius + 'px) ' +
                     'rotate(' + (-(angle + rotation)) + 'deg)';
-            });
+            }
 
-            var selectedIndex = getSelectedIndex(rotation);
-            updateTheme(selectedIndex);
+            updateTheme(getSelectedIndex(rotation), instant === true);
         }
 
         function snapDial() {
             var snapped = Math.round(dialRotation / SEGMENT) * SEGMENT;
-            updateDial(snapped, true);
+            updateDial(snapped, true, true);
         }
 
-        function rotateBySegments(direction) {
-            var target = Math.round((dialRotation + direction * SEGMENT) / SEGMENT) * SEGMENT;
-            updateDial(target, true);
+        // Step to the neighbouring edition (direction +1 = next, -1 = previous)
+        function stepEdition(direction) {
+            var n = editions.length;
+            var next = (((getSelectedIndex(dialRotation) + direction) % n) + n) % n;
+            goToIndex(next, true);
         }
 
-        // Pointer angle from center (0 = top, clockwise)
+        // Turn to a specific edition by the shortest way round
+        function goToIndex(index, animate) {
+            var target = -(index * SEGMENT);
+            while (target - dialRotation > 180) target -= 360;
+            while (target - dialRotation < -180) target += 360;
+            updateDial(target, animate !== false);
+        }
+
+        function enterSelected() {
+            var index = getSelectedIndex(dialRotation);
+            if (dialHub) {
+                dialHub.classList.add('pulse');
+                setTimeout(function () {
+                    dialHub.classList.remove('pulse');
+                }, 700);
+            }
+            window.location.href = editions[index].page;
+        }
+
+        function randomise() {
+            if (editions.length < 2) return;
+            var current = getSelectedIndex(dialRotation);
+            var next = current;
+            while (next === current) {
+                next = Math.floor(Math.random() * editions.length);
+            }
+            goToIndex(next, true);
+        }
+
+        // Pointer angle from centre (0 = top, clockwise)
         function pointerToAngle(clientX, clientY) {
             var rect = dialEl.getBoundingClientRect();
             var cx = rect.left + rect.width / 2;
@@ -494,6 +782,8 @@
             return angle;
         }
 
+        var dragStartIndex = -1;
+
         function onDragStart(e) {
             if (!dialEl || !dialRotor) return;
 
@@ -503,6 +793,7 @@
 
             isDragging = true;
             dialRotor.classList.add('dragging');
+            dragStartIndex = getSelectedIndex(dialRotation);
 
             var point = e.touches ? e.touches[0] : e;
             dragStartAngle = pointerToAngle(point.clientX, point.clientY);
@@ -519,7 +810,7 @@
             var delta = normalizeDelta(currentAngle - dragStartAngle);
             var newRotation = dragStartRotation + delta;
 
-            updateDial(newRotation, false);
+            updateDial(newRotation, false, true);
             e.preventDefault();
         }
 
@@ -527,7 +818,10 @@
             if (!isDragging) return;
             isDragging = false;
             dialRotor.classList.remove('dragging');
+            // Colours already followed the drag; settle, then fire the ceremony
+            var changed = getSelectedIndex(dialRotation) !== dragStartIndex;
             snapDial();
+            if (changed && !irisBusy) irisRun();
         }
 
         // Event bindings
@@ -543,68 +837,104 @@
             dialEl.addEventListener('wheel', function (e) {
                 if (Math.abs(e.deltaY) < 1) return;
                 e.preventDefault();
-                var direction = e.deltaY > 0 ? 1 : -1;
-                rotateBySegments(direction);
+                stepEdition(e.deltaY > 0 ? 1 : -1);
             }, { passive: false });
-
-            dialEl.addEventListener('keydown', function (e) {
-                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    rotateBySegments(1);
-                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    rotateBySegments(-1);
-                } else if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    if (dialHub) dialHub.click();
-                }
-            });
         }
+
+        // Keyboard — the whole chooser responds, just like the reference
+        document.addEventListener('keydown', function (e) {
+            if (e.metaKey || e.ctrlKey || e.altKey) return;
+            var tag = e.target && e.target.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                stepEdition(1);
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                stepEdition(-1);
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                enterSelected();
+            } else if (e.key === 'r' || e.key === 'R') {
+                e.preventDefault();
+                randomise();
+            } else if (e.key === ' ' && (e.target === dialEl || e.target === dialHub)) {
+                e.preventDefault();
+                enterSelected();
+            }
+        });
 
         // Arrow buttons
         if (arrowLeft) {
             arrowLeft.addEventListener('click', function () {
-                rotateBySegments(-1);
+                stepEdition(-1);
             });
         }
         if (arrowRight) {
             arrowRight.addEventListener('click', function () {
-                rotateBySegments(1);
+                stepEdition(1);
+            });
+        }
+        if (randomBtn) {
+            randomBtn.addEventListener('click', function () {
+                randomise();
             });
         }
 
-        // Label click
-        document.querySelectorAll('.dial-label').forEach(function (label) {
-            label.addEventListener('click', function (e) {
-                e.stopPropagation();
-                var sectionId = label.getAttribute('data-section');
-                for (var i = 0; i < editions.length; i++) {
-                    if (editions[i].id === sectionId) {
-                        var targetRotation = -editions[i].angle;
-                        while (targetRotation - dialRotation > 180) targetRotation -= 360;
-                        while (targetRotation - dialRotation < -180) targetRotation += 360;
-                        updateDial(targetRotation, true);
-                        break;
-                    }
-                }
-            });
-        });
+        // Label click — jump straight to that edition
+        for (var li = 0; li < labelEls.length; li++) {
+            (function (label, index) {
+                label.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    goToIndex(index, true);
+                });
+            })(labelEls[li], li);
+        }
 
-        // Hub click — navigate to selected edition
+        // Hub click — enter the selected edition
         if (dialHub) {
-            dialHub.addEventListener('click', function () {
-                dialHub.classList.add('pulse');
-                setTimeout(function () {
-                    dialHub.classList.remove('pulse');
-                }, 600);
-
-                var selectedIndex = getSelectedIndex(dialRotation);
-                window.location.href = editions[selectedIndex].page;
-            });
+            dialHub.addEventListener('click', enterSelected);
         }
 
         // Initialize
-        updateDial(0, true);
+        updateDial(0, true, true);
+
+        // Deep link — index.html?e=letter opens straight on that edition
+        var deepLink = null;
+        if (window.location.search) {
+            var qPairs = window.location.search.replace(/^\?/, '').split('&');
+            for (var qi = 0; qi < qPairs.length; qi++) {
+                var qKey = qPairs[qi].split('=');
+                if (qKey[0] === 'e') {
+                    deepLink = decodeURIComponent(qKey[1] || '');
+                    break;
+                }
+            }
+        }
+        if (deepLink) {
+            for (var ei = 0; ei < editions.length; ei++) {
+                if (editions[ei].id === deepLink || editions[ei].page === deepLink) {
+                    updateDial(-(ei * SEGMENT), false, true);
+                    if (dialRotor) dialRotor.classList.remove('dragging');
+                    break;
+                }
+            }
+        }
+
+        // Labels are positioned in pixels, so re-lay them out on resize
+        var resizeTimer = null;
+        window.addEventListener('resize', function () {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function () {
+                updateDial(dialRotation, false, true);
+            }, 120);
+        });
+
+        // Opening shot: the aperture dilates onto the ENTER hub
+        setTimeout(function () {
+            irisOpen();
+        }, 1100);
 
         // Trigger reveal animations
         setTimeout(function () {
@@ -613,43 +943,6 @@
             });
         }, 200);
     }
-
-    // --- Sub Pages: Card Flip ---
-    var birthdayCard = document.getElementById('birthdayCard');
-    if (birthdayCard) {
-        birthdayCard.addEventListener('click', function () {
-            birthdayCard.classList.toggle('flipped');
-        });
-
-        birthdayCard.setAttribute('tabindex', '0');
-        birthdayCard.setAttribute('role', 'button');
-        birthdayCard.setAttribute('aria-label', 'Flip the birthday card');
-
-        birthdayCard.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                birthdayCard.classList.toggle('flipped');
-            }
-        });
-    }
-
-    // --- Sub Pages: Wish Cards ---
-    var wishCards = document.querySelectorAll('.wish-card');
-    wishCards.forEach(function (card) {
-        card.addEventListener('click', function () {
-            card.classList.toggle('revealed');
-        });
-
-        card.setAttribute('tabindex', '0');
-        card.setAttribute('role', 'button');
-
-        card.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                card.classList.toggle('revealed');
-            }
-        });
-    });
 
     // --- Sub Pages: Journey Map (Moments page) ---
     var journeyTrain = document.getElementById('journeyTrain');
@@ -1244,214 +1537,484 @@
         return d;
     }
 
-    // --- Journey Stage (scroll-driven stamp collage) ---
-    var journeyStampsEl = document.getElementById('journeyStamps');
+    // --- Journey Stage (scroll-driven polaroid clothesline) ---
+    // Prints are pegged to a sagging string. Scrolling slides the whole line
+    // past a fixed centre; the line chases the scroll with a critically damped
+    // spring, and every print swings on its peg with the speed the line is
+    // moving, then settles back. Scroll position stays the single source of
+    // truth — drag / click / arrow keys all just move the window scroll.
     var journeyStageEl = document.getElementById('journeyStage');
     var journeyHintEl = document.getElementById('journeyHint');
+    var plRoot = document.getElementById('polaroidLine');
 
-    function lerp(a, b, t) { return a + (b - a) * t; }
-    function easeInOutCubic(t) {
-        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    }
+    function clampN(v, a, b) { return Math.min(b, Math.max(a, v)); }
+    function pad2(n) { return n < 10 ? '0' + n : String(n); }
 
-    if (journeyStampsEl && journeyStageEl) {
+    if (plRoot && journeyStageEl) {
         var N = journey.length;
-        var stampRotations = [-2.5, 1.8, -1.2, 2.2, -1.8, 1.4, -2.2, 1.1];
+        var plCardsEl = document.getElementById('plCards');
+        var plPathEl = document.getElementById('plStringPath');
+        var plCapEl = document.getElementById('plCap');
+        var plCountEl = document.getElementById('plCount');
+        var plSrEl = document.getElementById('plSr');
         var railBarEl = document.getElementById('journeyRailBar');
         var railTrainEl = document.getElementById('railBarTrain');
         var journeyFooterEl = document.querySelector('.footer');
+        var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        // Build stamp elements
+        var CFG = { cardWidth: 300, sag: 46, spacing: 1.06, spring: 62, swing: 1 };
+
+        /* --- Painted photographs -----------------------------------------
+           Places we have no photo of yet get a painted landscape instead, so
+           the page works with no assets. Drop a file into `journey[i].image`
+           and that wins. */
+        var PALETTES = {
+            dawn:  { top: '#e7b7a5', bottom: '#f8e8d6', sun: '#fff4df', far: '#d2b2bb', near: '#3a2a3b', mist: '255,240,232' },
+            alpine:{ top: '#7ea5c8', bottom: '#e3ecf2', sun: '#ffffff', far: '#a9bfd0', near: '#1c3044', mist: '236,244,250' },
+            dusk:  { top: '#2a2450', bottom: '#ef8d60', sun: '#ffd9a6', far: '#93607c', near: '#18121f', mist: '255,196,160' },
+            mist:  { top: '#c4d0cb', bottom: '#eef1ec', sun: '#ffffff', far: '#aebcb5', near: '#2c3a33', mist: '246,248,245' },
+            sea:   { top: '#8fc6d8', bottom: '#f0f6f4', sun: '#ffffff', far: '#7fa8bd', near: '#12303c', mist: '238,248,250' },
+            jade:  { top: '#a8c6a0', bottom: '#f2f5e8', sun: '#fffbe8', far: '#8fae8c', near: '#22301f', mist: '244,248,238' },
+            city:  { top: '#3b2a4a', bottom: '#f0a35e', sun: '#ffd9a6', far: '#7a4f6b', near: '#14101c', mist: '255,205,175' }
+        };
+
+        // Per-place mood + seed, so every print is a different photograph.
+        var PHOTO_LOOK = {
+            tanglang:  { palette: 'jade',   seed: 12 },
+            guangming: { palette: 'dawn',   seed: 27 },
+            xiamen:    { palette: 'sea',    seed: 5  },
+            zhuhai:    { palette: 'dusk',   seed: 9  },
+            macau:     { palette: 'city',   seed: 16 },
+            hongkong:  { palette: 'city',   seed: 33 },
+            chengdu:   { palette: 'mist',   seed: 21 },
+            singapore: { palette: 'alpine', seed: 44 }
+        };
+
+        function mulberry32(seed) {
+            var a = seed >>> 0;
+            return function () {
+                a = (a + 0x6d2b79f5) >>> 0;
+                var t = a;
+                t = Math.imul(t ^ (t >>> 15), t | 1);
+                t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            };
+        }
+        function hexRgb(h) {
+            var v = parseInt(h.replace('#', ''), 16);
+            return [(v >> 16) & 255, (v >> 8) & 255, v & 255];
+        }
+        function mixRgb(a, b, t) {
+            var A = hexRgb(a), B = hexRgb(b);
+            return 'rgb(' + A.map(function (v, i) { return Math.round(v + (B[i] - v) * t); }).join(',') + ')';
+        }
+
+        // A layered-ridge landscape: sky, a low sun, five ridges fading into
+        // haze with mist between them, a tree line, vignette, film grain.
+        function paintLandscape(seed, palette, w, h) {
+            var c = document.createElement('canvas');
+            c.width = w;
+            c.height = h;
+            var g = c.getContext('2d');
+            if (!g) return '';
+            var P = PALETTES[palette] || PALETTES.dawn;
+            var r = mulberry32(seed * 104729 + 7);
+
+            var sky = g.createLinearGradient(0, 0, 0, h * 0.72);
+            sky.addColorStop(0, P.top);
+            sky.addColorStop(1, P.bottom);
+            g.fillStyle = sky;
+            g.fillRect(0, 0, w, h);
+
+            var sx = w * (0.22 + r() * 0.56);
+            var sy = h * (0.26 + r() * 0.16);
+            var halo = g.createRadialGradient(sx, sy, 0, sx, sy, w * 0.45);
+            halo.addColorStop(0, 'rgba(' + hexRgb(P.sun).join(',') + ',.85)');
+            halo.addColorStop(0.08, 'rgba(' + hexRgb(P.sun).join(',') + ',.55)');
+            halo.addColorStop(1, 'rgba(' + hexRgb(P.sun).join(',') + ',0)');
+            g.fillStyle = halo;
+            g.fillRect(0, 0, w, h);
+            g.fillStyle = P.sun;
+            g.beginPath();
+            g.arc(sx, sy, h * 0.045, 0, Math.PI * 2);
+            g.fill();
+
+            var layers = 5;
+            for (var L = 0; L < layers; L++) {
+                var k = L / (layers - 1);
+                var base = h * (0.42 + k * 0.4);
+                var amp = h * (0.07 + k * 0.1);
+                var ph = [r(), r(), r(), r()].map(function (v) { return v * Math.PI * 2; });
+                var fr = [1.3 + r(), 3.1 + r() * 2, 7 + r() * 4, 17 + r() * 8];
+                var ridge = function (x) {
+                    var u = x / w;
+                    return base - amp * (
+                        0.55 * Math.sin(u * fr[0] + ph[0]) +
+                        0.28 * Math.sin(u * fr[1] + ph[1]) +
+                        0.12 * Math.abs(Math.sin(u * fr[2] + ph[2])) +
+                        0.05 * Math.sin(u * fr[3] + ph[3])
+                    );
+                };
+                var mist = g.createLinearGradient(0, base - amp * 1.4, 0, base + amp * 0.4);
+                mist.addColorStop(0, 'rgba(' + P.mist + ',0)');
+                mist.addColorStop(1, 'rgba(' + P.mist + ',' + (0.55 - k * 0.35).toFixed(2) + ')');
+                g.fillStyle = mist;
+                g.fillRect(0, base - amp * 1.4, w, amp * 1.8);
+                var body = g.createLinearGradient(0, base - amp, 0, h);
+                body.addColorStop(0, mixRgb(P.far, P.near, Math.pow(k, 1.3)));
+                body.addColorStop(1, mixRgb(P.far, P.near, Math.min(1, Math.pow(k, 1.3) + 0.18)));
+                g.fillStyle = body;
+                g.beginPath();
+                g.moveTo(0, h);
+                for (var x = 0; x <= w; x += 6) g.lineTo(x, ridge(x));
+                g.lineTo(w, h);
+                g.closePath();
+                g.fill();
+                if (L >= layers - 2) {
+                    g.fillStyle = mixRgb(P.far, P.near, Math.min(1, Math.pow(k, 1.3) + 0.08));
+                    for (var tx = 0; tx < w; tx += 7 + r() * 9) {
+                        if (r() < 0.35) continue;
+                        var ty = ridge(tx) + 2;
+                        var th = h * (0.025 + r() * 0.035) * (0.6 + k);
+                        var tw = th * 0.32;
+                        g.beginPath();
+                        g.moveTo(tx, ty - th);
+                        g.lineTo(tx + tw, ty);
+                        g.lineTo(tx - tw, ty);
+                        g.closePath();
+                        g.fill();
+                    }
+                }
+            }
+
+            var vig = g.createRadialGradient(w / 2, h * 0.45, h * 0.3, w / 2, h / 2, w * 0.78);
+            vig.addColorStop(0, 'rgba(0,0,0,0)');
+            vig.addColorStop(1, 'rgba(0,0,0,.32)');
+            g.fillStyle = vig;
+            g.fillRect(0, 0, w, h);
+
+            var grain = g.getImageData(0, 0, w, h);
+            var d = grain.data;
+            for (var i = 0; i < d.length; i += 4) {
+                var v = (r() - 0.5) * 14;
+                d[i] += v;
+                d[i + 1] += v;
+                d[i + 2] += v;
+            }
+            g.putImageData(grain, 0, 0);
+            return c.toDataURL('image/jpeg', 0.86);
+        }
+
+        /* --- Build the prints ------------------------------------------- */
+        var cards = [];
         journey.forEach(function (loc, i) {
-            var no = ('0' + (i + 1)).slice(-2);
-            var total = ('0' + journey.length).slice(-2);
-            var rot = stampRotations[i % stampRotations.length];
-            var dateParts = loc.date.split('.');
-
-            var stamp = document.createElement('a');
-            stamp.className = 'stamp-anim';
-            stamp.href = 'place.html?place=' + loc.id;
-            stamp.setAttribute('data-id', loc.id);
-            stamp.setAttribute('data-index', i);
-            stamp.style.setProperty('--rot', rot + 'deg');
-            stamp.style.setProperty('--stamp-color', loc.color);
-            stamp.innerHTML =
-                '<div class="stamp-inner">' +
-                    '<div class="stamp-art">' +
-                        '<span class="stamp-art-icon">' + loc.icon + '</span>' +
-                        '<span class="stamp-postmark">' + dateParts[0] + '<br>' + dateParts[1] + '</span>' +
-                    '</div>' +
-                    '<div class="stamp-info">' +
-                        '<div class="stamp-no">No. ' + no + ' / ' + total + '</div>' +
-                        '<h3 class="stamp-place">' + loc.place + '</h3>' +
-                        '<div class="stamp-meta">' + loc.date + ' &middot; ' + loc.city + '</div>' +
-                    '</div>' +
-                '</div>';
-
-            journeyStampsEl.appendChild(stamp);
+            var shot = loc.image
+                ? '<img src="' + loc.image + '" alt="' + loc.place + '" draggable="false" />'
+                : '';
+            var card = document.createElement('a');
+            card.className = 'pl-card';
+            card.href = 'place.html?place=' + loc.id;
+            card.setAttribute('data-i', i);
+            card.setAttribute('data-on', i === 0 ? '1' : '0');
+            card.setAttribute('aria-hidden', i === 0 ? 'false' : 'true');
+            card.style.setProperty('--i', i);
+            card.innerHTML =
+                '<div class="pl-print">' +
+                    '<div class="pl-shot">' + shot + '</div>' +
+                    '<div class="pl-note">' + loc.place + ' &middot; ' + loc.date + '</div>' +
+                '</div>' +
+                '<div class="pl-peg"></div>';
+            plCardsEl.appendChild(card);
+            cards.push(card);
         });
 
-        // Stage height = one viewport of travel per stamp, PLUS a tail section.
-        // Without the tail the last stamp can never finish: the maximum scroll
-        // position is (docHeight - vh), so a stage of exactly N * 100vh only
-        // lets the final stamp reach (N-1)/N of its own journey.
+        // Paint the missing photographs, one per frame, so first paint stays fast.
+        (function paintQueue() {
+            var queue = [];
+            for (var q = 0; q < journey.length; q++) if (!journey[q].image) queue.push(q);
+            (function next() {
+                if (!queue.length) return;
+                var i = queue.shift();
+                var look = PHOTO_LOOK[journey[i].id] || { palette: 'dawn', seed: i + 3 };
+                var url = paintLandscape(look.seed, look.palette, 1200, 750);
+                var shot = cards[i] && cards[i].querySelector('.pl-shot');
+                if (url && shot) {
+                    var img = document.createElement('img');
+                    img.src = url;
+                    img.alt = journey[i].place;
+                    img.draggable = false;
+                    shot.appendChild(img);
+                }
+                requestAnimationFrame(next);
+            })();
+        })();
+
+        /* --- Physics ----------------------------------------------------- */
+        var sim = { off: 0, vel: 0, target: 0, a: [], w: [] };
+        var size = { w: 0, h: 0, cw: 300, y0: 120, sag: 46 };
+        var spacing = 318;
+        var active = 0;
+        var idle = true;
+
+        function measure() {
+            var w = window.innerWidth;
+            var h = window.innerHeight;
+            var narrow = w < 700;
+            var bottomReserve = narrow ? 178 : 168;   // caption bar + railway bar
+            var y0 = Math.round(clampN(h * 0.17, 84, 148));
+            var sag = Math.round(Math.min(CFG.sag, h * 0.075));
+            var avail = h - y0 - sag - bottomReserve;
+            var cw = Math.round(clampN(
+                Math.min(CFG.cardWidth, w * (narrow ? 0.64 : 0.42), avail - 44),
+                140, CFG.cardWidth));
+            size = { w: w, h: h, cw: cw, y0: y0, sag: sag };
+            spacing = cw * CFG.spacing;
+            plRoot.style.setProperty('--pl-cw', cw + 'px');
+        }
+
+        function springStep(x, v, target, dt, k) {
+            var c = 2 * Math.sqrt(k);
+            var nv = v + (k * (target - x) - c * v) * dt;
+            return [x + nv * dt, nv];
+        }
+
+        // A print lags the line, is pulled back by gravity, and is damped.
+        function swingStep(a, w, lineVel, dt, gain) {
+            var nw = w + (-38 * a - 4.2 * w + lineVel * 0.0034 * gain) * dt;
+            return [clampN(a + nw * dt, -0.6, 0.6), nw];
+        }
+
+        function stringY(x, w, y0, sag) {
+            var t = clampN(x / w, 0, 1);
+            return y0 + 4 * sag * t * (1 - t);
+        }
+
+        function nearestAt(off) { return clampN(Math.round(off / spacing), 0, N - 1); }
+        function stageTop() { return journeyStageEl.offsetTop; }
+        function scrollNow() { return window.scrollY || window.pageYOffset || 0; }
+        function journeyUnits() { return (scrollNow() - stageTop()) / window.innerHeight; }
+
+        /* --- Per-frame render -------------------------------------------- */
+        var prev = 0;
+        var raf = 0;
+
+        function frame(now) {
+            raf = requestAnimationFrame(frame);
+            var dt = Math.min(0.033, (now - prev) / 1000);
+            prev = now;
+            if (idle) return;
+
+            var w = size.w, cw = size.cw, y0 = size.y0, sag = size.sag;
+            var before = sim.off;
+            var s = springStep(sim.off, sim.vel, sim.target, dt, CFG.spring);
+            sim.off = s[0];
+            sim.vel = s[1];
+            var lineVel = -(sim.off - before) / Math.max(dt, 1e-3);
+            var gain = reduceMotion ? 0 : CFG.swing;
+            var near = nearestAt(sim.off);
+
+            for (var i = 0; i < N; i++) {
+                var el = cards[i];
+                var x = w / 2 + i * spacing - sim.off;
+                if (x < -cw * 1.6 || x > w + cw * 1.6) {
+                    el.style.visibility = 'hidden';
+                    continue;
+                }
+                el.style.visibility = 'visible';
+                var sw = swingStep(sim.a[i] || 0, sim.w[i] || 0, lineVel, dt, gain);
+                var a = sw[0];
+                if (gain) a += Math.sin(now / 1300 + i * 1.7) * 0.0009 * gain;  // idle breeze
+                sim.a[i] = a;
+                sim.w[i] = sw[1];
+                var y = stringY(x, w, y0, sag) - 6;
+                el.style.transform =
+                    'translate(' + (x - cw / 2).toFixed(1) + 'px,' + y.toFixed(1) + 'px)' +
+                    ' rotate(' + a.toFixed(4) + 'rad)';
+                el.style.zIndex = String(i === near ? N + 1 : N - Math.abs(i - near));
+            }
+
+            plPathEl.setAttribute('d', 'M0 ' + y0 + ' Q' + (w / 2) + ' ' + (y0 + 2 * sag) + ' ' + w + ' ' + y0);
+            if (near !== active) {
+                active = near;
+                renderActive();
+            }
+        }
+
+        function renderActive() {
+            var loc = journey[active];
+            if (!loc) return;
+            for (var i = 0; i < cards.length; i++) {
+                cards[i].setAttribute('data-on', i === active ? '1' : '0');
+                cards[i].setAttribute('aria-hidden', i === active ? 'false' : 'true');
+            }
+            if (plCapEl) {
+                plCapEl.innerHTML =
+                    '<span class="pl-title">' + loc.place + '</span>' +
+                    '<span class="pl-sub">' + loc.date + ' &middot; ' + loc.city +
+                    ' &mdash; ' + loc.memory + '</span>';
+            }
+            if (plCountEl) plCountEl.innerHTML = '<b>' + pad2(active + 1) + '</b> / ' + pad2(N);
+            if (plSrEl) plSrEl.textContent = '第 ' + (active + 1) + ' 站，共 ' + N + ' 站：' + loc.place;
+        }
+
+        /* --- Scroll is the driver ---------------------------------------- */
+        var ready = false;
+
+        function onScroll() {
+            var js = journeyUnits();
+            sim.target = clampN(js, 0, N - 1) * spacing;
+
+            // fade in from just above the stage, fade out once the last print lands
+            var fin = clampN((js + 0.35) / 0.35, 0, 1);
+            var fout = 1 - clampN((js - (N - 1) - 0.35) / 1, 0, 1);
+            var op = Math.min(fin, fout);
+            plRoot.style.opacity = op.toFixed(3);
+            idle = op < 0.02;
+            plRoot.setAttribute('data-idle', idle ? '1' : '0');
+            if (!ready && op > 0.25) {
+                ready = true;
+                plRoot.setAttribute('data-ready', '1');   // starts the drop-in
+            }
+
+            if (journeyHintEl) journeyHintEl.classList.toggle('hidden', js > 0.12);
+
+            if (railTrainEl) {
+                railTrainEl.style.setProperty('--rail-pos',
+                    (2 + clampN(js / (N - 1), 0, 1) * 96).toFixed(2) + '%');
+            }
+            if (railBarEl) railBarEl.classList.toggle('visible', op > 0.02);
+        }
+
         function layoutStage() {
             var vh = window.innerHeight;
             var footerH = journeyFooterEl ? journeyFooterEl.offsetHeight : 0;
-            var h = Math.round((N + 1.7) * vh - footerH);
-            journeyStageEl.style.height = Math.max(N * vh, h) + 'px';
+            journeyStageEl.style.height =
+                Math.max(N * vh, Math.round((N + 1.7) * vh - footerH)) + 'px';
         }
 
-        var stampsAnim = journeyStampsEl.querySelectorAll('.stamp-anim');
-        var hoveredStamp = null;
-
-        // Hover tracking
-        for (var hi = 0; hi < stampsAnim.length; hi++) {
-            (function (s) {
-                s.addEventListener('mouseenter', function () {
-                    hoveredStamp = s;
-                    updateJourneyPositions();
-                });
-                s.addEventListener('mouseleave', function () {
-                    if (hoveredStamp === s) hoveredStamp = null;
-                    updateJourneyPositions();
-                });
-                s.addEventListener('focus', function () {
-                    hoveredStamp = s;
-                    updateJourneyPositions();
-                });
-                s.addEventListener('blur', function () {
-                    if (hoveredStamp === s) hoveredStamp = null;
-                    updateJourneyPositions();
-                });
-            })(stampsAnim[hi]);
+        /* --- Programmatic scrolling (drag / click / arrows / buttons) ----- */
+        var scrollAnim = 0;
+        function cancelScrollAnim() {
+            if (scrollAnim) { cancelAnimationFrame(scrollAnim); scrollAnim = 0; }
+        }
+        function animateScroll(top) {
+            cancelScrollAnim();
+            var from = scrollNow();
+            var delta = Math.max(0, top) - from;
+            if (Math.abs(delta) < 1) return;
+            var t0 = performance.now();
+            var dur = Math.min(900, 300 + Math.abs(delta) * 0.22);
+            var step = function (now) {
+                var t = Math.min(1, (now - t0) / dur);
+                var e = 1 - Math.pow(1 - t, 3);
+                window.scrollTo(0, from + delta * e);
+                scrollAnim = t < 1 ? requestAnimationFrame(step) : 0;
+            };
+            scrollAnim = requestAnimationFrame(step);
+        }
+        function scrollToIndex(i) {
+            animateScroll(stageTop() + clampN(i, 0, N - 1) * window.innerHeight);
         }
 
-        function updateJourneyPositions() {
-            var scrollY = window.scrollY || window.pageYOffset;
-            var vh = window.innerHeight;
-            var vw = window.innerWidth;
-            var stageTop = journeyStageEl.offsetTop;
-            // Journey scroll in viewport-height units (0 = stage top, N = all stamps done)
-            var journeyScrollVh = (scrollY - stageTop) / vh;
-            var hintHidden = false;
+        window.addEventListener('wheel', cancelScrollAnim, { passive: true });
+        window.addEventListener('touchstart', cancelScrollAnim, { passive: true });
 
-            // Loose stack geometry (fan out diagonally so every stamp stays visible)
-            var narrow = vw < 760;
-            var xBase = narrow ? 24 : 32;    // vw
-            var xStep = narrow ? 2.5 : 3.0;  // vw between neighbours
-            var yStep = narrow ? 24 : 34;    // px between neighbours
+        /* --- Drag the line ------------------------------------------------ */
+        var drag = null;
+        var lastDragEnd = -1e9;
 
-            // --- Railway progress bar (pinned to the bottom of the viewport) ---
-            var overall = Math.max(0, Math.min(1, journeyScrollVh / N));
-            if (railTrainEl) {
-                railTrainEl.style.setProperty('--rail-pos', (2 + overall * 96).toFixed(2) + '%');
+        plRoot.addEventListener('pointerdown', function (e) {
+            if (e.target && e.target.closest && e.target.closest('.pl-bar')) return;
+            cancelScrollAnim();
+            drag = { x: e.clientX, start: scrollNow(), lx: e.clientX, lt: e.timeStamp, v: 0, moved: false };
+        });
+
+        plRoot.addEventListener('pointermove', function (e) {
+            if (!drag) return;
+            var dx = e.clientX - drag.x;
+            if (!drag.moved && Math.abs(dx) > 5) {
+                drag.moved = true;
+                plRoot.setAttribute('data-drag', '1');
+                try { plRoot.setPointerCapture(e.pointerId); } catch (err) {}
             }
-            if (railBarEl) {
-                var railActive = journeyScrollVh > -0.8 && journeyScrollVh < N + 1.9;
-                if (railActive) railBarEl.classList.add('visible');
-                else railBarEl.classList.remove('visible');
+            if (!drag.moved) return;
+            var dt = Math.max(1, e.timeStamp - drag.lt);
+            drag.v = 0.7 * ((e.clientX - drag.lx) / dt) + 0.3 * drag.v;
+            drag.lx = e.clientX;
+            drag.lt = e.timeStamp;
+
+            var idx = (drag.start - stageTop()) / window.innerHeight - dx / spacing;
+            if (idx < 0) idx *= 0.35;                                   // rubber band
+            else if (idx > N - 1) idx = (N - 1) + (idx - (N - 1)) * 0.35;
+            window.scrollTo(0, Math.max(0, stageTop() + idx * window.innerHeight));
+        });
+
+        function endDrag(e) {
+            if (!drag) return;
+            var d = drag;
+            drag = null;
+            plRoot.setAttribute('data-drag', '0');
+            if (e && e.pointerId != null) {
+                try { plRoot.releasePointerCapture(e.pointerId); } catch (err) {}
             }
+            if (!d.moved) return;
+            lastDragEnd = performance.now();
+            // carry the flick into the next station
+            scrollToIndex(Math.round(clampN(sim.target / spacing - d.v * 180 / spacing, 0, N - 1)));
+        }
+        window.addEventListener('pointerup', endDrag);
+        window.addEventListener('pointercancel', endDrag);
 
-            for (var i = 0; i < stampsAnim.length; i++) {
-                var stamp = stampsAnim[i];
-                var baseRot = stampRotations[i % stampRotations.length];
-
-                // Resting place inside the stack
-                var stackX = xBase - i * xStep;                   // vw
-                var stackY = (i - (N - 1) / 2) * yStep - 18;      // px
-                var stackRot = baseRot + (i - (N - 1) / 2) * 0.8; // deg
-
-                // For stamp i its own journey spans [i, i + 1]
-                var progress = journeyScrollVh - i;
-
-                var x, y, scale, opacity, rot;
-
-                if (progress < 0) {
-                    // Pre-journey: parked off-screen to the left
-                    x = -80; y = 0; scale = 0.5; opacity = 0; rot = baseRot;
-                } else if (progress >= 1) {
-                    // Post-journey: settled in the stack
-                    x = stackX; y = stackY; scale = 1; opacity = 1; rot = stackRot;
-                } else {
-                    if (progress > 0) hintHidden = true;
-                    // Tilt gradually settles into the fanned stack angle
-                    rot = lerp(baseRot, stackRot,
-                        easeInOutCubic(Math.min(1, Math.max(0, (progress - 0.55) / 0.45))));
-
-                    if (progress < 0.28) {
-                        // A) Fly in from the left
-                        var tA = easeInOutCubic(progress / 0.28);
-                        x = lerp(-80, -30, tA);
-                        y = 0;
-                        scale = lerp(0.5, 1, tA);
-                        opacity = tA;
-                    } else if (progress < 0.58) {
-                        // B) Reach the centre and grow
-                        var tB = easeInOutCubic((progress - 0.28) / 0.3);
-                        x = lerp(-30, 0, tB);
-                        y = 0;
-                        scale = lerp(1, 1.42, tB);
-                        opacity = 1;
-                    } else if (progress < 0.84) {
-                        // C) Sweep to the right, slightly overshooting its slot
-                        var tC = easeInOutCubic((progress - 0.58) / 0.26);
-                        x = lerp(0, stackX + 9, tC);
-                        y = lerp(0, stackY - 8, tC);
-                        scale = lerp(1.42, 1.05, tC);
-                        opacity = 1;
-                    } else {
-                        // D) Settle back into the stack
-                        var tD = easeInOutCubic((progress - 0.84) / 0.16);
-                        x = lerp(stackX + 9, stackX, tD);
-                        y = lerp(stackY - 8, stackY, tD);
-                        scale = lerp(1.05, 1, tD);
-                        opacity = 1;
-                    }
+        /* --- Click a print: off-centre centres it, the centre opens it ---- */
+        cards.forEach(function (card, i) {
+            card.addEventListener('click', function (e) {
+                if (performance.now() - lastDragEnd < 320) { e.preventDefault(); return; }
+                if (i !== active) {
+                    e.preventDefault();
+                    scrollToIndex(i);
                 }
+            });
+        });
 
-                var stacked = progress >= 1;
-                var isHovered = hoveredStamp === stamp && stacked;
+        var plPrev = document.getElementById('plPrev');
+        var plNext = document.getElementById('plNext');
+        if (plPrev) plPrev.addEventListener('click', function () { scrollToIndex(active - 1); });
+        if (plNext) plNext.addEventListener('click', function () { scrollToIndex(active + 1); });
 
-                // The hover "lift" itself is a CSS transition on .stamp-inner,
-                // so it stays smooth and springy instead of snapping.
-                stamp.classList.toggle('stacked', stacked);
-                stamp.style.setProperty('--x', x.toFixed(3) + 'vw');
-                stamp.style.setProperty('--y', y.toFixed(2) + 'px');
-                stamp.style.setProperty('--scale', scale.toFixed(4));
-                stamp.style.setProperty('--rot', rot.toFixed(2) + 'deg');
-                stamp.style.opacity = opacity;
-                stamp.style.zIndex = isHovered ? 300 : (stacked ? (i + 20) : 10);
-            }
+        plRoot.addEventListener('keydown', function (e) {
+            if (e.key === 'ArrowRight') scrollToIndex(active + 1);
+            else if (e.key === 'ArrowLeft') scrollToIndex(active - 1);
+            else if (e.key === 'Home') scrollToIndex(0);
+            else if (e.key === 'End') scrollToIndex(N - 1);
+            else return;
+            e.preventDefault();
+        });
 
-            // Hide hint once the first stamp starts travelling
-            if (journeyHintEl && hintHidden) {
-                journeyHintEl.classList.add('hidden');
-            }
-        }
-
-        var journeyTicking = false;
+        /* --- Wiring ------------------------------------------------------- */
+        var ticking = false;
         window.addEventListener('scroll', function () {
-            if (!journeyTicking) {
-                requestAnimationFrame(function () {
-                    updateJourneyPositions();
-                    journeyTicking = false;
-                });
-                journeyTicking = true;
-            }
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(function () { onScroll(); ticking = false; });
         }, { passive: true });
-        window.addEventListener('resize', function () {
-            layoutStage();
-            updateJourneyPositions();
-        });
-        window.addEventListener('load', function () {
-            layoutStage();
-            updateJourneyPositions();
-        });
 
-        // Initial position
+        function refresh() {
+            layoutStage();
+            measure();
+            sim.target = clampN(journeyUnits(), 0, N - 1) * spacing;
+            sim.off = sim.target;
+            onScroll();
+            renderActive();
+        }
+        window.addEventListener('resize', refresh);
+        window.addEventListener('load', refresh);
+
         layoutStage();
-        updateJourneyPositions();
+        measure();
+        renderActive();
+        onScroll();
+        prev = performance.now();
+        raf = requestAnimationFrame(frame);
     }
 
     // --- Place detail page (place.html?place=<id>) ---

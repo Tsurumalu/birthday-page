@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Arcade — 3D island preview">
     <title>Games 3D Preview — Happy Birthday</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Archivo:wght@400;500;600;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css?v=20261008b">
+    <link rel="stylesheet" href="css/fonts.css?v=20261014c">
+    <link rel="stylesheet" href="css/style.css?v=20261014g">
 </head>
-<body class="page-sub theme-games">
+<body class="page-sub theme-games page-island3d">
     <div class="loader" id="loader">
         <div class="loader-text">
             <span class="loader-letter">L</span>
@@ -37,10 +35,8 @@
             <span class="nav-brand-text">For You</span>
         </a>
         <div class="nav-links">
-            <a href="card.html" class="nav-link">Card</a>
             <a href="moments.html" class="nav-link">Moments</a>
             <a href="message.html" class="nav-link">Letter</a>
-            <a href="wish.html" class="nav-link">Wish</a>
             <a href="games.html" class="nav-link active">Games</a>
             <a href="musics.html" class="nav-link">Music</a>
             <a href="cards.html" class="nav-link">Cards</a>
@@ -60,7 +56,7 @@
         <header class="games-masthead reveal-up">
             <span class="games-label">PREVIEW &middot; 3D ISLAND &middot; WORK IN PROGRESS</span>
             <h1 class="games-title">The Island</h1>
-            <p class="games-sub">小岛的 3D 小样 &mdash; 拖动环绕，滚轮缩放，点开据点看我们的集锦。</p>
+            <p class="games-sub">小岛的 3D 小样 &mdash; 主岛上摆着六张 VALORANT 沙盘，拖动环绕，点圆圈看集锦，点「进入地图」走进去。</p>
         </header>
 
         <!-- 3D world -->
@@ -75,7 +71,20 @@
                 <span>GENERATING WORLD</span>
             </div>
 
-            <div class="world3d-hint" id="world3dHint">&#10022; 拖动环绕小岛 &middot; 滚轮缩放 &middot; 点击据点</div>
+            <!-- 六张地图排队进场时显示进度（手机上不摆沙盘，这个不会出来） -->
+            <div class="w3-mapload" id="world3dMapLoad" hidden>
+                <span class="w3-mapload-ring"></span>
+                <span class="w3-mapload-text">
+                    <span class="w3-mapload-name" id="world3dMapLoadName">LOADING MAP</span>
+                    <span class="w3-mapload-bar"><i id="world3dMapLoadBar"></i></span>
+                </span>
+                <span class="w3-mapload-pct" id="world3dMapLoadPct">1%</span>
+            </div>
+
+            <div class="world3d-hint" id="world3dHint">&#10022; 拖动环绕 &middot; 滚轮缩放 &middot; 点击圆圈看集锦</div>
+
+            <!-- 群岛导航：一键飞到某座岛 -->
+            <div class="w3-isle-nav" id="world3dIsleNav" role="tablist" aria-label="群岛导航"></div>
 
             <div class="world3d-controls">
                 <button type="button" data-act="reset" aria-label="复位视角">
@@ -140,9 +149,12 @@
         <button class="game-video-close" id="gameVideoClose" aria-label="Close (Esc)">&#10006;</button>
     </div>
 
-    <script src="js/main.js?v=20261008a"></script>
+    <script src="js/main.js?v=20261014b"></script>
     <script src="assets/vendor/three.min.js"></script>
+    <script src="assets/vendor/WorkerPool.js"></script>
     <script src="assets/vendor/GLTFLoader.js"></script>
-    <script src="js/games-3d.js?v=20261008h"></script>
+    <script src="assets/vendor/DRACOLoader.js"></script>
+    <script src="js/video-source.js?v=20261011d"></script>
+    <script src="js/games-3d.js?v=20261014h"></script>
 </body>
 </html>
