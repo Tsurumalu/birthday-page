@@ -105,7 +105,26 @@
         '</svg>';
 
     var STORE_KEY = 'tyquiz.v1';
-    var NET = { path: '/api/quiz', timeout: 1800 };
+    var NET = { timeout: 1800 };
+
+    /* API 归属解析：
+       - GitHub Pages（https 且不在服务器域名下）→ 'https://lzteddy.cn'（跨域，服务端已开 CORS）
+       - 服务器域名 / 本地开发 → ''（同源相对路径）
+       - ?api=http://host:port 可强制覆盖（本地联调跨域场景用） */
+    function apiBase() {
+        try {
+            var q = new URLSearchParams(location.search).get('api');
+            if (q) return q.replace(/\/+$/, '');
+            var h = location.hostname;
+            if (location.protocol === 'https:' &&
+                h !== 'lzteddy.cn' && h !== 'www.lzteddy.cn' &&
+                h !== 'localhost' && h !== '127.0.0.1') {
+                return 'https://lzteddy.cn';
+            }
+        } catch (_) { /* file:// 等异常场景走同源 */ }
+        return '';
+    }
+    function apiUrl(p) { return apiBase() + p; }
     var DIFF_LABEL = { 1: '\u7B80\u5355', 2: '\u4E2D\u7B49', 3: '\u56F0\u96BE' };
 
     /* ============================================================
@@ -201,7 +220,7 @@
         var ctrl = window.AbortController ? new AbortController() : null;
         if (ctrl) opts.signal = ctrl.signal;
         var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, NET.timeout);
-        fetch(NET.path, opts)
+        fetch(apiUrl('/api/quiz'), opts)
             .then(function (r) { return r.ok ? r.json() : null; })
             .then(function (j) { clearTimeout(timer); done(j); })
             .catch(function () { clearTimeout(timer); done(null); });

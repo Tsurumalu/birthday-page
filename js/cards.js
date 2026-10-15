@@ -33,6 +33,25 @@
     // Tracks which server cards are already on the board (dedupe).
     var renderedCardIds = {};
 
+    /* API 归属解析：
+       - GitHub Pages（https 且不在服务器域名下）→ 'https://lzteddy.cn'（跨域，服务端已开 CORS）
+       - 服务器域名 / 本地开发 → ''（同源相对路径）
+       - ?api=http://host:port 可强制覆盖（本地联调跨域场景用） */
+    function apiBase() {
+        try {
+            var q = new URLSearchParams(location.search).get('api');
+            if (q) return q.replace(/\/+$/, '');
+            var h = location.hostname;
+            if (location.protocol === 'https:' &&
+                h !== 'lzteddy.cn' && h !== 'www.lzteddy.cn' &&
+                h !== 'localhost' && h !== '127.0.0.1') {
+                return 'https://lzteddy.cn';
+            }
+        } catch (_) { /* file:// 等异常场景走同源 */ }
+        return '';
+    }
+    function apiUrl(p) { return apiBase() + p; }
+
     var state = {
         avatar: '🦊',
         sticker: '',
@@ -323,7 +342,7 @@
         note.dataset.clientId = clientId;
         renderedCardIds['client:' + clientId] = true;
 
-        fetch('/api/cards', {
+        fetch(apiUrl('/api/cards'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -347,7 +366,7 @@
     }
 
     function updateCardPosition(id, x, y) {
-        fetch('/api/cards/' + encodeURIComponent(id), {
+        fetch(apiUrl('/api/cards/' + encodeURIComponent(id)), {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ x: x, y: y })
@@ -395,7 +414,7 @@
 
     function initCloud() {
         // Pull existing cards so the board is populated on load.
-        fetch('/api/cards')
+        fetch(apiUrl('/api/cards'))
             .then(function (r) { if (!r.ok) throw new Error('no server'); return r.json(); })
             .then(function (list) {
                 (list || []).forEach(function (card) { renderCard(card); });
@@ -406,7 +425,7 @@
 
     function openStream() {
         try {
-            var es = new EventSource('/api/cards/stream');
+            var es = new EventSource(apiUrl('/api/cards/stream'));
             es.onmessage = function (e) {
                 try {
                     var msg = JSON.parse(e.data);
