@@ -138,6 +138,15 @@
         // 单机小品
         repo: { src: 'assets/videos/repo.mp4' },
         fishing: { src: 'assets/videos/fish.mp4' },
+        // CS（DUST II 据点）：四条集锦做成 2×2 四宫格
+        cs2: {
+            grid: [
+                { src: 'assets/videos/cs/cs-1.mp4', cover: 'assets/covers/cs-1.jpg', label: 'CLIP 01' },
+                { src: 'assets/videos/cs/cs-2.mp4', cover: 'assets/covers/cs-2.jpg', label: 'CLIP 02' },
+                { src: 'assets/videos/cs/cs-3.mp4', cover: 'assets/covers/cs-3.jpg', label: 'CLIP 03' },
+                { src: 'assets/videos/cs/cs-4.mp4', cover: 'assets/covers/cs-4.jpg', label: 'CLIP 04' }
+            ]
+        },
         // VALORANT 六张地图：作者给了抖音链接的走抖音，
         // 其余用拷进 assets/videos/ 的本地文件（两页通用，格式自动识别）
         ascent: { vid: '7667074254554438897' },
@@ -148,45 +157,130 @@
         summit: { vid: '7679181559971339505' }
     };
 
-    /** 渲染集锦面板的内容区；有封面就先出封面 + 播放按钮。 */
-    function bodyHtml(spot) {
-        var cfg = (spot && spot.video && (spot.video.src || spot.video.vid || spot.video.bvid || spot.video.type))
-            ? spot.video
-            : CLIPS[spot && spot.id];
-        var r = resolve(cfg);
-        var cls = 'game-video-body' + (r.portrait ? ' is-portrait' : '');
+    /** 取据点的集锦配置（spot.video 优先，其次 CLIPS 表）。 */
+    function cfgOf(spot) {
+        var own = spot && spot.video;
+        if (own && (own.grid || own.src || own.vid || own.bvid || own.type)) return own;
+        return CLIPS[spot && spot.id] || null;
+    }
 
-        if (r.kind === 'none') {
-            return '<div class="' + cls + '">' +
-                       '<div class="game-video-placeholder">' +
-                           '<span class="game-video-placeholder-icon">\uD83C\uDFAC</span>' +
-                           '<strong>' + esc(spot.name) + ' 的精彩集锦还在路上</strong>' +
-                           (r.warn ? '<p class="game-video-warn">' + esc(r.warn) + '</p>' : '') +
-                           '<p>在 <code>js/games-3d.js</code> 里给这项填上 video：<br>' +
-                           '抖音 <code>{ type:"douyin", vid:"7357…" }</code>　' +
-                           'B站 <code>{ bvid:"BV…" }</code>　' +
-                           'YouTube <code>{ type:"youtube", src:"…" }</code><br>' +
-                           '本地文件放 <code>assets/videos/' + esc(spot.id) + '.mp4</code> 后填 ' +
-                           '<code>{ type:"file", src:"…" }</code>。' +
-                           '加 <code>cover:"assets/covers/…"</code> 可先显示封面。</p>' +
-                       '</div>' +
-                   '</div>';
-        }
+    /** 据点是否配置了多片段宫格（供面板加宽等用）。 */
+    function isGrid(spot) {
+        var cfg = cfgOf(spot);
+        return !!(cfg && cfg.grid && cfg.grid.length);
+    }
 
-        var cover = cfg && cfg.cover;
-        if (cover) {
-            return '<div class="' + cls + '">' +
+    /* ----------------------------------------------------------------
+       照片墙 —— 没有集锦视频、但有值得晒的截图/照片的据点。
+         PHOTOS['apex'] = [{ src: 'assets/photos/apex-1.jpg', label: '…' }, …];
+       spot.photos 数组优先于这张表。视频和照片可共存：都配则视频在上、照片在下。
+    ---------------------------------------------------------------- */
+    var PHOTOS = {
+        apex: [
+            { src: 'assets/photos/apex-1.jpg', label: '小队亮相' },
+            { src: 'assets/photos/apex-2.jpg', label: '捍卫者' }
+        ],
+        pubg: [
+            { src: 'assets/photos/pubg-1.jpg', label: '大吉大利，今晚吃鸡！' }
+        ]
+    };
+
+    function photosOf(spot) {
+        var own = spot && spot.photos;
+        if (own && own.length) return own;
+        return PHOTOS[spot && spot.id] || null;
+    }
+
+    /** 据点是否带照片墙（供面板切布局用）。 */
+    function hasPhotos(spot) {
+        var p = photosOf(spot);
+        return !!(p && p.length);
+    }
+
+    /** 渲染照片墙：整宽堆叠，圆角卡片 + 底部小标签。 */
+    function photosHtml(list, spot) {
+        var items = list.map(function (p) {
+            return '<figure class="photo-item">' +
+                       '<img src="' + esc(p.src) + '" alt="' + esc((spot && spot.name || '') + ' ' + (p.label || '')) + '" loading="lazy">' +
+                       (p.label ? '<figcaption class="photo-item-label">' + esc(p.label) + '</figcaption>' : '') +
+                   '</figure>';
+        }).join('');
+        return '<div class="photo-list">' + items + '</div>';
+    }
+
+    /** 渲染 2×2 四宫格：每格封面 + 播放按钮，点击才加载视频。 */
+    function gridHtml(cfg, spot) {
+        var cells = cfg.grid.map(function (item) {
+            var r = resolve(item);
+            if (r.kind === 'none') return '';
+            var label = item.label || (r.kind === 'file' ? '视频' : (LABEL[r.provider] || '视频'));
+            return '<div class="clip-cell">' +
                        '<button class="game-video-cover" type="button" data-src="' + esc(r.url) + '"' +
                                (r.referrer ? ' data-referrer="' + r.referrer + '"' : '') +
-                               ' style="background-image:url(\'' + esc(cover) + '\')" ' +
-                               'aria-label="播放 ' + esc(spot.name) + ' 集锦">' +
+                               (item.cover ? ' style="background-image:url(\'' + esc(item.cover) + '\')"' : '') +
+                               ' aria-label="播放 ' + esc(spot && spot.name || '') + ' ' + esc(label) + '">' +
                            '<span class="game-video-play" aria-hidden="true"></span>' +
-                           '<span class="game-video-cover-hint">' + esc(LABEL[r.provider] || '视频') + '</span>' +
+                           '<span class="game-video-cover-hint">' + esc(label) + '</span>' +
                        '</button>' +
                    '</div>';
+        }).join('');
+        return '<div class="game-video-body is-grid"><div class="clip-grid">' + cells + '</div></div>';
+    }
+
+    /** 渲染集锦面板的内容区：宫格 / 单条视频 / 照片墙，可叠加，全空才出占位。 */
+    function bodyHtml(spot) {
+        var cfg = cfgOf(spot);
+        var photos = photosOf(spot);
+        var parts = '';
+
+        if (cfg && cfg.grid && cfg.grid.length) {
+            parts += gridHtml(cfg, spot);
+        } else if (cfg) {
+            var r = resolve(cfg);
+            var cls = 'game-video-body' + (r.portrait ? ' is-portrait' : '');
+
+            if (r.kind === 'none') {
+                parts += '<div class="' + cls + '">' +
+                             '<div class="game-video-placeholder">' +
+                                 '<span class="game-video-placeholder-icon">\uD83C\uDFAC</span>' +
+                                 '<strong>' + esc(spot.name) + ' 的精彩集锦还在路上</strong>' +
+                                 (r.warn ? '<p class="game-video-warn">' + esc(r.warn) + '</p>' : '') +
+                                 '<p>在 <code>js/games-3d.js</code> 里给这项填上 video：<br>' +
+                                 '抖音 <code>{ type:"douyin", vid:"7357…" }</code>　' +
+                                 'B站 <code>{ bvid:"BV…" }</code>　' +
+                                 'YouTube <code>{ type:"youtube", src:"…" }</code><br>' +
+                                 '本地文件放 <code>assets/videos/' + esc(spot.id) + '.mp4</code> 后填 ' +
+                                 '<code>{ type:"file", src:"…" }</code>。' +
+                                 '加 <code>cover:"assets/covers/…"</code> 可先显示封面。</p>' +
+                             '</div>' +
+                         '</div>';
+            } else {
+                var cover = cfg && cfg.cover;
+                if (cover) {
+                    parts += '<div class="' + cls + '">' +
+                                 '<button class="game-video-cover" type="button" data-src="' + esc(r.url) + '"' +
+                                         (r.referrer ? ' data-referrer="' + r.referrer + '"' : '') +
+                                         ' style="background-image:url(\'' + esc(cover) + '\')" ' +
+                                         'aria-label="播放 ' + esc(spot.name) + ' 集锦">' +
+                                     '<span class="game-video-play" aria-hidden="true"></span>' +
+                                     '<span class="game-video-cover-hint">' + esc(LABEL[r.provider] || '视频') + '</span>' +
+                                 '</button>' +
+                             '</div>';
+                } else {
+                    parts += '<div class="' + cls + '">' + playerHtml(r) + '</div>';
+                }
+            }
         }
 
-        return '<div class="' + cls + '">' + playerHtml(r) + '</div>';
+        if (photos && photos.length) parts += photosHtml(photos, spot);
+
+        if (!parts) {
+            return '<div class="game-video-body"><div class="game-video-placeholder">' +
+                       '<span class="game-video-placeholder-icon">\uD83C\uDFAC</span>' +
+                       '<strong>' + esc(spot.name) + ' 的精彩集锦还在路上</strong>' +
+                   '</div></div>';
+        }
+        return parts;
     }
 
     /** 封面 → 真实播放器（事件委托，两个页面只需调用一次）。 */
@@ -213,8 +307,11 @@
     window.VideoSource = {
         resolve: resolve,
         bodyHtml: bodyHtml,
+        isGrid: isGrid,
+        hasPhotos: hasPhotos,
         bindCovers: bindCovers,
-        CLIPS: CLIPS
+        CLIPS: CLIPS,
+        PHOTOS: PHOTOS
     };
     bindCovers();
 })();

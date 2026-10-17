@@ -101,8 +101,13 @@
         { id: 'pearl',  name: 'PEARL',  zh: '珍珠',   icon: '\uD83D\uDC1A', color: 0xffa36b, x:     0, z:  32,   base: 3.0, island: 'home',
           model: mapModel('pearl'),  modelSize: 18, modelOpaque: true, modelShadow: false, bigModel: true, dive: true,
           flat: true, flatR: 22, flatCore: 12.6, modelSpin: false, groundLift: 0.06, clearance: 14.5,
-          // 这张 rip 在图心叠了十几个占位箱（Nanite 回退代理），把真地图盖住了
-          junk: { prefix: 'InstancedStaticMesh', near: 5 } },
+          // junk 规则已于 20261015 撤除：它按 prefix 'InstancedStaticMesh' + 图心
+          // 半径 5 删件，本意是清掉图心的 Nanite 占位代理；但 InstancedStaticMesh
+          // 是 UE 里极通用的类名（灌木、栏杆、路灯、地砖装饰都用它），实测一删
+          // 就是 221 块。而现在 hideOutlierMeshes / isShellMesh 已经能处理残留，
+          // 关掉这条规则后隐藏数 221→1，包围盒和落地高度分毫未变 —— 纯误删。
+          // spot.junk 机制本身保留，将来真遇到占位堆还能用（prefix 要写具体名）。
+          _junkRemoved: true },
         { id: 'split',  name: 'SPLIT',  zh: '裂口',   icon: '\uD83D\uDD00', color: 0xff5c7d, x: -27.7, z:  16,   base: 3.2, island: 'home',
           model: mapModel('split'),  modelSize: 18, modelOpaque: true, modelShadow: false, bigModel: true, dive: true,
           flat: true, flatR: 22, flatCore: 12.6, modelSpin: false, groundLift: 0.06, clearance: 14.5 },
@@ -893,7 +898,11 @@
             var b = new THREE.Box3().setFromObject(o);
             if (!isFinite(b.min.y)) { o.visible = false; n++; return; }
             var sz = b.getSize(new THREE.Vector3());
-            if (Math.min(sz.x, sz.y, sz.z) < 0.02) { o.visible = false; n++; }
+            // 只有「三个方向都缩成尘埃」的才是真垃圾。
+            // 千万别拿最短边当判据：地板、墙体、贴面在游戏模型里本来就是
+            // 零厚度平面（正好一个维度 = 0），用 min < 阈值会把 A 包点地板、
+            // 储藏室地板、塔内墙、A 点围墙整片删光 —— 表现就是「地图缺墙少地板」。
+            if (Math.max(sz.x, sz.y, sz.z) < 0.02) { o.visible = false; n++; }
         });
         return n;
     }
@@ -923,13 +932,32 @@
                            .sort(function (a, b) { return a - b; });
             med[ax] = arr[Math.floor(arr.length / 2)];
         });
-        var ds = items.map(function (e) { return e.c.distanceTo(med); })
+
+        // 水平方向：取 90 分位当主体的自然半径，超出 1.6 倍才按离群隐藏。
+        // 用 75 分位时，像 lotus 这种「内容堆在中心、边缘散着零星道具」的图，
+        // 半径 8~9 的灌木路灯会被当成离群删掉（地图半对角其实有 11.4）。
+        var hds = items.map(function (e) {
+                       return Math.hypot(e.c.x - med.x, e.c.z - med.z);
+                   }).sort(function (a, b) { return a - b; });
+        var dQuota = hds[Math.floor(hds.length * 0.9)] || 0;
+        var limitH = Math.max(dQuota * 1.6, 1);
+
+        // 垂直方向要分两头看：
+        //   往下掉 —— 掉到图底下几百上千单位的残留，才是要清的目标；
+        //   往上长 —— 塔楼、屋顶、船屋上层都是合法的高处结构，
+        //            曾经因为「三维距离」把 ascent 船屋屋顶整个判成离群删掉了
+        //            （表现就是屋顶/阁楼凭空消失）。所以向上完全不限制。
+        var ys = items.map(function (e) { return e.c.y; })
                       .sort(function (a, b) { return a - b; });
-        var d75 = ds[Math.floor(ds.length * 0.75)] || 0;
-        var limit = Math.max(d75 * 1.6, 1);
+        var y05 = ys[Math.floor(ys.length * 0.05)];
+        var y95 = ys[Math.floor(ys.length * 0.95)];
+        var yr = (y95 - y05) || 1;
+        var yFloor = y05 - yr * 1.5;        // 允许主体自身再往下探一倍半
+
         var hidden = 0;
         items.forEach(function (e) {
-            if (e.c.distanceTo(med) > limit) { e.mesh.visible = false; hidden++; }
+            var dh = Math.hypot(e.c.x - med.x, e.c.z - med.z);
+            if (dh > limitH || e.c.y < yFloor) { e.mesh.visible = false; hidden++; }
         });
         return hidden;
     }
@@ -1469,6 +1497,11 @@
 
     function openSpot(spot) {
         if (!lightbox || !panel) return;
+        var VS = window.VideoSource || {};
+        var grid = VS.isGrid ? VS.isGrid(spot) : false;
+        var photos = VS.hasPhotos ? VS.hasPhotos(spot) : false;
+        panel.classList.toggle('has-grid', grid);
+        panel.classList.toggle('is-photos', photos);
         panel.innerHTML =
             '<div class="game-video-head">' +
                 '<span class="game-video-icon" style="--pin-color:#' + ('000000' + spot.color.toString(16)).slice(-6) + '">' + spot.icon + '</span>' +
@@ -1477,7 +1510,7 @@
                     '<p class="game-video-zh">' + spot.zh + ' \u00B7 HIGHLIGHTS</p>' +
                 '</div>' +
             '</div>' +
-            '<div class="game-video-body">' + videoBodyHtml(spot) + '</div>';
+            '<div class="game-video-body' + (photos ? ' is-photos' : '') + '">' + videoBodyHtml(spot) + '</div>';
         lightbox.hidden = false;
         lightbox.setAttribute('aria-hidden', 'false');
         requestAnimationFrame(function () { lightbox.classList.add('open'); });

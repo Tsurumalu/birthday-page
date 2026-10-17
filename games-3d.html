@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Arcade — 3D island preview">
     <title>Games 3D Preview — Happy Birthday</title>
-    <link rel="stylesheet" href="css/fonts.css?v=20261014c">
-    <link rel="stylesheet" href="css/style.css?v=20261014g">
+    <link rel="stylesheet" href="css/fonts.css?v=20261015a">
+    <link rel="stylesheet" href="css/style.css?v=20261017i">
 </head>
 <body class="page-sub theme-games page-island3d">
     <div class="loader" id="loader">
@@ -37,7 +37,7 @@
         <div class="nav-links">
             <a href="moments.html" class="nav-link">Moments</a>
             <a href="message.html" class="nav-link">Letter</a>
-            <a href="games.html" class="nav-link active">Games</a>
+            <a href="games-3d.html" class="nav-link active">Games</a>
             <a href="musics.html" class="nav-link">Music</a>
             <a href="cards.html" class="nav-link">Cards</a>
         </div>
@@ -54,9 +54,9 @@
 
     <main class="games-page" id="gamesPage">
         <header class="games-masthead reveal-up">
-            <span class="games-label">PREVIEW &middot; 3D ISLAND &middot; WORK IN PROGRESS</span>
+            <span class="games-label">3D ISLAND &middot; WORK IN PROGRESS</span>
             <h1 class="games-title">The Island</h1>
-            <p class="games-sub">小岛的 3D 小样 &mdash; 主岛上摆着六张 VALORANT 沙盘，拖动环绕，点圆圈看集锦，点「进入地图」走进去。</p>
+            <p class="games-sub">小岛的 3D 小样 &mdash; 主岛上摆着<strong>六张 VALORANT 沙盘</strong>，拖动环绕，点圆圈看集锦，点「进入地图」走进去。</p>
         </header>
 
         <!-- 3D world -->
@@ -125,13 +125,12 @@
 
             <div class="world3d-fallback" id="world3dFallback" hidden>
                 <strong>这台设备暂时跑不动 3D 小岛</strong>
-                <p>可能是浏览器未开启 WebGL，或显卡不支持。<a href="games.html">回到平面版地图 &rarr;</a></p>
+                <p>可能是浏览器未开启 WebGL，或显卡不支持。</p>
             </div>
         </div>
 
         <nav class="games-footer-nav reveal-up" style="--delay: 0.35s">
             <span class="games-credit">PLAYER 1 &middot; PLAYER 2 &mdash; CO-OP MODE</span>
-            <a class="games-compare-link" href="games.html">&larr; 对比平面版地图</a>
         </nav>
     </main>
 
@@ -149,12 +148,14 @@
         <button class="game-video-close" id="gameVideoClose" aria-label="Close (Esc)">&#10006;</button>
     </div>
 
-    <script src="js/main.js?v=20261014b"></script>
+    <script src="js/tracks-core.js?v=20261017a"></script>
+    <script src="js/mini-player.js?v=20261017c"></script>
+    <script src="js/main.js?v=20261017a"></script>
     <script src="assets/vendor/three.min.js"></script>
     <script src="assets/vendor/WorkerPool.js"></script>
     <script src="assets/vendor/GLTFLoader.js"></script>
     <script src="assets/vendor/DRACOLoader.js"></script>
-    <script src="js/video-source.js?v=20261011d"></script>
-    <script src="js/games-3d.js?v=20261014h"></script>
+    <script src="js/video-source.js?v=20261017a"></script>
+    <script src="js/games-3d.js?v=20261017a"></script>
 </body>
 </html>

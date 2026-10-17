@@ -215,6 +215,89 @@ const server = http.createServer(function (req, res) {
         return;
     }
 
+    /* ---------------- Admin panel (LOCAL ONLY) ----------------
+       管理面板（admin.html）只服务本机与 SSH 隧道，无登录。
+       外网防线：nginx 已挡掉 /api/admin/；这里再兜底一层——
+       经过 nginx 反代的请求必然带 X-Forwarded-For（访客真实 IP），
+       而隧道/本机直连不带该头，据此区分。 */
+    function isLocalAdmin(req) {
+        var fwd = req.headers['x-forwarded-for'];
+        if (fwd) {
+            var first = String(fwd).split(',')[0].trim();
+            if (first !== '127.0.0.1' && first !== '::1' && first !== '::ffff:127.0.0.1') return false;
+        }
+        var ra = req.socket.remoteAddress || '';
+        return ra === '127.0.0.1' || ra === '::1' || ra === '::ffff:127.0.0.1';
+    }
+    function adminJson(res, code, obj) {
+        res.writeHead(code, { 'Content-Type': MIME['.json'] });
+        res.end(JSON.stringify(obj));
+    }
+
+    if (pathname === '/admin' || pathname === '/admin.html') {
+        fs.readFile(path.join(ROOT, 'admin.html'), function (err, buf) {
+            if (err) { res.writeHead(404, { 'Content-Type': MIME['.html'] }); res.end('admin.html not found'); return; }
+            res.writeHead(200, { 'Content-Type': MIME['.html'] });
+            res.end(buf);
+        });
+        return;
+    }
+
+    if (pathname.indexOf('/api/admin') === 0) {
+        if (!isLocalAdmin(req)) { adminJson(res, 403, { error: 'admin endpoints are local-only' }); return; }
+
+        /* ---- 读取 ---- */
+        if (req.method === 'GET' && pathname.replace(/\/$/, '') === '/api/admin/cards') {
+            adminJson(res, 200, cards);
+            return;
+        }
+        if (req.method === 'GET' && pathname.replace(/\/$/, '') === '/api/admin/quiz') {
+            adminJson(res, 200, quiz);
+            return;
+        }
+
+        /* ---- 纸条：删一条 / 清空（广播 delete，在线页面同步消失） ---- */
+        if (req.method === 'DELETE' && pathname.indexOf('/api/admin/cards') === 0) {
+            var cid = pathname.split('/').pop();
+            if (cid === 'cards') {
+                var n = cards.length;
+                cards.forEach(function (c) { broadcast({ type: 'delete', id: c.id }); });
+                cards = [];
+                saveCards();
+                adminJson(res, 200, { ok: true, removed: n });
+            } else {
+                var ci = cards.findIndex(function (c) { return c.id === cid; });
+                if (ci < 0) { adminJson(res, 404, { error: 'not found' }); return; }
+                cards.splice(ci, 1);
+                saveCards();
+                broadcast({ type: 'delete', id: cid });
+                adminJson(res, 200, { ok: true, removed: 1 });
+            }
+            return;
+        }
+
+        /* ---- 榜单：删一条 / 清空（无实时通道，访客刷新即见） ---- */
+        if (req.method === 'DELETE' && pathname.indexOf('/api/admin/quiz') === 0) {
+            var qid = pathname.split('/').pop();
+            if (qid === 'quiz') {
+                var qn = quiz.length;
+                quiz = [];
+                saveQuiz();
+                adminJson(res, 200, { ok: true, removed: qn });
+            } else {
+                var qi = quiz.findIndex(function (e) { return e.id === qid; });
+                if (qi < 0) { adminJson(res, 404, { error: 'not found' }); return; }
+                quiz.splice(qi, 1);
+                saveQuiz();
+                adminJson(res, 200, { ok: true, removed: 1 });
+            }
+            return;
+        }
+
+        adminJson(res, 405, { error: 'method not allowed' });
+        return;
+    }
+
     /* ---------------- Static files ---------------- */
     let rel = pathname === '/' ? 'index.html' : pathname;
     let filePath = path.normalize(path.join(ROOT, rel));

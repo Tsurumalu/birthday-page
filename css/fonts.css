@@ -965,3 +965,34 @@
   font-display:swap;
   src:url(../assets/fonts/ark-pixel-12px-zh_hans.woff2) format('woff2');
 }
+
+/* VALORANT fan font by Bryan Torres (CC BY-SA 4.0)
+   https://ko-fi.com/brylark — uppercase-only display face,
+   used for the 3D island page masthead. */
+@font-face{
+  font-family:'VALORANT';
+  font-style:normal;
+  font-weight:400;
+  font-display:swap;
+  src:url(../assets/fonts/valorant.ttf) format('truetype');
+}
+
+/* 851 GBai 马克笔体（猫啃网免费商用）— 用于 cards 页中文手写感。 */
+@font-face{
+  font-family:'851GBai';
+  font-style:normal;
+  font-weight:400;
+  font-display:swap;
+  src:url(../assets/fonts/851gbai-marker.woff2) format('woff2');
+}
+
+/* 字制区喜脉喜欢体 1.00（猫啃网免费商用）— musics 页全局字体。
+   已按页面实际用字子集化（858 字，约 320KB），字形覆盖歌词全量；
+   若后续歌词改动出现缺字，重跑 .workbuddy/tmp/subset_ximai.py 即可。 */
+@font-face{
+  font-family:'Ximai';
+  font-style:normal;
+  font-weight:400;
+  font-display:swap;
+  src:url(../assets/fonts/ximai-xinmai.woff2) format('woff2');
+}

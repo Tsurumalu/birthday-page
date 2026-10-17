@@ -16,7 +16,6 @@
     'use strict';
 
     var avatarSelect = document.getElementById('avatarSelect');
-    var stickerSelect = document.getElementById('stickerSelect');
     var nameInput = document.getElementById('nameInput');
     var messageInput = document.getElementById('messageInput');
     var printBtn = document.getElementById('printBtn');
@@ -26,7 +25,6 @@
     var printedAvatar = document.getElementById('printedAvatar');
     var printedBody = document.getElementById('printedBody');
     var printedAuthor = document.getElementById('printedAuthor');
-    var printedSticker = document.getElementById('printedSticker');
     var pinItBtn = document.getElementById('pinItBtn');
     var boardCork = document.getElementById('boardCork');
 
@@ -53,15 +51,13 @@
     function apiUrl(p) { return apiBase() + p; }
 
     var state = {
-        avatar: '🦊',
-        sticker: '',
-        stickerSvg: '',
-        stickerColor: '',
+        avatar: 'assets/cards/avatars/ava-01.png',
         isPrinting: false,
         isPrinted: false,
         isDragging: false,
         dragEl: null,
         dragIsPrinted: false,
+        dragIsSticker: false,
         dragOffsetX: 0,
         dragOffsetY: 0,
         dragOriginParent: null,
@@ -70,16 +66,8 @@
         noteCount: 0
     };
 
-    var stickerSvgs = {
-        heart: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
-        star: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>',
-        flower: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5c1.5 2.5 4.5 2.5 6 0 .5 3 3.5 4 5.5 2.5-1 2.5.5 5 3 5.5-2.5 1.5-2.5 4.5 0 6-3 .5-4 3.5-2.5 5.5-2.5-1-5 .5-5.5 3-1.5-2.5-4.5-2.5-6 0-.5-3-3.5-4-5.5-2.5 1-2.5-.5-5-3-5.5 2.5-1.5 2.5-4.5 0-6 3-.5 4-3.5 2.5-5.5 2.5 1 5-.5 5.5-3z"/><circle cx="12" cy="12" r="3" fill="#6b4a32"/></svg>'
-    };
-    var stickerColors = { heart: '#ef4444', star: '#f59e0b', flower: '#f472b6' };
-
     /* ---------- Event bindings ---------- */
     avatarSelect.addEventListener('click', onAvatarClick);
-    stickerSelect.addEventListener('click', onStickerClick);
     printBtn.addEventListener('click', onPrintClick);
     pinItBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
     pinItBtn.addEventListener('click', function (e) { e.stopPropagation(); pinToBoard(); });
@@ -97,15 +85,6 @@
         if (!btn) return;
         setSelected(avatarSelect, 'avatar-btn', btn);
         state.avatar = btn.dataset.avatar;
-    }
-
-    function onStickerClick(e) {
-        var btn = e.target.closest('.sticker-btn');
-        if (!btn) return;
-        setSelected(stickerSelect, 'sticker-btn', btn);
-        state.sticker = btn.dataset.sticker || '';
-        state.stickerSvg = state.sticker ? stickerSvgs[state.sticker] : '';
-        state.stickerColor = state.sticker ? stickerColors[state.sticker] : '';
     }
 
     function setSelected(container, cls, activeBtn) {
@@ -128,7 +107,32 @@
             return;
         }
 
+        // If a card is still sitting in the printer tray, pin it first so it
+        // isn't lost when the next card slides out. Then print the new one.
+        if (state.isPrinted) {
+            var nextName = nameInput.value;
+            var nextMessage = messageInput.value;
+
+            pinToBoard();
+
+            // Restore the form values the user had already typed for the
+            // next card (pinToBoard calls resetPrinter, which clears them).
+            nameInput.value = nextName;
+            messageInput.value = nextMessage;
+        }
+
         doPrint(name, message);
+    }
+
+    function isImageAvatar(avatar) {
+        return avatar && (/\.(png|jpg|jpeg|webp|gif)$/i.test(avatar) || avatar.indexOf('/') !== -1);
+    }
+
+    function renderAvatar(avatar) {
+        if (!avatar) return '';
+        return isImageAvatar(avatar)
+            ? '<img src="' + escapeHtml(avatar) + '" alt="">'
+            : escapeHtml(avatar);
     }
 
     function doPrint(name, message) {
@@ -139,12 +143,11 @@
         tabletDot.classList.add('on', 'blink');
 
         // Build the card content.
-        printedAvatar.textContent = state.avatar;
+        printedAvatar.innerHTML = isImageAvatar(state.avatar)
+            ? '<img src="' + escapeHtml(state.avatar) + '" alt="">'
+            : escapeHtml(state.avatar);
         printedBody.textContent = message;
-        printedAuthor.textContent = name ? '— ' + name : '— A friend';
-        printedSticker.innerHTML = state.stickerSvg
-            ? '<span style="color:' + state.stickerColor + ';">' + state.stickerSvg + '</span>'
-            : '';
+        printedAuthor.textContent = name ? '— ' + name : '— 一位朋友';
 
         // After the print delay, slide the card out of the slot.
         setTimeout(function () {
@@ -155,7 +158,7 @@
             state.isPrinting = false;
             state.isPrinted = true;
             printBtn.disabled = false;
-            printBtn.textContent = 'Print another card';
+            printBtn.textContent = '再打印一张';
         }, 900);
     }
 
@@ -177,9 +180,7 @@
         var data = {
             avatar: state.avatar,
             name: nameFromAuthor(printedAuthor.textContent),
-            message: printedBody.textContent,
-            stickerSvg: state.stickerSvg,
-            stickerColor: state.stickerColor
+            message: printedBody.textContent
         };
         var note = createBoardNote(data, x, y, null);
         boardCork.appendChild(note);
@@ -193,15 +194,63 @@
     function resetPrinter() {
         printedCard.classList.remove('printed');
         printedCard.hidden = true;
-        printedSticker.innerHTML = '';
         state.isPrinted = false;
-        printBtn.textContent = 'Print my card';
-        // Keep the name + avatar for the next card; clear message + sticker.
+        printBtn.textContent = '打印我的贺卡';
+        // Keep the name + avatar for the next card; clear message.
         messageInput.value = '';
-        setSelected(stickerSelect, 'sticker-btn', stickerSelect.querySelector('[data-sticker=""]'));
-        state.sticker = '';
-        state.stickerSvg = '';
-        state.stickerColor = '';
+    }
+
+    /* ---------- Drag the decorative stickers on the cork board ---------- */
+    var STICKER_POS_KEY = 'cards_sticker_pos_v1';
+
+    function restoreStickerPositions() {
+        var saved = {};
+        try { saved = JSON.parse(localStorage.getItem(STICKER_POS_KEY) || '{}'); } catch (_) {}
+        Object.keys(saved).forEach(function (idx) {
+            var st = boardCork.querySelector('.sticker-collage[data-sticker-idx="' + idx + '"]');
+            if (st && saved[idx]) {
+                st.style.left = saved[idx].left;
+                st.style.top = saved[idx].top;
+            }
+        });
+    }
+
+    function saveStickerPosition(idx, left, top) {
+        var saved = {};
+        try { saved = JSON.parse(localStorage.getItem(STICKER_POS_KEY) || '{}'); } catch (_) {}
+        saved[idx] = { left: left, top: top };
+        try { localStorage.setItem(STICKER_POS_KEY, JSON.stringify(saved)); } catch (_) {}
+    }
+
+    function initStickerDrag() {
+        var stickers = boardCork.querySelectorAll('.sticker-collage');
+        stickers.forEach(function (sticker) {
+            sticker.addEventListener('pointerdown', function (e) {
+                if (state.isDragging || e.pointerType === 'touch') return;
+                startStickerDrag(sticker, e);
+            });
+        });
+    }
+
+    function startStickerDrag(sticker, e) {
+        e.preventDefault();
+        state.isDragging = true;
+        state.dragEl = sticker;
+        state.dragIsPrinted = false;
+        state.dragIsSticker = true;
+
+        var rect = sticker.getBoundingClientRect();
+        state.dragOffsetX = e.clientX - rect.left;
+        state.dragOffsetY = e.clientY - rect.top;
+        state.dragOriginStyle = sticker.getAttribute('style') || '';
+
+        sticker.style.position = 'fixed';
+        sticker.style.left = (e.clientX - state.dragOffsetX) + 'px';
+        sticker.style.top = (e.clientY - state.dragOffsetY) + 'px';
+        sticker.style.width = rect.width + 'px';
+        sticker.style.margin = '0';
+        sticker.classList.add('sticker-dragging');
+        document.body.appendChild(sticker);
     }
 
     /* ---------- Drag the printed card (or a board card) ---------- */
@@ -225,6 +274,7 @@
         state.isDragging = true;
         state.dragEl = el;
         state.dragIsPrinted = !!isPrinted;
+        state.dragIsSticker = false;
 
         var rect = el.getBoundingClientRect();
         state.dragOffsetX = e.clientX - rect.left;
@@ -259,8 +309,26 @@
                         e.clientY >= boardRect.top && e.clientY <= boardRect.bottom;
 
         el.classList.remove('card-dragging');
+        el.classList.remove('sticker-dragging');
 
-        if (state.dragIsPrinted) {
+        if (state.dragIsSticker) {
+            if (overBoard) {
+                var nxS = e.clientX - boardRect.left - state.dragOffsetX;
+                var nyS = e.clientY - boardRect.top - state.dragOffsetY;
+                var pctX = ((nxS / boardRect.width) * 100).toFixed(2);
+                var pctY = ((nyS / boardRect.height) * 100).toFixed(2);
+                el.style.position = 'absolute';
+                el.style.left = pctX + '%';
+                el.style.top = pctY + '%';
+                el.style.width = '';
+                el.style.margin = '';
+                boardCork.appendChild(el);
+                saveStickerPosition(el.dataset.stickerIdx, pctX + '%', pctY + '%');
+            } else {
+                el.setAttribute('style', state.dragOriginStyle);
+                boardCork.appendChild(el);
+            }
+        } else if (state.dragIsPrinted) {
             if (overBoard) {
                 var nx = e.clientX - boardRect.left - state.dragOffsetX;
                 var ny = e.clientY - boardRect.top - state.dragOffsetY;
@@ -293,6 +361,7 @@
         state.isDragging = false;
         state.dragEl = null;
         state.dragIsPrinted = false;
+        state.dragIsSticker = false;
     }
 
     document.addEventListener('pointermove', onPointerMove);
@@ -313,17 +382,11 @@
             renderedCardIds[id] = true;
         }
 
-        var stickerHtml = '';
-        if (data.stickerSvg) {
-            stickerHtml = '<div style="margin-top:0.2rem;color:' + data.stickerColor + ';">' + data.stickerSvg + '</div>';
-        }
-
         note.innerHTML =
             '<span class="pushpin pushpin-green pin-enter"></span>' +
-            '<div class="printed-avatar" style="font-size:1.4rem;line-height:1;">' + escapeHtml(data.avatar) + '</div>' +
+            '<div class="printed-avatar">' + renderAvatar(data.avatar) + '</div>' +
             '<p class="note-text" style="margin-top:0.25rem;">' + escapeHtml(data.message) + '</p>' +
-            '<p class="note-author">' + escapeHtml(data.name ? '— ' + data.name : '— A friend') + '</p>' +
-            stickerHtml;
+            '<p class="note-author">' + escapeHtml(data.name ? '— ' + data.name : '— 一位朋友') + '</p>';
 
         setTimeout(function () {
             var pin = note.querySelector('.pushpin');
@@ -349,7 +412,6 @@
                 avatar: data.avatar,
                 name: data.name,
                 message: data.message,
-                sticker: state.sticker,
                 x: x,
                 y: y,
                 clientId: clientId
@@ -391,11 +453,9 @@
         var x = (card.x != null) ? card.x : (boardRect.width / 2 - 80);
         var y = (card.y != null) ? card.y : (boardRect.height / 2 - 60);
         var data = {
-            avatar: card.avatar || '🦊',
+            avatar: card.avatar || 'assets/cards/avatars/ava-01.png',
             name: card.name || '',
-            message: card.message || '',
-            stickerSvg: card.sticker ? (stickerSvgs[card.sticker] || '') : '',
-            stickerColor: card.sticker ? (stickerColors[card.sticker] || '') : ''
+            message: card.message || ''
         };
         var note = createBoardNote(data, x, y, card.id);
         boardCork.appendChild(note);
@@ -410,6 +470,18 @@
             note.style.left = card.x + 'px';
             note.style.top = card.y + 'px';
         }
+    }
+
+    function deleteCardById(id) {
+        if (!id) return;
+        var note = boardCork.querySelector('[data-card-id="' + id + '"]');
+        if (note) {
+            note.classList.add('note-leave');
+            setTimeout(function () {
+                if (note.parentNode) { note.remove(); updateWallCount(); }
+            }, 300);
+        }
+        delete renderedCardIds[id];
     }
 
     function initCloud() {
@@ -431,14 +503,22 @@
                     var msg = JSON.parse(e.data);
                     if (msg.type === 'insert' && msg.card) renderCard(msg.card);
                     else if (msg.type === 'update' && msg.card) moveCard(msg.card);
+                    else if (msg.type === 'delete' && msg.id) deleteCardById(msg.id);
                 } catch (_) { /* ignore malformed */ }
             };
             es.onerror = function () { /* SSE retries automatically */ };
         } catch (_) { /* EventSource unsupported — cards still work locally */ }
     }
 
+    // Sync badge count with the actual template notes on load.
+    updateWallCount();
+
     // Kick off the backend sync once the DOM is ready.
     initCloud();
+
+    // Decorative stickers can be dragged around; restore any saved positions.
+    initStickerDrag();
+    restoreStickerPositions();
 
     /* ---------- Utilities ---------- */
     function updateWallCount() {

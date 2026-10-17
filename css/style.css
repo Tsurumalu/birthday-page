@@ -57,6 +57,10 @@
     /* Typography */
     --font-serif: 'Cormorant Garamond', Georgia, serif;
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    /* 全局兜底：原先只在 .theme-stamp/.theme-postcard 等块里定义，
+       theme-games 等页 var(--font-display) 解析为空、整条声明失效回退继承值 */
+    --font-display: 'Bricolage Grotesque', 'Archivo', sans-serif;
+    --font-body: 'Archivo', 'Inter', sans-serif;
 
     /* Transitions */
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -4759,6 +4763,148 @@ body.theme-postcard::before {
     text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
 }
 
+/* --- 多条集锦：2×2 四宫格（CS 据点等） --- */
+.game-video-body.is-grid .clip-grid {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 10px;
+}
+
+.clip-cell {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #120d18;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.game-video-body.is-grid .game-video-cover {
+    border-radius: 10px;
+}
+
+.game-video-body.is-grid .game-video-cover::after {
+    background: radial-gradient(circle at 50% 45%, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.55));
+}
+
+.game-video-body.is-grid .game-video-play {
+    width: 44px;
+    height: 44px;
+}
+
+.game-video-body.is-grid .game-video-play::before {
+    border-left-width: 12px;
+    border-top-width: 8px;
+    border-bottom-width: 8px;
+}
+
+.game-video-body.is-grid .game-video-cover-hint {
+    font-size: 0.62rem;
+    bottom: 0.65rem;
+    letter-spacing: 0.2em;
+}
+
+/* 宫格面板比单视频面板宽一档 */
+.game-video-panel.has-grid {
+    width: min(1100px, 100%);
+}
+
+/* --- 照片墙（截图/照片挂进据点弹窗） --- */
+/* 照片模式解除 16:9 限高，面板自身限高并滚动 */
+.game-video-body.is-photos {
+    aspect-ratio: auto;
+}
+
+.game-video-panel.is-photos {
+    width: min(1100px, 100%);
+    max-height: min(92vh, 940px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.photo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.photo-item {
+    position: relative;
+    margin: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #120d18;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.photo-item img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.photo-item-label {
+    position: absolute;
+    left: 50%;
+    bottom: 1rem;
+    transform: translateX(-50%);
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: rgba(255, 255, 255, 0.92);
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.85);
+    padding: 0.32rem 0.85rem;
+    border-radius: 999px;
+    background: rgba(12, 9, 18, 0.55);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+@media (max-width: 720px) {
+    .game-video-panel.is-photos {
+        max-height: 88vh;
+    }
+
+    .photo-list {
+        gap: 8px;
+    }
+
+    .photo-item {
+        border-radius: 9px;
+    }
+
+    .photo-item-label {
+        font-size: 0.62rem;
+        bottom: 0.65rem;
+    }
+}
+
+@media (max-width: 720px) {
+    .game-video-body.is-grid .clip-grid {
+        gap: 6px;
+    }
+
+    .clip-cell,
+    .game-video-body.is-grid .game-video-cover {
+        border-radius: 7px;
+    }
+
+    .game-video-body.is-grid .game-video-play {
+        width: 34px;
+        height: 34px;
+    }
+
+    .game-video-body.is-grid .game-video-play::before {
+        border-left-width: 9px;
+        border-top-width: 6px;
+        border-bottom-width: 6px;
+    }
+}
+
 /* --- Responsive --- */
 @media (max-width: 720px) {
     .games-page {
@@ -4820,21 +4966,84 @@ body.theme-postcard::before {
    Games — 3D island preview (games-3d.html)
    ============================================ */
 
+/* games-3d 专属：暗金双龙主题 —— 背景图 + 金色主题变量整体覆盖 */
+body.page-island3d {
+    /* 暗金主题：全页（nav 激活态、小标、引线、光晕）跟着换色 */
+    --theme-primary: #d4ab63;
+    --theme-soft: #ecd9ae;
+    --theme-dim: rgba(212, 171, 99, 0.14);
+    --theme-glow: rgba(212, 171, 99, 0.3);
+}
+/* 龙纹背景画在 .theme-bg 固定层上（同 music 页的覆盖方式），
+   上下暗色渐晕保证标题/导航可读 */
+body.page-island3d .theme-bg {
+    background:
+        linear-gradient(180deg, rgba(12, 10, 12, 0.88) 0%, rgba(12, 10, 12, 0.42) 30%, rgba(12, 10, 12, 0.6) 62%, rgba(12, 10, 12, 0.9) 100%),
+        url(../assets/valorant-dragons.jpg) center / cover no-repeat;
+}
+
 /* games-3d 专属：展示窗口放大——放宽页面容器，
    舞台宽度占满的同时受视口高度反推约束（保住 16:9 且一屏能看全） */
 .page-island3d .games-page {
-    max-width: 1780px;
-    padding: 6.5rem clamp(1rem, 2vw, 2rem) 2.5rem;
+    max-width: 1880px;
+    padding: 5.5rem clamp(1rem, 2vw, 2rem) 2.5rem;
 }
 .page-island3d .games-masthead {
-    margin-bottom: 1.4rem;
+    margin-bottom: 1rem;
 }
+
+/* --- 3D 岛页标题排印：两侧引线的小标 + VALORANT 字体渐变金大标题 --- */
+.page-island3d .games-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.1em;
+    font-size: 0.64rem;
+    letter-spacing: 0.42em;
+    color: var(--theme-soft);
+    text-shadow: 0 0 16px var(--theme-glow);
+}
+.page-island3d .games-label::before,
+.page-island3d .games-label::after {
+    content: '';
+    flex: none;
+    width: 3.4em;
+    height: 1px;
+}
+.page-island3d .games-label::before {
+    background: linear-gradient(90deg, transparent, var(--theme-primary));
+}
+.page-island3d .games-label::after {
+    background: linear-gradient(270deg, transparent, var(--theme-primary));
+}
+.page-island3d .games-label { margin-bottom: 0.65rem; }
 .page-island3d .games-title {
-    font-size: clamp(2rem, 4.6vh, 3.4rem);
+    font-family: 'VALORANT', var(--font-display);
+    font-weight: 400;              /* 该字体只有单字重，700 会伪加粗糊掉切角 */
+    text-transform: uppercase;     /* 字体只有大写字形 */
+    font-size: clamp(2.2rem, 5.4vh, 4rem);
+    letter-spacing: 0.09em;
+    background: linear-gradient(180deg, #ffffff 4%, #f4e4bb 50%, var(--theme-primary) 130%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 8px 30px rgba(212, 171, 99, 0.45));
+    margin-bottom: 0.55rem;
+    padding-left: 0.09em;          /* 抵消 letter-spacing 造成的视觉右偏 */
+}
+.page-island3d .games-sub {
+    color: rgba(242, 238, 248, 0.75);
+}
+.page-island3d .games-sub strong {
+    color: var(--theme-soft);
+    font-weight: 500;
 }
 .page-island3d .world3d-stage {
-    max-width: 1760px;
-    width: min(100%, calc((100vh - 264px) * 16 / 9));
+    max-width: 1860px;
+    width: min(100%, calc((100vh - 212px) * 16 / 9));
+    box-shadow:
+        0 34px 90px -34px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(212, 171, 99, 0.22),
+        0 0 80px -10px var(--theme-glow);
 }
 
 .world3d-stage {
@@ -6112,9 +6321,9 @@ body.theme-postcard::before {
 }
 
 .hu-title {
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Archivo', var(--cjk), sans-serif;
     font-weight: 600;
-    font-size: clamp(14px, 2.6vmin, 21px);
+    font-size: clamp(16px, 3vmin, 24px);
     letter-spacing: 0.05em;
     color: #f6efe6;
     white-space: nowrap;
@@ -6123,7 +6332,7 @@ body.theme-postcard::before {
 }
 
 .hu-artist {
-    font-size: clamp(8px, 0.7vw, 10px);
+    font-size: clamp(10px, 0.9vw, 12.5px);
     letter-spacing: 0.24em;
     text-transform: uppercase;
     color: rgba(255, 179, 122, 0.72);
@@ -6178,7 +6387,7 @@ body.theme-postcard::before {
     display: flex;
     justify-content: space-between;
     font-family: var(--mono);
-    font-size: clamp(8px, 0.7vw, 10px);
+    font-size: clamp(10px, 0.85vw, 12px);
     letter-spacing: 0.14em;
     color: rgba(200, 210, 235, 0.42);
 }
@@ -6859,9 +7068,9 @@ body.theme-postcard::before {
 }
 
 .cas-label b {
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Archivo', var(--cjk), sans-serif;
     font-weight: 700;
-    font-size: clamp(7px, 0.62vw, 9px);
+    font-size: clamp(8.5px, 0.78vw, 11.5px);
     letter-spacing: 0.14em;
     white-space: nowrap;
 }
@@ -6869,7 +7078,7 @@ body.theme-postcard::before {
 .cas-label i {
     font-style: normal;
     font-family: var(--mono);
-    font-size: clamp(5px, 0.42vw, 6.5px);
+    font-size: clamp(6.5px, 0.55vw, 8.5px);
     letter-spacing: 0.14em;
     opacity: 0.72;
     white-space: nowrap;
@@ -7018,14 +7227,14 @@ body.theme-postcard::before {
 
 .spine-col {
     position: absolute;
-    top: 12%;
-    bottom: 26%;
-    width: clamp(92px, 9.6vw, 132px);
+    top: 10%;
+    bottom: 22%;
+    width: clamp(96px, 10.6vw, 152px);
     z-index: 27;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: clamp(6px, 1vh, 10px);
+    gap: clamp(3px, 0.42vh, 6px);
     pointer-events: none;
 }
 
@@ -7039,7 +7248,7 @@ body.theme-postcard::before {
     display: flex;
     align-items: center;
     gap: 8px;
-    height: clamp(28px, 4.4vh, 40px);
+    height: clamp(18px, 2.6vh, 26px);
     padding: 0 10px 0 8px;
     border: none;
     border-radius: 5px;
@@ -7085,10 +7294,10 @@ body.theme-postcard::before {
 .spine-title {
     flex: 1 1 auto;
     min-width: 0;
-    font-family: 'Archivo', sans-serif;
+    font-family: 'Archivo', var(--cjk), sans-serif;
     font-weight: 700;
-    font-size: clamp(8px, 0.72vw, 11px);
-    letter-spacing: 0.12em;
+    font-size: clamp(9.5px, 0.92vw, 13px);
+    letter-spacing: 0.05em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -7186,7 +7395,7 @@ body.theme-postcard::before {
     margin: 0;
     font-family: 'Bricolage Grotesque', sans-serif;
     font-weight: 500;
-    font-size: clamp(13px, 1.35vw, 19px);
+    font-size: clamp(16px, 1.65vw, 23px);
     line-height: 1.35;
     letter-spacing: 0.02em;
     color: rgba(255, 255, 255, 0.26);
@@ -7197,6 +7406,14 @@ body.theme-postcard::before {
 }
 
 .lyric-line.is-past { color: rgba(255, 255, 255, 0.14); }
+
+/* Chinese lyrics: pixel face hurts readability at this size */
+.lyric-line.is-cjk {
+    font-family: var(--cjk), sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    line-height: 1.5;
+}
 
 .lyric-line.is-active {
     color: #fff;
@@ -10294,4 +10511,266 @@ body.theme-postcard::before {
     .qz-btier { font-size: 9.5px; }
     .qz-bacc { font-size: 14.5px; }
     .qz-bscore { font-size: 13.5px; }
+}
+
+/* ============================================
+   Music v3 — video tapes playing on the windshield
+   ============================================ */
+
+.ws-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    background: #05060a;
+}
+
+.ws-frame.video-view .ws-video { opacity: 1; }
+.ws-frame.video-view .lyric-layer { opacity: 0; }
+.ws-frame.video-view .ws-tint { background: linear-gradient(180deg, rgba(6,8,16,0.18) 0%, rgba(0,0,0,0) 42%, rgba(5,5,9,0.34) 100%); }
+
+/* small "recording" feel while a video tape runs */
+.ws-frame.video-view::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(180deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 3px);
+    opacity: 0.5;
+}
+
+/* video tapes look like VHS cases, not music cassettes */
+.spine.is-video {
+    box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset -14px 0 18px -12px rgba(0, 0, 0, 0.45);
+}
+
+.spine.is-video .spine-brand {
+    background: rgba(0, 0, 0, 0.22);
+    color: var(--tape-ink);
+    border-color: rgba(0, 0, 0, 0.35);
+}
+
+.spine.is-video .spine-title,
+.spine.is-cjk .spine-title,
+.cassette.is-video .cas-label b,
+.cassette.is-cjk .cas-label b,
+.hu-title.is-cjk,
+.hu-artist.is-cjk,
+.deck-label.is-cjk {
+    font-family: var(--px), var(--cjk), sans-serif;
+    letter-spacing: 0.04em;
+}
+
+.spine.is-video .spine-title { font-size: clamp(9px, 0.78vw, 11.5px); font-weight: 700; }
+
+.cassette.is-video .cas-window { opacity: 0.35; }
+
+.deck-label.is-cjk { font-size: clamp(7px, 0.62vw, 9px); }
+
+/* on narrow screens the walls hide, so the rack holds everything in rows */
+@media (max-width: 1100px) {
+    .rack { flex-wrap: wrap; justify-content: center; width: min(88vw, 460px); }
+    .cassette { width: calc(25% - 8px); }
+}
+
+/* ============================================
+   MINI PLAYER — persistent bar on every page
+   Bottom-right thin player; state lives in
+   localStorage (see js/mini-player.js). The car
+   player page renders no bar of its own.
+   ============================================ */
+
+.mini-player {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 800;
+    width: min(392px, calc(100vw - 32px));
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px 13px 11px 11px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: rgba(15, 12, 17, 0.82);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5);
+    color: var(--text-primary);
+    overflow: hidden;
+    animation: mp-in 0.5s var(--ease-out) both;
+}
+
+@keyframes mp-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.mini-player.is-hidden { display: none; }
+
+.mp-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+}
+
+.mp-progress::after {  /* fatter touch target */
+    content: '';
+    position: absolute;
+    inset: -6px 0;
+}
+
+.mp-fill {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--theme-primary, #e59a62);
+    transition: width 0.25s linear;
+}
+
+.mp-cover {
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background-color: #241d26;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    padding: 0;
+}
+
+.mp-meta {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    cursor: pointer;
+}
+
+.mp-title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mp-artist {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mp-time {
+    font-size: 11px;
+    color: var(--text-secondary);
+    opacity: 0.8;
+    font-variant-numeric: tabular-nums;
+}
+
+.mp-eq {
+    flex: none;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 14px;
+    width: 14px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.mini-player.is-playing .mp-eq { opacity: 1; }
+
+.mp-eq i {
+    flex: 1;
+    background: var(--theme-primary, #e59a62);
+    border-radius: 1px;
+    animation: mp-eq 0.9s ease-in-out infinite;
+}
+
+.mp-eq i:nth-child(2) { animation-delay: 0.25s; }
+.mp-eq i:nth-child(3) { animation-delay: 0.5s; }
+
+@keyframes mp-eq {
+    0%, 100% { height: 30%; }
+    50% { height: 100%; }
+}
+
+.mp-btn {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.25s, background 0.25s;
+}
+
+.mp-btn:hover {
+    color: var(--theme-primary);
+    background: var(--theme-dim, rgba(255, 255, 255, 0.06));
+}
+
+.mp-play {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--theme-primary, #e59a62);
+    color: #16110d;
+}
+
+.mp-play:hover {
+    color: #16110d;
+    background: var(--theme-soft, #f0b080);
+}
+
+.mp-play .ic-pause { display: none; }
+.mini-player.is-playing .mp-play .ic-play { display: none; }
+.mini-player.is-playing .mp-play .ic-pause { display: block; }
+
+.mp-close { width: 24px; height: 24px; opacity: 0.6; }
+
+@media (max-width: 640px) {
+    .mini-player {
+        right: 12px;
+        bottom: 12px;
+        width: min(360px, calc(100vw - 24px));
+    }
+    .mp-title { font-size: 14px; }
+    .mp-artist { font-size: 11.5px; }
+}
+
+/* ============================================
+   MUSIC PAGE TYPE — 字制区喜脉喜欢体
+   The whole musics.html renders in this
+   handwriting face, per request. Scoped to the
+   page body (.page-sub.theme-music) so the home
+   dial's music edition preview is untouched.
+   ============================================ */
+
+.page-sub.theme-music,
+.page-sub.theme-music *:not(svg):not(svg *) {
+    font-family: 'Ximai', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
 }

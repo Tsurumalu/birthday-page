@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="An evening drive — pick a tape, press play">
     <title>Music — Happy Birthday</title>
-    <link rel="stylesheet" href="css/fonts.css?v=20261014c">
-    <link rel="stylesheet" href="css/style.css?v=20261014g">
+    <link rel="stylesheet" href="css/fonts.css?v=20261017a">
+    <link rel="stylesheet" href="css/style.css?v=20261017i">
 </head>
 <body class="page-sub theme-music">
     <div class="loader" id="loader">
@@ -37,7 +37,7 @@
         <div class="nav-links">
             <a href="moments.html" class="nav-link">Moments</a>
             <a href="message.html" class="nav-link">Letter</a>
-            <a href="games.html" class="nav-link">Games</a>
+            <a href="games-3d.html" class="nav-link">Games</a>
             <a href="musics.html" class="nav-link active">Music</a>
             <a href="cards.html" class="nav-link">Cards</a>
         </div>
@@ -74,6 +74,7 @@
                         <div class="ws-layer" data-scene="stars"></div>
                         <div class="ws-layer ws-cover" data-scene="cover" id="wsCover"></div>
                     </div>
+                    <video class="ws-video" id="wsVideo" playsinline webkit-playsinline preload="none"></video>
                     <div class="ws-speed" id="wsSpeed"></div>
                     <div class="ws-tint"></div>
                     <div class="lyric-layer" id="lyricLayer" aria-hidden="true">
@@ -146,7 +147,7 @@
                                 </div>
                             </div>
                             <div class="hu-controls">
-                                <span class="hu-trk" id="huTrk">TRK --/10</span>
+                                <span class="hu-trk" id="huTrk">TRK --/12</span>
                                 <button class="hu-btn" id="btnPrev" aria-label="Previous">
                                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 6h2.4v12H7zM19 6l-9.2 6L19 18z"/></svg>
                                 </button>
@@ -288,7 +289,10 @@
         </div>
     </main>
 
-    <script src="js/main.js?v=20261014b"></script>
-    <script src="js/music.js?v=20261008e"></script>
+    <script src="js/tracks-core.js?v=20261017a"></script>
+    <script src="js/mini-player.js?v=20261017c"></script>
+    <script src="js/main.js?v=20261017a"></script>
+    <script src="js/lyrics-zh.js?v=20261017g"></script>
+    <script src="js/music.js?v=20261017i"></script>
 </body>
 </html>

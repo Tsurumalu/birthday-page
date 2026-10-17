@@ -13,208 +13,68 @@
     // Config — drop real mp3 files into assets/music/ with these names
     // and the player switches from silent simulation to real audio.
     // ---------------------------------------------------------------
-    var TRACKS = [
-        {
-            id: 'sunset-drive',
-            title: 'SUNSET DRIVE',
-            artist: 'SIDE A \u00B7 CHILLWAVE',
-            dur: 227,
-            file: 'assets/music/sunset-drive.mp3',
-            cover: 'assets/covers/cover-dusk.png',
-            scene: 'dusk',
-            body: '#d99a45', ink: '#5c3d14', label: '#f7ecd8',
-            lyrics: [
-                'Golden hour on the interstate',
-                'Your hand out the window, riding the wind',
-                'Every streetlight wakes up one by one',
-                'The radio hums our summer back to me',
-                'Orange sky melting into blue',
-                'We drive a little slower tonight',
-                'Nowhere to be, everything to feel',
-                'Stay for one more sunset with me'
-            ]
+    // Timed lyrics for the real songs live in js/lyrics-zh.js (parsed from .lrc)
+    var ZH = (window.ZH_LYRICS || {});
+
+    function hasCJK(s) { return /[\u4E00-\u9FA5]/.test(s || ''); }
+
+    // Shared library lives in js/tracks-core.js (the site-wide mini player
+    // reads the same list). Scene / tape colours / lyrics are presentation
+    // extras keyed by id; artist here is the display string for the deck.
+    var EXTRAS = {
+        'yigege': {
+            artist: 'SIDE A \u00B7 \u536b\u5170',
+            scene: 'dusk', body: '#d9885a', ink: '#5b2c12', label: '#fbe8da',
+            lyrics: ZH['yigege']
         },
-        {
-            id: 'neon-nights',
-            title: 'NEON NIGHTS',
-            artist: 'SIDE B \u00B7 CITY POP',
-            dur: 254,
-            file: 'assets/music/neon-nights.mp3',
-            cover: 'assets/covers/cover-city.png',
-            scene: 'city',
-            body: '#7b6fd6', ink: '#241d55', label: '#ece7fb',
-            lyrics: [
-                'City lights bleed into the rain',
-                'A crescent moon over the vending machine',
-                'We chase the glow down empty streets',
-                'Bassline thumping like a second heart',
-                'Neon signatures on wet asphalt',
-                'Every sign says open, we say stay',
-                'Midnight is a color tonight',
-                'The city hums us home'
-            ]
+        'love-song': {
+            artist: 'SIDE B \u00B7 \u65b9\u5927\u540c',
+            scene: 'dusk', body: '#c25f79', ink: '#54202f', label: '#fae2e7',
+            lyrics: ZH['love-song']
         },
-        {
-            id: 'starry-coast',
-            title: 'STARRY COAST',
-            artist: 'SIDE A \u00B7 NOCTURNE',
-            dur: 281,
-            file: 'assets/music/starry-coast.mp3',
-            cover: 'assets/covers/cover-stars.png',
-            scene: 'stars',
-            body: '#4a7fae', ink: '#14314d', label: '#e3eef8',
-            lyrics: [
-                'The Milky Way spills over the cliffs',
-                'Salt air and a quiet engine hum',
-                'A lighthouse counts the waves for us',
-                'Ten thousand stars, one small car',
-                'Moonlight writes silver on the sea',
-                'We talk about nothing, beautifully',
-                'The coast road curves into forever',
-                'Park here, stay until the dawn'
-            ]
+        'chunfengchui': {
+            artist: 'SIDE A \u00B7 \u65b9\u5927\u540c',
+            scene: 'dusk', body: '#79a55f', ink: '#27421a', label: '#eaf4e0',
+            lyrics: ZH['chunfengchui']
         },
-        {
-            id: 'for-you',
-            title: 'FOR YOU',
-            artist: 'SIDE B \u00B7 MIXTAPE 1314',
-            dur: 314,
-            file: 'assets/music/for-you.mp3',
-            cover: 'assets/covers/cover-tape.png',
-            scene: 'dusk',
-            body: '#cf6a5a', ink: '#5a2019', label: '#fae7de',
-            lyrics: [
-                'This one goes out to you',
-                'Every song secretly knows your name',
-                'I taped our laughter between the tracks',
-                'Side A is where I miss you',
-                'Side B is where I find you',
-                'Rewind, replay, remember',
-                'A whole album just to say one thing',
-                'Happy birthday \u2014 press play'
-            ]
+        'aiaiai': {
+            artist: 'SIDE B \u00B7 \u65b9\u5927\u540c',
+            scene: 'city', body: '#c9a13e', ink: '#57430f', label: '#faf1d8',
+            lyrics: ZH['aiaiai']
         },
-        {
-            id: 'midnight-fm',
-            title: 'MIDNIGHT FM',
-            artist: 'SIDE A \u00B7 SYNTHWAVE',
-            dur: 238,
-            file: 'assets/music/midnight-fm.mp3',
-            cover: 'assets/covers/cover-city.png',
-            scene: 'city',
-            body: '#4f8f7d', ink: '#12352b', label: '#e2f3ec',
-            lyrics: [
-                'Static and streetlights at 2 a.m.',
-                'The DJ plays it slow for the night shift',
-                'Dial drifting through sleeping cities',
-                'Every station humming the same blue',
-                'Headlights draw long quiet lines',
-                'Coffee cold in the cupholder',
-                'The tunnel swallows the chorus whole',
-                'Signal fades, feeling doesn\u2019t'
-            ]
+        'tebiederens': {
+            artist: 'SIDE A \u00B7 \u65b9\u5927\u540c',
+            scene: 'stars', body: '#5b7fb5', ink: '#1e3350', label: '#e6eef9',
+            lyrics: ZH['tebiederens']
         },
-        {
-            id: 'paper-moon',
-            title: 'PAPER MOON',
-            artist: 'SIDE B \u00B7 DREAMPOP',
-            dur: 266,
-            file: 'assets/music/paper-moon.mp3',
-            cover: 'assets/covers/cover-stars.png',
-            scene: 'stars',
-            body: '#c7a3d9', ink: '#4a2c5e', label: '#f7eefb',
-            lyrics: [
-                'Fold the sky into a paper moon',
-                'Crayon stars on a bedroom ceiling',
-                'If the tide takes my letter, so be it',
-                'We were made of summertime',
-                'Clouds like unstamped postcards',
-                'Dream in low resolution, love in high',
-                'The night is soft around the edges',
-                'Sleep tight, the moon keeps watch'
-            ]
+        'maienli': {
+            artist: 'SIDE B \u00B7 \u65b9\u5927\u540c',
+            scene: 'stars', body: '#9a6bb0', ink: '#3a2250', label: '#f2e8f8',
+            lyrics: ZH['maienli']
         },
-        {
-            id: 'gasoline-heart',
-            title: 'GASOLINE HEART',
-            artist: 'SIDE A \u00B7 ROADTRIP',
-            dur: 213,
-            file: 'assets/music/gasoline-heart.mp3',
-            cover: 'assets/covers/cover-dusk.png',
-            scene: 'dusk',
-            body: '#b0513c', ink: '#4d1c12', label: '#f9e3da',
-            lyrics: [
-                'Full tank and a half-used map',
-                'Dust on the dashboard, dreams on repeat',
-                'Every mile marker counts us closer',
-                'Your playlist vs. mine, a peace treaty',
-                'Small towns glowing like pilot lights',
-                'The engine learns our favorite song',
-                'Rest stop skies, wide and endless',
-                'Home is wherever you ride shotgun'
-            ]
+        'aibulai': {
+            artist: 'FEAT \u00B7 \u65b9\u5927\u540c',
+            scene: 'city', body: '#4f9a95', ink: '#173b39', label: '#e2f4f2',
+            lyrics: ZH['aibulai']
         },
-        {
-            id: 'aqua-veil',
-            title: 'AQUA VEIL',
-            artist: 'SIDE B \u00B7 AMBIENT',
-            dur: 292,
-            file: 'assets/music/aqua-veil.mp3',
-            cover: 'assets/covers/cover-stars.png',
-            scene: 'stars',
-            body: '#3d7d8c', ink: '#113038', label: '#e0f2f6',
-            lyrics: [
-                'Blue on blue on blue',
-                'The sea breathes under a velvet veil',
-                'Windows down, let the ocean in',
-                'Waves keep time better than we do',
-                'Gulls write cursive across the wind',
-                'A quiet kind of forever out here',
-                'Salt on the air, calm in the chest',
-                'Drift with me a little longer'
-            ]
+        'tuofeilun': {
+            artist: 'SIDE A \u00B7 \u9648\u5955\u8fc5',
+            scene: 'stars', body: '#8a6a4f', ink: '#3d2a18', label: '#f4ead9',
+            lyrics: ZH['tuofeilun']
         },
-        {
-            id: 'honey-sky',
-            title: 'HONEY SKY',
-            artist: 'SIDE A \u00B7 BOSSA',
-            dur: 247,
-            file: 'assets/music/honey-sky.mp3',
-            cover: 'assets/covers/cover-dusk.png',
-            scene: 'dusk',
-            body: '#dfa14e', ink: '#5a3a10', label: '#faf0dc',
-            lyrics: [
-                'Peach light pours over the dash',
-                'Warm wind through fingers like honey',
-                'The horizon drips gold, slowly',
-                'Slow dance at sixty kilometers',
-                'Your laugh, the best kind of chorus',
-                'Sunburn sky, sugar-cloud days',
-                'Evening sticks to us like jam',
-                'One more golden mile, please'
-            ]
-        },
-        {
-            id: 'velvet-rain',
-            title: 'VELVET RAIN',
-            artist: 'SIDE B \u00B7 LOFI',
-            dur: 259,
-            file: 'assets/music/velvet-rain.mp3',
-            cover: 'assets/covers/cover-city.png',
-            scene: 'city',
-            body: '#6c5a92', ink: '#291d45', label: '#ece5f8',
-            lyrics: [
-                'Rain makes velvet of the window',
-                'Wipers keep the beat, we keep the quiet',
-                'Streetlights bloom in every drop',
-                'The night wears its softest coat',
-                'Raindrops tapping secret morse code',
-                'Warm air, cold glass, good company',
-                'Every drop carries the melody down',
-                'Let it rain \u2014 we\u2019re not in a hurry'
-            ]
-        }
-    ];
+        'v-rose': { artist: 'VIDEO TAPE \u00B7 SIDE A', body: '#b3566a', ink: '#4a1524', label: '#f7e0e6' },
+        'v-transparent': { artist: 'VIDEO TAPE \u00B7 SIDE A', body: '#3f7f8c', ink: '#113038', label: '#e0f2f6' },
+        'v-eleven': { artist: 'VIDEO TAPE \u00B7 SIDE B', body: '#6c5a92', ink: '#291d45', label: '#ece5f8' },
+        'v-lightyear': { artist: 'VIDEO TAPE \u00B7 SIDE B', body: '#4a7fae', ink: '#14314d', label: '#e3eef8' }
+    };
+
+    var TRACKS = (window.GIFT_TRACKS || []).map(function (t) {
+        var m = {}, k;
+        for (k in t) m[k] = t[k];
+        var ex = EXTRAS[t.id] || {};
+        for (k in ex) m[k] = ex[k];
+        return m;
+    });
 
     function pad2(n) { return ('0' + n).slice(-2); }
 
@@ -269,12 +129,15 @@
     var spineLeft = document.getElementById('spineLeft');
     var spineRight = document.getElementById('spineRight');
     var wsFrame = document.querySelector('.ws-frame');
+    var wsVideo = document.getElementById('wsVideo');
     var lyricLayer = document.getElementById('lyricLayer');
     var lyricTint = document.getElementById('lyricTint');
     var lyricScroll = document.getElementById('lyricScroll');
 
     // --- state ---
     var current = -1;          // inserted tape index
+    var pendingSeek = -1;      // position to apply once metadata lands
+    var autoRestoring = false; // true while we auto-resume (no silent fallback)
     var playing = false;
     var simTime = 0;           // simulated playback position (s)
     var tickTimer = null;
@@ -301,43 +164,82 @@
         return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2);
     }
 
+    // video tapes play a clip on the windshield instead of a scene
+    function isVideo(i) { return !!(TRACKS[i] && TRACKS[i].kind === 'video'); }
+    function videoMode() { return current >= 0 && isVideo(current); }
+
     function setPlayingUI(on) {
         playing = on;
+        var silent = on && !realMode && !videoMode();
         document.body.classList.toggle('tape-playing', on);
         cockpit.classList.toggle('is-playing', on);
         btnPlay.classList.toggle('is-playing', on);
         if (ledPlay) ledPlay.classList.toggle('on', on);
-        if (huMute) huMute.classList.toggle('on', on && !realMode);
-        if (ledMute) ledMute.classList.toggle('on', on && !realMode);
+        if (huMute) huMute.classList.toggle('on', silent);
+        if (ledMute) ledMute.classList.toggle('on', silent);
+        publishState();
     }
+
+    // ---------------------------------------------------------------
+    // Mini-player bridge — keeps the song alive across pages
+    // ---------------------------------------------------------------
+    function publishState(force) {
+        if (!window.MiniPlayer) return;
+        if (current < 0) { MiniPlayer.clear(); return; }
+        var t = TRACKS[current];
+        var cur = videoMode() && wsVideo ? (wsVideo.currentTime || 0)
+                : (realMode && realAudio ? realAudio.currentTime : simTime);
+        MiniPlayer.publish({
+            id: t.id,
+            pos: cur || 0,
+            playing: playing,
+            muted: volume === 0
+        }, { immediate: !!force });
+    }
+    window.addEventListener('pagehide', function () { publishState(true); });
 
     function updateProgress() {
         if (current < 0) return;
         var t = TRACKS[current];
-        var cur = realMode && realAudio ? realAudio.currentTime : simTime;
-        var pct = Math.min(1, cur / t.dur);
+        var cur, dur;
+        if (videoMode() && wsVideo) {
+            cur = wsVideo.currentTime || 0;
+            dur = wsVideo.duration || t.dur;
+        } else {
+            cur = realMode && realAudio ? realAudio.currentTime : simTime;
+            dur = t.dur;
+        }
+        if (!isFinite(dur) || dur <= 0) dur = t.dur;
+        var pct = Math.min(1, cur / dur);
         huFill.style.width = (pct * 100).toFixed(2) + '%';
         timeNow.textContent = fmt(cur);
         updateLyrics();
+        publishState();
     }
 
     // ---------------------------------------------------------------
     // Lyrics on the windshield
     // ---------------------------------------------------------------
     var lyricLines = [];
+    var lyricTimes = [];
     var lyricIdx = -1;
 
     function buildLyrics(t) {
         if (!lyricScroll) return;
         lyricScroll.innerHTML = '';
         lyricLines = [];
+        lyricTimes = [];
         lyricIdx = -1;
+        var cjk = hasCJK(t.title) || hasCJK(t.artist);
         (t.lyrics || []).forEach(function (line) {
             var p = document.createElement('p');
-            p.className = 'lyric-line';
-            p.textContent = line;
+            p.className = 'lyric-line' + (cjk ? ' is-cjk' : '');
+            // timed LRC: { t: seconds, x: text }  |  plain: 'text'
+            var timed = (line && typeof line === 'object' && typeof line.t === 'number');
+            p.textContent = timed ? line.x : String(line);
             lyricScroll.appendChild(p);
             lyricLines.push(p);
+            lyricTimes.push(timed ? line.t : null);
         });
         updateLyrics(true);
     }
@@ -345,9 +247,19 @@
     function updateLyrics(force) {
         if (current < 0 || !lyricLines.length) return;
         var t = TRACKS[current];
-        var cur = realMode && realAudio ? realAudio.currentTime : simTime;
-        var per = t.dur / lyricLines.length;
-        var idx = Math.max(0, Math.min(lyricLines.length - 1, Math.floor(cur / per)));
+        var cur = (realMode && realAudio && !realAudio.paused) ? realAudio.currentTime : simTime;
+        var idx;
+        if (lyricTimes[0] !== null && lyricTimes[0] !== undefined) {
+            // walk the LRC timeline: last line whose time has passed
+            idx = 0;
+            for (var i = 0; i < lyricTimes.length; i++) {
+                if (lyricTimes[i] <= cur) idx = i; else break;
+            }
+        } else {
+            var per = t.dur / lyricLines.length;
+            idx = Math.max(0, Math.min(lyricLines.length - 1, Math.floor(cur / per)));
+        }
+        idx = Math.max(0, Math.min(lyricLines.length - 1, idx));
         if (!force && idx === lyricIdx) return;
         lyricIdx = idx;
         lyricLines.forEach(function (el, i) {
@@ -367,9 +279,13 @@
         var t = TRACKS[current];
         huTitle.textContent = t.title;
         huArtist.textContent = t.artist;
-        huSrc.textContent = 'TAPE ' + pad2(current + 1);
+        huSrc.textContent = (t.kind === 'video' ? 'VIDEO ' : 'TAPE ') + pad2(current + 1);
         huTrk.textContent = 'TRK ' + pad2(current + 1) + '/' + pad2(TRACKS.length);
         timeTotal.textContent = fmt(t.dur);
+        // Chinese tape names need the CJK/pixel stack
+        if (huTitle) huTitle.classList.toggle('is-cjk', hasCJK(t.title));
+        if (huArtist) huArtist.classList.toggle('is-cjk', hasCJK(t.artist));
+        if (deckLabel) deckLabel.classList.toggle('is-cjk', hasCJK(t.title));
         huArt.style.backgroundImage = 'url("' + t.cover + '")';
         huArt.classList.add('has-art');
         deckLabel.textContent = t.title;
@@ -404,7 +320,9 @@
     function startTickers() {
         stopTickers();
         tickTimer = setInterval(function () {
-            if (realMode && realAudio) return;
+            // only stand down when the real audio is actually running
+            if (realMode && realAudio && !realAudio.paused) return;
+            if (videoMode()) return;            // video tracks keep their own clock
             simTime += 0.25;
             if (simTime >= TRACKS[current].dur) { nextTrack(true); return; }
             updateProgress();
@@ -415,22 +333,65 @@
         }, 1600);
     }
 
+    // --- video tape playback on the windshield ---
+    function attachVideo(track) {
+        if (!wsVideo) return;
+        wsVideo.pause();
+        wsVideo.src = track.file;
+        wsVideo.volume = volume / 100;
+        wsVideo.load();
+        wsVideo.onloadedmetadata = function () {
+            if (videoMode()) timeTotal.textContent = fmt(wsVideo.duration || track.dur);
+            if (pendingSeek > 0.5) {
+                try { wsVideo.currentTime = Math.min(pendingSeek, (wsVideo.duration || track.dur) - 0.5); } catch (e) {}
+                simTime = pendingSeek;
+                pendingSeek = -1;
+                if (videoMode()) updateProgress();
+            }
+        };
+        wsVideo.ontimeupdate = function () { if (videoMode()) updateProgress(); };
+        wsVideo.onended = function () {
+            if (!videoMode()) return;
+            pause();
+            nextTrack(true);
+        };
+        wsVideo.onerror = function () { if (wsFrame) wsFrame.classList.remove('video-view'); };
+    }
+
     function attachAudio(track) {
         realMode = false;
         if (realAudio) { realAudio.pause(); realAudio = null; }
+        if (track.kind === 'video') { attachVideo(track); return; }
+        if (wsVideo) wsVideo.pause();   // leaving a video tape for an audio tape
         try {
             realAudio = new Audio();
             realAudio.volume = volume / 100;
             realAudio.preload = 'auto';
             realAudio.src = track.file;
             realAudio.addEventListener('canplaythrough', function () {
-                realMode = true;
                 if (playing) {
-                    realAudio.currentTime = Math.min(simTime, track.dur - 1);
+                    if (simTime > 0.5 && Math.abs((realAudio.currentTime || 0) - simTime) > 0.75) {
+                        try { realAudio.currentTime = Math.min(simTime, track.dur - 1); } catch (e) {}
+                    }
                     var p = realAudio.play();
-                    if (p) p.catch(function () {});
+                    if (p && p.then) {
+                        p.then(function () { realMode = true; setPlayingUI(true); })
+                         .catch(function () { realMode = false; setPlayingUI(true); });
+                    } else { realMode = true; }
+                } else {
+                    realMode = true;   // buffered and ready for the user's PLAY
                 }
                 setPlayingUI(playing);
+            });
+            realAudio.addEventListener('loadedmetadata', function () {
+                var d = realAudio.duration;
+                if (isFinite(d) && d > 1) { track.dur = d; timeTotal.textContent = fmt(d); }
+                if (pendingSeek > 0.5) {
+                    try { realAudio.currentTime = Math.min(pendingSeek, (isFinite(d) ? d : track.dur) - 0.5); } catch (e) {}
+                    simTime = pendingSeek;
+                    pendingSeek = -1;
+                    updateProgress();
+                }
             });
             realAudio.addEventListener('error', function () { realMode = false; setPlayingUI(playing); });
             realAudio.addEventListener('timeupdate', function () { if (realMode) updateProgress(); });
@@ -441,11 +402,42 @@
     function play() {
         if (current < 0) { hintNoTape(); return; }
         var t = TRACKS[current];
+        if (videoMode()) {
+            if (wsFrame) wsFrame.classList.add('video-view');
+            setPlayingUI(true);
+            startTickers();
+            var vp = wsVideo.play();
+            if (vp) vp.catch(function () {});
+            updateProgress();
+            return;
+        }
         simTime = Math.min(simTime, t.dur - 0.5);
-        if (realMode && realAudio) {
-            realAudio.currentTime = simTime;
+        // Kick off real playback from inside the user gesture even if the file
+        // is still buffering — otherwise autoplay policy can refuse the later
+        // canplaythrough call and the progress bar freezes at 0.
+        if (realAudio) {
+            // Only seek when we actually resume mid-track: a redundant
+            // currentTime=0 write before play() can stall the media clock.
+            if (simTime > 0.5 && realAudio.readyState >= 1 &&
+                Math.abs((realAudio.currentTime || 0) - simTime) > 0.75) {
+                try { realAudio.currentTime = Math.min(simTime, (realAudio.duration || t.dur) - 0.5); } catch (e) {}
+            }
             var p = realAudio.play();
-            if (p) p.catch(function () { realMode = false; setPlayingUI(true); });
+            if (p && p.then) {
+                p.then(function () { realMode = true; setPlayingUI(true); })
+                 .catch(function () {
+                     realMode = false;
+                     if (autoRestoring) {
+                         // browser blocked the silent auto-resume — stay paused
+                         // at the right position rather than faking progress
+                         autoRestoring = false;
+                         setPlayingUI(false);
+                         stopTickers();
+                     } else {
+                         setPlayingUI(true);
+                     }
+                 });
+            }
         }
         setPlayingUI(true);
         startTickers();
@@ -453,6 +445,7 @@
     }
 
     function pause() {
+        if (videoMode() && wsVideo) wsVideo.pause();
         if (realMode && realAudio) realAudio.pause();
         setPlayingUI(false);
         stopTickers();
@@ -466,6 +459,12 @@
     function seekTo(pct) {
         if (current < 0) return;
         var t = TRACKS[current];
+        if (videoMode() && wsVideo) {
+            var vdur = wsVideo.duration || t.dur;
+            try { wsVideo.currentTime = Math.max(0, Math.min(1, pct)) * vdur; } catch (e) {}
+            updateProgress();
+            return;
+        }
         var target = Math.max(0, Math.min(1, pct)) * t.dur;
         if (realMode && realAudio) {
             try { realAudio.currentTime = target; } catch (e) {}
@@ -491,8 +490,11 @@
         current = -1;
         simTime = 0;
         if (realAudio) { realAudio.pause(); realAudio = null; }
+        if (wsVideo) wsVideo.pause();
         realMode = false;
         setEmptyUI();
+        publishState(true);
+        if (wsFrame) wsFrame.classList.remove('video-view');
         deckTape.classList.remove('inserted');
         deckTape.classList.add('ejecting');
         setTimeout(function () { deckTape.classList.remove('ejecting'); }, 500);
@@ -514,7 +516,7 @@
 
     function prevTrack() {
         var t = TRACKS[current];
-        var cur = realMode && realAudio ? realAudio.currentTime : simTime;
+        var cur = (realMode && realAudio && !realAudio.paused) ? realAudio.currentTime : simTime;
         if (cur > 3) { seekTo(0); return; }
         var prev = (current - 1 + TRACKS.length) % TRACKS.length;
         selectTapeVisual(prev, playing);
@@ -550,12 +552,23 @@
     // ---------------------------------------------------------------
     // Rack (featured album tapes) + side spine library
     // ---------------------------------------------------------------
-    var FEATURED = 4;   // tapes shown in the bottom rack
+    // bottom rack holds the featured album tapes; on narrow screens the spine
+    // walls are hidden, so it expands to the whole library (videos included)
+    var FEATURED = 4;
+    var narrowMQ = window.matchMedia('(max-width: 1100px)');
+
+    function rackList() {
+        return narrowMQ.matches ? TRACKS : TRACKS.slice(0, FEATURED);
+    }
 
     function buildRack() {
-        TRACKS.slice(0, FEATURED).forEach(function (t, i) {
+        rack.innerHTML = '';
+        rackList().forEach(function (t, slot) {
+            var i = TRACKS.indexOf(t);
             var el = document.createElement('button');
-            el.className = 'cassette';
+            el.className = 'cassette' + (t.kind === 'video' ? ' is-video' : '') +
+                (hasCJK(t.title) ? ' is-cjk' : '');
+            el.setAttribute('data-idx', i);
             el.style.setProperty('--tape-body', t.body);
             el.style.setProperty('--tape-ink', t.ink);
             el.style.setProperty('--tape-label', t.label);
@@ -577,13 +590,14 @@
                 // split the library: alternating columns like a tape wall
                 if (i % 2 !== c) return;
                 var el = document.createElement('button');
-                el.className = 'spine';
+                el.className = 'spine' + (t.kind === 'video' ? ' is-video' : '') +
+                    (hasCJK(t.title) ? ' is-cjk' : '');
                 el.setAttribute('data-idx', i);
                 el.style.setProperty('--tape-body', t.body);
                 el.style.setProperty('--tape-ink', t.ink);
                 el.setAttribute('aria-label', 'Insert tape: ' + t.title);
                 el.innerHTML =
-                    '<span class="spine-brand">FY</span>' +
+                    '<span class="spine-brand">' + (t.kind === 'video' ? 'VHS' : 'FY') + '</span>' +
                     '<span class="spine-title">' + t.title + '</span>' +
                     '<span class="spine-no">' + pad2(i + 1) + '</span>' +
                     '<span class="spine-led"></span>';
@@ -591,6 +605,13 @@
                 col.appendChild(el);
             });
         });
+    }
+
+    // rebuild the rack when we cross the breakpoint where the walls hide
+    function bindRackResize() {
+        var apply = function () { buildRack(); syncRackSlot(); };
+        if (narrowMQ.addEventListener) narrowMQ.addEventListener('change', apply);
+        else if (narrowMQ.addListener) narrowMQ.addListener(apply);
     }
 
     function insertFromLibrary(i, srcEl) {
@@ -622,8 +643,8 @@
     }
 
     function syncRackSlot() {
-        rack.querySelectorAll('.cassette').forEach(function (c, idx) {
-            c.classList.toggle('hidden-slot', idx === current);
+        rack.querySelectorAll('.cassette').forEach(function (c) {
+            c.classList.toggle('hidden-slot', Number(c.getAttribute('data-idx')) === current);
         });
     }
 
@@ -646,10 +667,17 @@
     function setScene(name, fromUser) {
         activeScene = name;
         if (fromUser) coverPinned = (name === 'cover');
+        if (wsFrame) wsFrame.classList.toggle('cover-view', name === 'cover');
+        // a video tape owns the whole glass — no scenery layer underneath
+        if (wsFrame) wsFrame.classList.toggle('video-view', name === 'video');
+        if (name === 'video') {
+            wsLayers.querySelectorAll('.ws-layer').forEach(function (l) { l.classList.remove('is-active'); });
+            sceneDotsWrap.querySelectorAll('.scene-dot').forEach(function (d) { d.classList.remove('is-active'); });
+            return;
+        }
         if (name === 'cover' && current >= 0 && wsCover) {
             wsCover.style.backgroundImage = 'url("' + TRACKS[current].cover + '")';
         }
-        if (wsFrame) wsFrame.classList.toggle('cover-view', name === 'cover');
         wsLayers.querySelectorAll('.ws-layer').forEach(function (l) {
             l.classList.toggle('is-active', l.getAttribute('data-scene') === name);
         });
@@ -659,7 +687,11 @@
     }
 
     sceneDotsWrap.querySelectorAll('.scene-dot').forEach(function (d) {
-        d.addEventListener('click', function () { setScene(d.getAttribute('data-scene'), true); });
+        d.addEventListener('click', function () {
+            // stepping back to a scenery view puts the video tape on hold
+            if (videoMode() && playing) pause();
+            setScene(d.getAttribute('data-scene'), true);
+        });
     });
 
     // ---------------------------------------------------------------
@@ -756,6 +788,7 @@
         var ang = -135 + 270 * volume / 100;
         knobVol.style.setProperty('--angle', ang + 'deg');
         if (realAudio) realAudio.volume = volume / 100;
+        if (wsVideo) wsVideo.volume = volume / 100;
         var lit = Math.round(volume / 100 * 6);
         volLeds.querySelectorAll('i').forEach(function (led, i) {
             led.classList.toggle('on', i < lit);
@@ -870,6 +903,35 @@
     // ---------------------------------------------------------------
     // Clock + idle needle states
     // ---------------------------------------------------------------
+    // Cross-page restore — the mini player keeps the song alive on other
+    // pages, so the car page takes it over (tape + position) on arrival
+    // instead of starting from an empty deck.
+    // ---------------------------------------------------------------
+    function restoreFromShared() {
+        if (!window.MiniPlayer || typeof MiniPlayer.snapshot !== 'function') return;
+        var snap = MiniPlayer.snapshot();
+        if (!snap || !snap.id) return;
+        var idx = -1, i;
+        for (i = 0; i < TRACKS.length; i++) { if (TRACKS[i].id === snap.id) { idx = i; break; } }
+        if (idx < 0) return;
+        var pos = snap.pos || 0;
+        if (pos > (TRACKS[idx].dur || 0) - 2) pos = 0;   // finished while away
+        current = idx;
+        pendingSeek = pos;
+        simTime = pos;
+        attachAudio(TRACKS[idx]);
+        setNowPlayingUI();
+        updateProgress();
+        setScene(TRACKS[idx].scene, false);
+        if (deckTape) deckTape.classList.add('inserted');
+        btnEject.disabled = false;
+        syncRackSlot();
+        syncSpines();
+        syncHasTape();
+        if (snap.playing) { autoRestoring = true; play(); }
+        else { pause(); }
+    }
+
     function tickClock() {
         var d = new Date();
         huClock.textContent = ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
@@ -894,10 +956,20 @@
     // ---------------------------------------------------------------
     // Boot
     // ---------------------------------------------------------------
+    if (window.MiniPlayer) {
+        var mutePrevVol = 0;
+        MiniPlayer.setMuteToggler(function (muted) {
+            if (muted) { if (volume > 0) mutePrevVol = volume; setVolume(0); }
+            else { setVolume(mutePrevVol || 62); }
+        });
+        if (MiniPlayer.initialMuted()) { mutePrevVol = 62; setVolume(0); }
+    }
     buildRack();
+    bindRackResize();
     buildSpines();
     setEmptyUI();
     setVolume(62);
     setCabin(false);
     setScene('dusk', false);
+    restoreFromShared();
 })();

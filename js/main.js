@@ -47,7 +47,7 @@
             label: 'Games',
             labelCn: '小游戏',
             subtitle: 'Our little arcade — drop a pin, press play.',
-            page: 'games.html',
+            page: 'games-3d.html',
             theme: 'theme-games',
             color: '#a48cc4',
             icon: iconSvg(
@@ -208,8 +208,16 @@
 
     if (soundToggle) {
         soundToggle.classList.add('muted');
+        // the mini player (and the car player via its bridge) owns this button:
+        // it reflects the persisted mute state and takes over clicks
+        if (window.MiniPlayer) MiniPlayer.setIconUpdater(updateSoundIcon, soundToggle);
 
         soundToggle.addEventListener('click', function () {
+            // handled by the music player whenever a tape exists
+            // (or on the music page itself); otherwise fall back
+            // to the ambient drone below
+            if (window.MiniPlayer && MiniPlayer.onSoundToggleClick()) return;
+
             if (isPlaying) {
                 stopAmbientSound();
                 soundToggle.classList.add('muted');

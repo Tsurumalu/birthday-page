@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Leave a little note on the birthday card board.">
-    <title>The Cards — Happy Birthday</title>
-    <link rel="stylesheet" href="css/fonts.css?v=20261014c">
-    <link rel="stylesheet" href="css/style.css?v=20261014g">
+    <meta name="description" content="在生日贺卡墙上留下一张小纸条。">
+    <title>贺卡墙 — 生日快乐</title>
+    <link rel="stylesheet" href="css/fonts.css?v=20261017b">
+    <link rel="stylesheet" href="css/style.css?v=20261017i">
     <style>
         /* =========================================================
            Theme: warm scrapbook / light cork board
@@ -252,7 +252,7 @@
 
         .tablet-title {
             font-family: var(--font-serif);
-            font-size: 1.1rem;
+            font-size: 1.35rem;
             font-weight: 500;
             color: var(--ink);
         }
@@ -263,9 +263,9 @@
 
         .field-label {
             display: block;
-            font-size: 0.65rem;
+            font-size: 0.85rem;
             font-weight: 500;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
             color: var(--text-muted);
             margin-bottom: 0.4rem;
@@ -276,9 +276,9 @@
             width: 100%;
             border: 1px solid rgba(58, 46, 34, 0.12);
             border-radius: 8px;
-            padding: 0.65rem 0.8rem;
+            padding: 0.7rem 0.85rem;
             font-family: var(--font-sans);
-            font-size: 0.9rem;
+            font-size: 1.05rem;
             background: #fff;
             color: var(--ink);
             transition: border-color 0.2s, box-shadow 0.2s;
@@ -292,17 +292,15 @@
             box-shadow: 0 0 0 3px var(--theme-dim);
         }
 
-        .avatar-select,
-        .sticker-select {
+        .avatar-select {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
         }
 
-        .avatar-btn,
-        .sticker-btn {
-            width: 40px;
-            height: 40px;
+        .avatar-btn {
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             border: 2px solid transparent;
             background: rgba(58, 46, 34, 0.06);
@@ -311,25 +309,25 @@
             align-items: center;
             justify-content: center;
             transition: transform 0.2s, border-color 0.2s, background 0.2s;
+            overflow: hidden;
         }
 
-        .avatar-btn:hover,
-        .sticker-btn:hover {
+        .avatar-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .avatar-btn:hover {
             transform: scale(1.08);
             background: rgba(58, 46, 34, 0.1);
         }
 
-        .avatar-btn.selected,
-        .sticker-btn.selected {
+        .avatar-btn.selected {
             border-color: var(--theme-primary);
             background: var(--theme-dim);
             transform: scale(1.1);
-        }
-
-        .sticker-btn svg {
-            width: 20px;
-            height: 20px;
-            display: block;
         }
 
         /* Colorful pastel tints for the picker chips */
@@ -340,13 +338,7 @@
         .theme-cards .avatar-btn:nth-child(6n+5) { background: #d8e7fb; }
         .theme-cards .avatar-btn:nth-child(6n+6) { background: #ecdcfa; }
 
-        .theme-cards .sticker-btn:nth-child(6n+1) { background: #ffe3e3; }
-        .theme-cards .sticker-btn:nth-child(6n+2) { background: #fff4c2; }
-        .theme-cards .sticker-btn:nth-child(6n+3) { background: #ecdcfa; }
-        .theme-cards .sticker-btn:nth-child(6n+4) { background: #d9f0e4; }
-
-        .avatar-btn.selected,
-        .sticker-btn.selected {
+        .avatar-btn.selected {
             box-shadow: 0 0 0 3px var(--theme-dim);
         }
 
@@ -359,7 +351,7 @@
             background: linear-gradient(120deg, #c06a4a, #e0708f);
             color: #fff;
             font-family: var(--font-sans);
-            font-size: 0.85rem;
+            font-size: 1rem;
             font-weight: 500;
             letter-spacing: 0.02em;
             cursor: pointer;
@@ -461,8 +453,22 @@
         }
 
         .printed-avatar {
-            font-size: 1.5rem;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
             line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .printed-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .printed-body {
@@ -477,12 +483,6 @@
             font-weight: 500;
             color: var(--text-secondary);
             margin-top: auto;
-        }
-
-        .printed-sticker svg {
-            width: 22px;
-            height: 22px;
-            display: block;
         }
 
         .pin-it-btn {
@@ -597,19 +597,19 @@
         }
 
         .note-author {
-            font-size: 0.7rem;
+            font-size: 0.88rem;
             font-weight: 500;
             color: var(--text-secondary);
             margin-bottom: 0.3rem;
         }
 
         .note-text {
-            font-size: 0.84rem;
-            line-height: 1.45;
+            font-size: 1.05rem;
+            line-height: 1.5;
             word-break: break-word;
             font-family: var(--font-sans);
-            font-weight: 600;
-            letter-spacing: 0.005em;
+            font-weight: 400;
+            letter-spacing: 0.01em;
         }
 
         .note-yellow { --note-paper: var(--paper-yellow); }
@@ -835,6 +835,13 @@
             100% { opacity: 1; transform: rotate(var(--rot, 0deg)) scale(1); }
         }
 
+        /* Note removal (admin panel delete, broadcast via SSE) */
+        .board-note.note-leave {
+            opacity: 0;
+            transform: rotate(var(--rot, 0deg)) scale(0.85);
+            transition: opacity 0.28s var(--ease-out), transform 0.28s var(--ease-out);
+        }
+
         /* Decorative SVG stickers */
         .board-deco {
             position: absolute;
@@ -852,6 +859,24 @@
 
         .sticker-collage svg {
             filter: drop-shadow(2px 3px 0 rgba(0,0,0,0.2));
+        }
+
+        /* Decorative stickers are draggable so users can arrange the board */
+        .sticker-collage {
+            pointer-events: auto;
+            cursor: move;
+            z-index: 5;
+            transition: transform 0.15s var(--ease-out), filter 0.15s var(--ease-out);
+        }
+        .sticker-collage img,
+        .sticker-collage svg {
+            pointer-events: none;
+            user-select: none;
+        }
+        .sticker-collage.sticker-dragging {
+            z-index: 100;
+            transform: rotate(0deg) scale(1.08) !important;
+            filter: drop-shadow(0 8px 14px rgba(0,0,0,0.35));
         }
 
         /* Drop zone */
@@ -1092,9 +1117,64 @@
                 filter: blur(3px) drop-shadow(0 6px 10px rgba(58, 46, 34, 0.22));
             }
         }
+
+        /* Full-bleed desk photo as the base layer (never shows a flat color block) */
+        body.theme-cards {
+            background: #d4a574 url('assets/cards/bg/desk.jpg') no-repeat center center / cover fixed;
+        }
+        /* "sheet" layer: a paper-style background that fills the whole viewport (cover),
+           so it never leaves blank areas. Set --paper-bg to a sheet image; leave it
+           none to fall back to the desk base layer only. */
+        body.theme-cards::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-image: var(--paper-bg, none);
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+            background-attachment: fixed;
+            pointer-events: none;
+        }
+        body.theme-cards .theme-bg {
+            display: none;
+        }
+
+        /* PNG stickers use the same size token as SVG stickers */
+        .board-deco img {
+            width: var(--sticker-size, 36px);
+            height: var(--sticker-size, 36px);
+            display: block;
+            object-fit: contain;
+            filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.2));
+        }
+
+        /* 851 GBai marker pen feel on cards page only */
+        .theme-cards .nav-brand-text,
+        .theme-cards .nav-link,
+        .theme-cards .sub-eyebrow,
+        .theme-cards .sub-subtitle,
+        .theme-cards .tablet-title,
+        .theme-cards .field-label,
+        .theme-cards .print-btn,
+        .theme-cards .note-author,
+        .theme-cards .note-text,
+        .theme-cards .polaroid-caption,
+        .theme-cards .ticket-line1,
+        .theme-cards .ticket-line2,
+        .theme-cards .note-check-title,
+        .theme-cards .note-check-body,
+        .theme-cards .board-badge,
+        .theme-cards .footer-text,
+        .theme-cards .footer-sub {
+            font-family: '851GBai', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            /* 851GBai 只有常规字重，强制字重可避免浏览器合成伪粗体导致笔画糊在一起 */
+            font-weight: 400;
+        }
     </style>
 </head>
-<body class="page-sub theme-cards">
+<body class="page-sub theme-cards" style="--paper-bg: url('assets/cards/bg/bg2.jpg')">
     <div class="loader" id="loader">
         <div class="loader-text">
             <span class="loader-letter">L</span>
@@ -1112,22 +1192,22 @@
 
     <a href="index.html" class="back-btn">
         <span class="back-btn-arrow">&#8249;</span>
-        <span>Back</span>
+        <span>返回</span>
     </a>
 
     <nav class="nav" id="nav">
         <a href="index.html" class="nav-brand">
             <span class="nav-brand-mark">&#10022;</span>
-            <span class="nav-brand-text">For You</span>
+            <span class="nav-brand-text">致你</span>
         </a>
         <div class="nav-links">
-            <a href="moments.html" class="nav-link">Moments</a>
-            <a href="message.html" class="nav-link">Letter</a>
-            <a href="games.html" class="nav-link">Games</a>
-            <a href="musics.html" class="nav-link">Music</a>
-            <a href="cards.html" class="nav-link active">Cards</a>
+            <a href="moments.html" class="nav-link">瞬间</a>
+            <a href="message.html" class="nav-link">信件</a>
+            <a href="games-3d.html" class="nav-link">游戏</a>
+            <a href="musics.html" class="nav-link">音乐</a>
+            <a href="cards.html" class="nav-link active">贺卡</a>
         </div>
-        <button class="sound-toggle" id="soundToggle" aria-label="Toggle sound">
+        <button class="sound-toggle" id="soundToggle" aria-label="开关声音">
             <span class="sound-icon" id="soundIcon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                     <path d="M11 5L6 9H2v6h4l5 4V5z"/>
@@ -1142,67 +1222,58 @@
         <div class="cards-sparkles" aria-hidden="true">
             <span></span><span></span><span></span><span></span><span></span><span></span>
         </div>
-        <p class="sub-eyebrow reveal-up">Edition 05</p>
-        <h1 class="sub-title reveal-up ransom-title" aria-label="CARDS">
+        <p class="sub-eyebrow reveal-up">第 05 辑</p>
+        <h1 class="sub-title reveal-up ransom-title" aria-label="贺卡">
             <img class="title-letter" src="assets/cards/title/c.png" alt="C" style="--tl-rot:-3deg;">
             <img class="title-letter" src="assets/cards/title/a.png" alt="A" style="--tl-rot:2deg;">
-            <img class="title-letter" src="assets/cards/title/r.jpg" alt="R" style="--tl-rot:-2deg;">
+            <img class="title-letter" src="assets/cards/title/r.png" alt="R" style="--tl-rot:-2deg;">
             <img class="title-letter" src="assets/cards/title/d.png" alt="D" style="--tl-rot:3deg;">
             <img class="title-letter" src="assets/cards/title/s.png" alt="S" style="--tl-rot:-1deg;">
         </h1>
-        <p class="sub-subtitle reveal-up">Leave a little note. We’ll pin it up for you.</p>
+        <p class="sub-subtitle reveal-up">留下一张小纸条，我们会帮你钉到墙上。</p>
     </header>
 
     <main class="sub-content cards-main">
         <div class="cards-layout reveal-up">
             <!-- Left: tablet -->
-            <section class="cards-studio" aria-label="Leave a note">
+            <section class="cards-studio" aria-label="写张贺卡">
                 <div class="tablet">
                     <div class="tablet-screen">
                         <div class="tablet-header">
                             <span class="tablet-dot" id="tabletDot"></span>
-                            <span class="tablet-title">Write your note</span>
+                            <span class="tablet-title">写张贺卡</span>
                         </div>
 
                         <div class="field">
-                            <label class="field-label">Pick an avatar</label>
+                            <label class="field-label">选个头像</label>
                             <div class="avatar-select" id="avatarSelect">
-                                <button class="avatar-btn" data-avatar="🐻" type="button" aria-label="Bear">🐻</button>
-                                <button class="avatar-btn" data-avatar="🐰" type="button" aria-label="Rabbit">🐰</button>
-                                <button class="avatar-btn selected" data-avatar="🦊" type="button" aria-label="Fox">🦊</button>
-                                <button class="avatar-btn" data-avatar="🐱" type="button" aria-label="Cat">🐱</button>
-                                <button class="avatar-btn" data-avatar="🐼" type="button" aria-label="Panda">🐼</button>
-                                <button class="avatar-btn" data-avatar="🐧" type="button" aria-label="Penguin">🐧</button>
+                                <button class="avatar-btn selected" data-avatar="assets/cards/avatars/ava-01.png" type="button" aria-label="Avatar 1"><img src="assets/cards/avatars/ava-01.png" alt=""></button>
+                                <button class="avatar-btn" data-avatar="assets/cards/avatars/ava-02.png" type="button" aria-label="Avatar 2"><img src="assets/cards/avatars/ava-02.png" alt=""></button>
+                                <button class="avatar-btn" data-avatar="assets/cards/avatars/ava-03.png" type="button" aria-label="Avatar 3"><img src="assets/cards/avatars/ava-03.png" alt=""></button>
+                                <button class="avatar-btn" data-avatar="assets/cards/avatars/ava-04.png" type="button" aria-label="Avatar 4"><img src="assets/cards/avatars/ava-04.png" alt=""></button>
+                                <button class="avatar-btn" data-avatar="assets/cards/avatars/ava-05.png" type="button" aria-label="Avatar 5"><img src="assets/cards/avatars/ava-05.png" alt=""></button>
+                                <button class="avatar-btn" data-avatar="assets/cards/avatars/ava-06.png" type="button" aria-label="Avatar 6"><img src="assets/cards/avatars/ava-06.png" alt=""></button>
+                                <button class="avatar-btn" data-avatar="assets/cards/avatars/ava-07.png" type="button" aria-label="Avatar 7"><img src="assets/cards/avatars/ava-07.png" alt=""></button>
+                                <button class="avatar-btn" data-avatar="assets/cards/avatars/ava-08.png" type="button" aria-label="Avatar 8"><img src="assets/cards/avatars/ava-08.png" alt=""></button>
+                                <button class="avatar-btn" data-avatar="assets/cards/avatars/ava-09.png" type="button" aria-label="Avatar 9"><img src="assets/cards/avatars/ava-09.png" alt=""></button>
+                                <button class="avatar-btn" data-avatar="assets/cards/avatars/ava-10.png" type="button" aria-label="Avatar 10"><img src="assets/cards/avatars/ava-10.png" alt=""></button>
+                                <button class="avatar-btn" data-avatar="assets/cards/avatars/ava-11.png" type="button" aria-label="Avatar 11"><img src="assets/cards/avatars/ava-11.png" alt=""></button>
+                                <button class="avatar-btn" data-avatar="assets/cards/avatars/ava-12.png" type="button" aria-label="Avatar 12"><img src="assets/cards/avatars/ava-12.png" alt=""></button>
+                                <button class="avatar-btn" data-avatar="assets/cards/avatars/ava-13.png" type="button" aria-label="Avatar 13"><img src="assets/cards/avatars/ava-13.png" alt=""></button>
                             </div>
                         </div>
 
                         <div class="field">
-                            <label class="field-label" for="nameInput">Your name</label>
-                            <input type="text" id="nameInput" class="cards-input" placeholder="Alex" maxlength="20" autocomplete="off">
+                            <label class="field-label" for="nameInput">你的名字</label>
+                            <input type="text" id="nameInput" class="cards-input" placeholder="小明" maxlength="20" autocomplete="off">
                         </div>
 
                         <div class="field">
-                            <label class="field-label" for="messageInput">Your message</label>
-                            <textarea id="messageInput" class="cards-textarea" rows="3" placeholder="Write something sweet..." maxlength="160"></textarea>
+                            <label class="field-label" for="messageInput">你的祝福</label>
+                            <textarea id="messageInput" class="cards-textarea" rows="3" placeholder="写点暖心的话…" maxlength="160"></textarea>
                         </div>
 
-                        <div class="field">
-                            <label class="field-label">Add a sticker</label>
-                            <div class="sticker-select" id="stickerSelect">
-                                <button class="sticker-btn" data-sticker="heart" data-color="#ef4444" type="button" aria-label="Heart sticker">
-                                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                                </button>
-                                <button class="sticker-btn" data-sticker="star" data-color="#f59e0b" type="button" aria-label="Star sticker">
-                                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                                </button>
-                                <button class="sticker-btn" data-sticker="flower" data-color="#f472b6" type="button" aria-label="Flower sticker">
-                                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5c1.5 2.5 4.5 2.5 6 0 .5 3 3.5 4 5.5 2.5-1 2.5.5 5 3 5.5-2.5 1.5-2.5 4.5 0 6-3 .5-4 3.5-2.5 5.5-2.5-1-5 .5-5.5 3-1.5-2.5-4.5-2.5-6 0-.5-3-3.5-4-5.5-2.5 1-2.5-.5-5-3-5.5 2.5-1.5 2.5-4.5 0-6 3-.5 4-3.5 2.5-5.5 2.5 1 5-.5 5.5-3z"/><circle cx="12" cy="12" r="3" fill="#6b4a32"/></svg>
-                                </button>
-                                <button class="sticker-btn selected" data-sticker="" type="button" aria-label="No sticker">—</button>
-                            </div>
-                        </div>
-
-                        <button class="print-btn" id="printBtn" type="button">Print my card</button>
+                        <button class="print-btn" id="printBtn" type="button">打印我的贺卡</button>
                     </div>
                 </div>
 
@@ -1212,99 +1283,116 @@
                         <div class="printed-avatar" id="printedAvatar"></div>
                         <div class="printed-body" id="printedBody"></div>
                         <div class="printed-author" id="printedAuthor"></div>
-                        <div class="printed-sticker" id="printedSticker"></div>
-                        <button class="pin-it-btn" id="pinItBtn" type="button" title="Pin to board" aria-label="Pin to board">&#128204;</button>
+                        <button class="pin-it-btn" id="pinItBtn" type="button" title="钉到墙上" aria-label="钉到墙上">&#128204;</button>
                     </div>
                 </div>
 
             </section>
 
             <!-- Right: cork board -->
-            <section class="cards-board" aria-label="Message cork board">
+            <section class="cards-board" aria-label="留言软木板">
                 <div class="board-frame">
                     <div class="board-cork" id="boardCork">
                         <div class="board-garland" aria-hidden="true">
                             <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
                         </div>
-                        <div class="board-badge" title="Notes on the wall"><span class="count">7</span> on the wall</div>
+                        <div class="board-badge" title="墙上的贺卡"><span class="count">3</span> 张在墙上</div>
                         <article class="board-note note-white" style="left: 7%; top: 7%; --rot: -4deg;">
                             <span class="pushpin"></span>
-                            <p class="note-author">— Sam</p>
-                            <p class="note-text">Hope your day is as wonderful as you are!</p>
+                            <p class="note-author">— 小山</p>
+                            <p class="note-text">愿你的一天和你一样美好！</p>
                         </article>
 
                         <article class="board-note note-yellow" style="left: 37%; top: 9%; --rot: 6deg;">
                             <span class="tape tape-yellow"></span>
-                            <p class="note-text">Don’t forget to make a wish! ✨</p>
-                        </article>
-
-                        <article class="board-note note-polaroid" style="left: 68%; top: 13%; --rot: -2deg;">
-                            <svg class="safety-pin" viewBox="0 0 40 40" aria-hidden="true" style="--pin-rot:-8deg"><path d="M8 8 C8 4 12 4 12 8 L12 24 C12 30 20 34 26 32 C32 30 32 24 28 22 C26 21 22 22 22 26" fill="none" stroke="#9ca3af" stroke-width="3" stroke-linecap="round"/><circle cx="10" cy="8" r="3.5" fill="#d1d5db"/></svg>
-                            <div class="polaroid-photo"><span class="photo-icon">&#128247;</span></div>
-                            <p class="polaroid-caption">Last summer</p>
+                            <p class="note-text">别忘了许个愿！✨</p>
                         </article>
 
                         <article class="board-note note-pink" style="left: 11%; top: 42%; --rot: -3deg;">
                             <span class="paperclip"></span>
-                            <p class="note-text">Best friend forever ♥</p>
-                        </article>
-
-                        <article class="board-note note-ticket" style="left: 36%; top: 46%; --rot: 2deg;">
-                            <span class="pushpin pushpin-orange"></span>
-                            <p class="ticket-line1">ADMIT ONE — BIRTHDAY</p>
-                            <p class="ticket-line2">Valid today only · Have fun!</p>
-                            <img class="ticket-sticker" src="assets/cards/sticker-heart.png" alt="Red heart sticker">
-                        </article>
-
-                        <article class="board-note note-blue" style="left: 66%; top: 44%; --rot: -5deg;">
-                            <span class="tape tape-blue"></span>
-                            <p class="note-text">Cheers to many more adventures!</p>
-                        </article>
-
-                        <article class="board-note note-check" style="left: 7%; top: 74%; --rot: 2deg;">
-                            <span class="pushpin pushpin-red"></span>
-                            <p class="note-check-title">Guest Check</p>
-                            <p class="note-check-body">1 x Huge Hug<br>1 x Big Smile<br>1 x Best Wishes</p>
+                            <p class="note-text">永远是好朋友 ♥</p>
                         </article>
 
                         <!-- Collage stickers -->
-                        <div class="board-deco sticker-collage" style="left: 82%; top: 72%; --rot: 15deg; --sticker-size: 50px;">
-                            <svg viewBox="0 0 48 48" aria-hidden="true">
-                                <circle cx="24" cy="24" r="22" fill="#facc15" stroke="#ca8a04" stroke-width="1.2"/>
-                                <circle cx="18" cy="20" r="3" fill="#1f2937"/><circle cx="30" cy="20" r="3" fill="#1f2937"/>
-                                <path d="M15 32c4 6 20 6 24 0" fill="none" stroke="#1f2937" stroke-width="2.8" stroke-linecap="round"/>
-                                <path d="M36 8 L48 8 L48 20 Z" fill="#fff" opacity="0.95"/>
-                            </svg>
+                        <div class="board-deco sticker-collage" data-sticker-idx="1" style="left: 82%; top: 72%; --rot: 15deg; --sticker-size: 96px;">
+                            <img src="assets/cards/stickers/spyfamily.png" alt="间谍过家家贴纸" aria-hidden="true">
                         </div>
 
-                        <div class="board-deco sticker-collage" style="left: 58%; top: 78%; --rot: -10deg; --sticker-size: 52px;">
-                            <svg viewBox="0 0 48 48" aria-hidden="true">
-                                <g fill="#65a30d"><ellipse cx="24" cy="9" rx="7" ry="11"/><ellipse cx="24" cy="39" rx="7" ry="11"/><ellipse cx="9" cy="24" rx="11" ry="7"/><ellipse cx="39" cy="24" rx="11" ry="7"/><ellipse cx="14" cy="14" rx="9" ry="6" transform="rotate(-45 14 14)"/><ellipse cx="34" cy="34" rx="9" ry="6" transform="rotate(-45 34 34)"/><ellipse cx="34" cy="14" rx="9" ry="6" transform="rotate(45 34 14)"/><ellipse cx="14" cy="34" rx="9" ry="6" transform="rotate(45 14 34)"/></g>
-                                <circle cx="24" cy="24" r="10" fill="#fcd34d"/>
-                                <circle cx="20" cy="21" r="2.2" fill="#1f2937"/><circle cx="28" cy="21" r="2.2" fill="#1f2937"/>
-                                <path d="M19 29c3 3 9 3 12 0" fill="none" stroke="#1f2937" stroke-width="1.8" stroke-linecap="round"/>
-                            </svg>
+                        <div class="board-deco sticker-collage" data-sticker-idx="2" style="left: 58%; top: 78%; --rot: -10deg; --sticker-size: 86px;">
+                            <img src="assets/cards/stickers/bee.png" alt="蜜蜂贴纸" aria-hidden="true">
                         </div>
 
-                        <div class="board-deco sticker-collage" style="left: 88%; top: 30%; --rot: 10deg; --sticker-size: 46px;">
-                            <svg viewBox="0 0 48 48" aria-hidden="true">
-                                <path d="M14 46c-6-4-8-14-4-22-2-4-2-10 2-12 3-1 6 0 7 5l2 12 2-14c0-4 4-5 6-3 2 2 2 6 0 10l-2 8c2-2 6-1 8 3 2 5-1 12-6 14-6 2-13 2-15 0z" fill="#f97316" stroke="#c2410c" stroke-width="1.2"/>
-                            </svg>
+                        <div class="board-deco sticker-collage" data-sticker-idx="3" style="left: 88%; top: 30%; --rot: 10deg; --sticker-size: 84px;">
+                            <img src="assets/cards/stickers/neon.png" alt="Neon 贴纸" aria-hidden="true">
                         </div>
 
-                        <div class="board-deco sticker-collage" style="left: 3%; top: 54%; --rot: -16deg; --sticker-size: 58px;">
-                            <svg viewBox="0 0 48 48" aria-hidden="true">
-                                <path d="M24 0 L28 11 L39 6 L34 17 L47 19 L36 25 L45 35 L32 33 L30 46 L24 37 L18 46 L16 33 L3 35 L12 25 L1 19 L14 17 L9 6 L20 11Z" fill="#f472b6" stroke="#db2777" stroke-width="1.2"/>
-                                <text x="24" y="28" text-anchor="middle" font-family="Impact, Haettenschweiler, Arial Narrow Bold, sans-serif" font-size="11" fill="#fff" font-weight="700">WOW</text>
-                            </svg>
+                        <div class="board-deco sticker-collage" data-sticker-idx="4" style="left: 3%; top: 54%; --rot: -16deg; --sticker-size: 100px;">
+                            <img src="assets/cards/stickers/spiderman.png" alt="蜘蛛侠贴纸" aria-hidden="true">
                         </div>
 
-                        <div class="board-deco sticker-collage" style="left: 93%; top: 58%; --rot: 8deg; --sticker-size: 60px;">
+                        <div class="board-deco sticker-collage" data-sticker-idx="5" style="left: 93%; top: 58%; --rot: 8deg; --sticker-size: 78px;">
                             <svg viewBox="0 0 52 28" aria-hidden="true">
                                 <path d="M2 14 L16 0 L48 0 C50 0 52 2 52 4 L52 24 C52 26 50 28 48 28 L16 28 L2 14Z" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
                                 <circle cx="44" cy="14" r="3.5" fill="#d97706"/>
                                 <text x="18" y="19" font-family="Courier New, Courier, monospace" font-size="11" font-weight="700" fill="#92400e">$4.20</text>
                             </svg>
+                        </div>
+
+                        <!-- 新增贴纸 -->
+                        <div class="board-deco sticker-collage" data-sticker-idx="6" style="left: 4%; top: 18%; --rot: -10deg; --sticker-size: 72px;">
+                            <img src="assets/cards/stickers/xlgcat.png" alt="像素小猫贴纸" aria-hidden="true">
+                        </div>
+
+                        <div class="board-deco sticker-collage" data-sticker-idx="7" style="left: 82%; top: 12%; --rot: 5deg; --sticker-size: 74px;">
+                            <img src="assets/cards/stickers/gundam.jpg" alt="高达贴纸" aria-hidden="true">
+                        </div>
+
+                        <div class="board-deco sticker-collage" data-sticker-idx="8" style="left: 88%; top: 3%; --rot: -8deg; --sticker-size: 60px;">
+                            <img src="assets/cards/stickers/2cyber.png" alt="赛博朋克贴纸" aria-hidden="true">
+                        </div>
+
+                        <div class="board-deco sticker-collage" data-sticker-idx="9" style="left: 26%; top: 88%; --rot: 10deg; --sticker-size: 88px;">
+                            <img src="assets/cards/stickers/car.png" alt="汽车贴纸" aria-hidden="true">
+                        </div>
+
+                        <div class="board-deco sticker-collage" data-sticker-idx="10" style="left: 54%; top: 88%; --rot: -6deg; --sticker-size: 84px;">
+                            <img src="assets/cards/stickers/car2.png" alt="汽车贴纸" aria-hidden="true">
+                        </div>
+
+                        <div class="board-deco sticker-collage" data-sticker-idx="11" style="left: 92%; top: 76%; --rot: 8deg; --sticker-size: 78px;">
+                            <img src="assets/cards/stickers/car3.png" alt="汽车贴纸" aria-hidden="true">
+                        </div>
+
+                        <div class="board-deco sticker-collage" data-sticker-idx="12" style="left: 5%; top: 66%; --rot: -12deg; --sticker-size: 80px;">
+                            <img src="assets/cards/stickers/cyber.png" alt="赛博贴纸" aria-hidden="true">
+                        </div>
+
+                        <div class="board-deco sticker-collage" data-sticker-idx="13" style="left: 92%; top: 24%; --rot: 10deg; --sticker-size: 78px;">
+                            <img src="assets/cards/stickers/eva.jpg" alt="EVA 贴纸" aria-hidden="true">
+                        </div>
+
+                        <div class="board-deco sticker-collage" data-sticker-idx="14" style="left: 12%; top: 86%; --rot: -5deg; --sticker-size: 70px;">
+                            <img src="assets/cards/stickers/fll.png" alt="芙莉莲贴纸" aria-hidden="true">
+                        </div>
+
+                        <div class="board-deco sticker-collage" data-sticker-idx="15" style="left: 46%; top: 2%; --rot: 4deg; --sticker-size: 54px;">
+                            <img src="assets/cards/stickers/nba.png" alt="NBA 贴纸" aria-hidden="true">
+                        </div>
+
+                        <div class="board-deco sticker-collage" data-sticker-idx="16" style="left: 72%; top: 52%; --rot: -14deg; --sticker-size: 76px;">
+                            <img src="assets/cards/stickers/pubgchick.png" alt="吃鸡小鸡贴纸" aria-hidden="true">
+                        </div>
+
+                        <div class="board-deco sticker-collage" data-sticker-idx="17" style="left: 20%; top: 4%; --rot: -6deg; --sticker-size: 54px;">
+                            <img src="assets/cards/stickers/sega.png" alt="SEGA 贴纸" aria-hidden="true">
+                        </div>
+
+                        <div class="board-deco sticker-collage" data-sticker-idx="18" style="left: 42%; top: 92%; --rot: 12deg; --sticker-size: 78px;">
+                            <img src="assets/cards/stickers/shoubing.png" alt="手柄贴纸" aria-hidden="true">
+                        </div>
+
+                        <div class="board-deco sticker-collage" data-sticker-idx="19" style="left: 6%; top: 80%; --rot: -9deg; --sticker-size: 74px;">
+                            <img src="assets/cards/stickers/viper.jpg" alt="Viper 贴纸" aria-hidden="true">
                         </div>
 
                     </div>
@@ -1315,13 +1403,15 @@
 
     <footer class="footer">
         <div class="footer-content">
-            <p class="footer-text">Crafted with love</p>
-            <p class="footer-sub">&#10022; For someone who deserves the stars</p>
+            <p class="footer-text">用心制作</p>
+            <p class="footer-sub">&#10022; 致那个值得拥有满天星辰的人</p>
         </div>
     </footer>
 
-    <script src="js/main.js?v=20261014b"></script>
-    <script src="js/cards.js?v=20261015a"></script>
+    <script src="js/tracks-core.js?v=20261017a"></script>
+    <script src="js/mini-player.js?v=20261017c"></script>
+    <script src="js/main.js?v=20261017a"></script>
+    <script src="js/cards.js?v=20261017i"></script>
     <script src="js/cursor-trail.js?v=20261013b"></script>
 </body>
 </html>

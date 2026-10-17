@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理面板 · 礼物站</title>
+<style>
+  :root {
+    --bg: #f5f2ec; --panel: #ffffff; --ink: #2b2620; --muted: #8a8177;
+    --line: #e5ded2; --danger: #c0392b; --ok: #2e7d4f;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    background: var(--bg); color: var(--ink); min-height: 100vh; padding: 24px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+  h1 { font-size: 19px; font-weight: 700; letter-spacing: .5px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #d8d0c2; flex: none; }
+  .dot.on { background: var(--ok); box-shadow: 0 0 0 3px rgba(46,125,79,.15); }
+  .dot.off { background: var(--danger); box-shadow: 0 0 0 3px rgba(192,57,43,.12); }
+  #status { font-size: 13px; color: var(--muted); }
+  .spacer { flex: 1; }
+  button {
+    font: inherit; font-size: 13px; cursor: pointer; border: 1px solid var(--line);
+    background: #fff; border-radius: 8px; padding: 7px 14px; color: var(--ink);
+    transition: border-color .15s, background .15s;
+  }
+  button:hover { border-color: var(--muted); }
+  button.danger { color: var(--danger); border-color: #ecc9c4; }
+  button.danger:hover { background: #fdf0ee; border-color: var(--danger); }
+  label.chk { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 5px; cursor: pointer; }
+  .stats { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 18px; font-size: 12px; color: var(--muted); min-width: 108px; }
+  .stat b { display: block; font-size: 22px; color: var(--ink); font-variant-numeric: tabular-nums; margin-bottom: 2px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+  .tabs button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+  .toolbar input[type=search] {
+    font: inherit; font-size: 13px; padding: 7px 12px; border: 1px solid var(--line);
+    border-radius: 8px; background: #fff; width: 240px; color: var(--ink);
+  }
+  .toolbar input[type=search]:focus { outline: none; border-color: var(--muted); }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .panel-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left; padding: 10px 12px; background: #faf7f1; border-bottom: 1px solid var(--line);
+    color: var(--muted); font-weight: 600; white-space: nowrap; font-size: 12px;
+  }
+  td { padding: 10px 12px; border-bottom: 1px solid #f2ede3; vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #fbf9f4; }
+  .num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .msg { max-width: 340px; word-break: break-all; line-height: 1.5; }
+  .avatar { font-size: 18px; line-height: 1; }
+  .del { color: var(--danger); padding: 4px 10px; font-size: 12px; border-color: transparent; background: transparent; }
+  .del:hover { background: #fdf0ee; border-color: #ecc9c4; }
+  .empty { padding: 52px 20px; text-align: center; color: var(--muted); font-size: 13px; }
+  .warn {
+    background: #fdf3e7; border: 1px solid #f0dcc0; color: #8a5a1e;
+    padding: 14px 18px; border-radius: 10px; margin-bottom: 16px; font-size: 13px; line-height: 1.8;
+  }
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%);
+    background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 10px;
+    font-size: 13px; opacity: 0; transition: opacity .25s; pointer-events: none; z-index: 99;
+  }
+  .toast.show { opacity: 1; }
+  .hidden { display: none !important; }
+  code { background: #efe9dd; padding: 1px 7px; border-radius: 5px; font-size: 12px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>🗂 礼物站管理面板</h1>
+    <span class="dot" id="dot"></span>
+    <span id="status">连接中…</span>
+    <span class="spacer"></span>
+    <button id="refreshBtn">刷新</button>
+    <label class="chk"><input type="checkbox" id="autoRefresh" checked> 自动刷新 5s</label>
+  </header>
+
+  <div class="warn hidden" id="localWarn">
+    ⚠️ <b>当前不是在服务器本地打开</b>——管理接口只接受本机 / SSH 隧道访问，这里加载不到数据。<br>
+    请在本机（保持窗口开着）运行：<code>ssh -L 8081:localhost:8080 my-server</code><br>
+    然后浏览器访问 <code>http://localhost:8081/admin</code>
+  </div>
+
+  <div class="stats" id="statsBox">
+    <div class="stat"><b id="statCards">–</b>纸条总数</div>
+    <div class="stat"><b id="statQuiz">–</b>榜单条目</div>
+    <div class="stat"><b id="statLast">–</b>最近动态</div>
+  </div>
+
+  <div class="tabs" id="tabsBox">
+    <button data-tab="cards" class="active">📒 纸条</button>
+    <button data-tab="quiz">🏆 问卷榜单</button>
+  </div>
+
+  <div class="toolbar" id="toolbarBox">
+    <input type="search" id="filter" placeholder="按名字 / 内容筛选…">
+    <span class="spacer"></span>
+    <button id="exportBtn">导出 JSON 备份</button>
+    <button class="danger" id="clearBtn">清空全部</button>
+  </div>
+
+  <div class="panel">
+    <div class="panel-scroll">
+      <table>
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div class="empty hidden" id="empty">暂无数据</div>
+  </div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var tab = 'cards';
+  var cards = [];
+  var quiz = [];
+  var timer = null;
+  var toastTimer = null;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function p2(n) { return (n < 10 ? '0' : '') + n; }
+  function fmtTime(ts) {
+    if (!ts) return '–';
+    var d = new Date(ts);
+    return p2(d.getMonth() + 1) + '-' + p2(d.getDate()) + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes());
+  }
+  function fmtMs(ms) {
+    var s = Math.round((ms || 0) / 1000);
+    return Math.floor(s / 60) + ':' + p2(s % 60);
+  }
+  function toast(msg) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2400);
+  }
+  function api(path, opts) {
+    return fetch(path, opts).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+  }
+  function setStatus(state, extra) {
+    var dot = $('dot');
+    dot.className = 'dot ' + (state === 'on' ? 'on' : state === 'off' ? 'off' : '');
+    $('status').textContent = state === 'on' ? ('已连接 · 更新于 ' + p2(new Date().getHours()) + ':' + p2(new Date().getMinutes()) + ':' + p2(new Date().getSeconds()))
+      : state === 'off' ? ('连接失败' + (extra ? ' · ' + extra : ''))
+      : '连接中…';
+  }
+
+  /* ---------- data ---------- */
+  function load() {
+    if (!isLocal) return;
+    Promise.all([api('/api/admin/cards'), api('/api/admin/quiz')])
+      .then(function (rs) { cards = rs[0] || []; quiz = rs[1] || []; setStatus('on'); })
+      .catch(function (e) { setStatus('off', e.message); })
+      .then(render);
+  }
+
+  /* ---------- render ---------- */
+  function render() {
+    var last = 0;
+    cards.concat(quiz).forEach(function (x) { if (x.createdAt > last) last = x.createdAt; });
+    $('statCards').textContent = cards.length;
+    $('statQuiz').textContent = quiz.length;
+    $('statLast').textContent = last ? fmtTime(last) : '–';
+
+    var kw = $('filter').value.trim().toLowerCase();
+    var rows = [];
+    var thead = '';
+
+    if (tab === 'cards') {
+      thead = '<tr><th>时间</th><th>头像</th><th>名字</th><th>内容</th><th>贴纸</th><th>坐标</th><th></th></tr>';
+      cards.forEach(function (c) {
+        if (kw && ((c.name || '') + ' ' + (c.message || '')).toLowerCase().indexOf(kw) < 0) return;
+        rows.push(
+          '<tr>' +
+          '<td class="num">' + fmtTime(c.createdAt) + '</td>' +
+          '<td class="avatar">' + esc(c.avatar || '🦊') + '</td>' +
+          '<td>' + esc(c.name || '—') + '</td>' +
+          '<td class="msg">' + esc(c.message) + '</td>' +
+          '<td>' + esc(c.sticker || '—') + '</td>' +
+          '<td class="num">' + (c.x != null ? c.x + ', ' + c.y : '—') + '</td>' +
+          '<td><button class="del" data-kind="card" data-id="' + esc(c.id) + '">删除</button></td>' +
+          '</tr>'
+        );
+      });
+    } else {
+      thead = '<tr><th>时间</th><th>名字</th><th>分数</th><th>正确率</th><th>档位</th><th>最高连对</th><th>用时</th><th></th></tr>';
+      quiz.forEach(function (e) {
+        if (kw && (e.name || '').toLowerCase().indexOf(kw) < 0) return;
+        rows.push(
+          '<tr>' +
+          '<td class="num">' + fmtTime(e.createdAt) + '</td>' +
+          '<td>' + esc(e.name || '—') + '</td>' +
+          '<td class="num"><b>' + esc(e.score) + '</b></td>' +
+          '<td class="num">' + Math.round((e.acc || 0) * 100) + '%</td>' +
+          '<td>' + esc(e.tier || '—') + '</td>' +
+          '<td class="num">' + esc(e.best) + '</td>' +
+          '<td class="num">' + fmtMs(e.ms) + '</td>' +
+          '<td><button class="del" data-kind="quiz" data-id="' + esc(e.id) + '">删除</button></td>' +
+          '</tr>'
+        );
+      });
+    }
+
+    $('thead').innerHTML = thead;
+    $('tbody').innerHTML = rows.join('');
+    $('empty').classList.toggle('hidden', rows.length > 0);
+  }
+
+  /* ---------- actions ---------- */
+  function afterAction(msg) { toast(msg); load(); }
+
+  $('tbody').addEventListener('click', function (ev) {
+    var btn = ev.target.closest('.del');
+    if (!btn) return;
+    var kind = btn.dataset.kind;
+    var id = btn.dataset.id;
+    var label = kind === 'card' ? '这条纸条' : '这条榜单记录';
+    if (!confirm('确定删除' + label + '吗？\n（在线用户页面会同步消失；每日备份可兜底回滚）')) return;
+    api('/api/admin/' + (kind === 'card' ? 'cards/' : 'quiz/') + encodeURIComponent(id), { method: 'DELETE' })
+      .then(function () { afterAction('已删除'); })
+      .catch(function (e) { toast('删除失败：' + e.message); });
+  });
+
+  $('clearBtn').addEventListener('click', function () {
+    var n = tab === 'cards' ? cards.length : quiz.length;
+    if (!n) { toast('已经是空的了'); return; }
+    if (!confirm('确定清空' + (tab === 'cards' ? '全部纸条' : '整个榜单') + '吗？共 ' + n + ' 条，不可恢复！\n（每日凌晨 4 点的备份可回滚）')) return;
+    api('/api/admin/' + tab, { method: 'DELETE' })
+      .then(function (r) { afterAction('已清空 ' + (r.removed != null ? r.removed : n) + ' 条'); })
+      .catch(function (e) { toast('清空失败：' + e.message); });
+  });
+
+  $('exportBtn').addEventListener('click', function () {
+    var data = tab === 'cards' ? cards : quiz;
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    var d = new Date();
+    a.href = URL.createObjectURL(blob);
+    a.download = (tab === 'cards' ? 'cards-' : 'quiz-') + d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) + '.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast('已导出 ' + data.length + ' 条');
+  });
+
+  $('refreshBtn').addEventListener('click', load);
+
+  $('filter').addEventListener('input', render);
+
+  $('autoRefresh').addEventListener('change', function () {
+    clearInterval(timer);
+    if (this.checked) timer = setInterval(load, 5000);
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.tabs button'), function (b) {
+    b.addEventListener('click', function () {
+      document.querySelector('.tabs .active').classList.remove('active');
+      b.classList.add('active');
+      tab = b.dataset.tab;
+      render();
+    });
+  });
+
+  /* ---------- boot ---------- */
+  if (!isLocal) {
+    $('localWarn').classList.remove('hidden');
+    $('statsBox').classList.add('hidden');
+    $('tabsBox').classList.add('hidden');
+    $('toolbarBox').classList.add('hidden');
+    setStatus('off', '非本地访问');
+  } else {
+    load();
+    timer = setInterval(load, 5000);
+  }
+})();
+</script>
+</body>
+</html>
