@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="在生日贺卡墙上留下一张小纸条。">
     <title>贺卡墙 — 生日快乐</title>
-    <link rel="stylesheet" href="css/fonts.css?v=20261017b">
-    <link rel="stylesheet" href="css/style.css?v=20261017i">
+    <link rel="stylesheet" href="css/fonts.css?v=20261019a">
+    <link rel="stylesheet" href="css/style.css?v=20261019p">
     <style>
         /* =========================================================
            Theme: warm scrapbook / light cork board
@@ -1001,7 +1001,21 @@
             }
 
             .board-cork {
-                min-height: 520px;
+                min-height: 620px;
+            }
+
+            /* 移动端：贴纸只保留一半，小屏不拥挤（隐藏奇数序号的 10 张） */
+            .board-deco[data-sticker-idx="1"],
+            .board-deco[data-sticker-idx="3"],
+            .board-deco[data-sticker-idx="5"],
+            .board-deco[data-sticker-idx="7"],
+            .board-deco[data-sticker-idx="9"],
+            .board-deco[data-sticker-idx="11"],
+            .board-deco[data-sticker-idx="13"],
+            .board-deco[data-sticker-idx="15"],
+            .board-deco[data-sticker-idx="17"],
+            .board-deco[data-sticker-idx="19"] {
+                display: none;
             }
         }
 
@@ -1041,7 +1055,7 @@
             }
 
             .board-cork {
-                min-height: 440px;
+                min-height: 760px;
             }
 
             .board-note {
@@ -1296,22 +1310,7 @@
                         <div class="board-garland" aria-hidden="true">
                             <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
                         </div>
-                        <div class="board-badge" title="墙上的贺卡"><span class="count">3</span> 张在墙上</div>
-                        <article class="board-note note-white" style="left: 7%; top: 7%; --rot: -4deg;">
-                            <span class="pushpin"></span>
-                            <p class="note-author">— 小山</p>
-                            <p class="note-text">愿你的一天和你一样美好！</p>
-                        </article>
-
-                        <article class="board-note note-yellow" style="left: 37%; top: 9%; --rot: 6deg;">
-                            <span class="tape tape-yellow"></span>
-                            <p class="note-text">别忘了许个愿！✨</p>
-                        </article>
-
-                        <article class="board-note note-pink" style="left: 11%; top: 42%; --rot: -3deg;">
-                            <span class="paperclip"></span>
-                            <p class="note-text">永远是好朋友 ♥</p>
-                        </article>
+                        <div class="board-badge" title="墙上的贺卡"><span class="count">0</span> 张在墙上</div>
 
                         <!-- Collage stickers -->
                         <div class="board-deco sticker-collage" data-sticker-idx="1" style="left: 82%; top: 72%; --rot: 15deg; --sticker-size: 96px;">
@@ -1410,7 +1409,7 @@
 
     <script src="js/tracks-core.js?v=20261017a"></script>
     <script src="js/mini-player.js?v=20261017c"></script>
-    <script src="js/main.js?v=20261017a"></script>
+    <script src="js/main.js?v=20261019d"></script>
     <script src="js/cards.js?v=20261017i"></script>
     <script src="js/cursor-trail.js?v=20261013b"></script>
 </body>

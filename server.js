@@ -204,6 +204,7 @@ const server = http.createServer(function (req, res) {
                 best: clampNum(d.best, 0, 100, 0),
                 ms: clampNum(d.ms, 0, 86400000, 0),
                 picks: picks,
+                nick: escapeStr(d.nick, 40),   // 最后一题（不计分）填的称呼
                 createdAt: Date.now()
             };
             quiz.push(entry);

@@ -1555,11 +1555,52 @@
     var journeyHintEl = document.getElementById('journeyHint');
     var plRoot = document.getElementById('polaroidLine');
 
+    /* --- The moments ----------------------------------------------------
+       Photos live in assets/moments/. `label` is the handwriting on the
+       print, `text` is the thought shown under the line. Add or remove
+       entries freely — the counter and the railway follow the count.
+       `fit: 'contain'` is for photos whose shape fights the print frame
+       (very tall or very wide): they are shown whole over a blurred copy
+       of themselves instead of being cropped. */
+    var moments = [
+        { id: 'paizhao', image: 'assets/moments/m01.jpg', label: '宣讲那天',
+          text: '在一起之前，有个周末我要去宣讲，玩出说要来给我拍照，我以为开玩笑呢，结果后面真来了，而且结束时候还送我回了个家。后面才知道那天其实他熬夜熬穿了，一时不知道应该感动还是说他要惜命一点。' },
+        { id: 'goupiwang', image: 'assets/moments/m02.jpg', label: '狗屁王',
+          text: '感谢这个送我狗屁王并且包保养（防滑贴+脚垫更换）的玩出\uD83D\uDE2D It means a lot' },
+        { id: 'qinghui', image: 'assets/moments/m03.jpg', label: '清灰 + 加装',
+          text: '弯处清灰+加装存储服务，好吧其实只是弯处比较爱倒腾电脑' },
+        { id: 'jianpan', image: 'assets/moments/m04.jpg', label: '键盘复活', fit: 'contain',
+          text: '不小心把水撒进我的磁轴键盘里了\uD83D\uDE2D 然后弯处提供到一个远程指导键盘拆卸清理修复服务 我感觉读电子系真有用吧！我的键盘已复活\u270C' },
+        { id: 'pifu', image: 'assets/moments/m05.jpg', label: '心选皮肤',
+          text: '感谢这个品味很好的弯处，就这样获得心选皮肤\uD83D\uDE0B' },
+        { id: 'maixuanfeng', image: 'assets/moments/m06.jpg', label: '麦旋风',
+          text: '玩出看到我之前发的微博说很想吃麦旋风，然后第二天就带我去吃了\u270C' },
+        { id: 'guanjun', image: 'assets/moments/m07.jpg', label: '工院杯冠军',
+          text: '工院杯冠军\uD83E\uDD47对手追分时投出关键3分之人<br>书院杯亚军\uD83E\uDD48进入状态最快最稳之人 好几场的前几分都是玩出拿的' },
+        { id: 'chidao', image: 'assets/moments/m08.jpg', label: '快迟到的玩出',
+          text: '二楼阳台拍的一个快迟到的玩出，我觉得我的构图很艺术有人懂吗' },
+        { id: 'diandongche', image: 'assets/moments/m09.jpg', label: '校园兜风',
+          text: '这个学期基本上都是：早上弯处就骑车送我去工位，然后去上课，中午来接我，下午一起去上课，下课之后去吃饭，晚上送我去工位，然后十一点多再来工位接我回宿舍。<br>好几次emo了，弯处就载我在校园里兜风，或者去欣园喂小猫。感谢伟大的弯处，感谢纯粹的、珍贵的校园时光。' },
+        { id: 'xiyu', video: 'assets/moments/m10.mp4', image: 'assets/moments/m10.jpg',
+          label: '西语对话', fit: 'contain',
+          text: '去成都玩的时候遇到了西班牙人找人帮忙拍照，于是西语高考生热情对话中。有种吾家有儿初长成的欣慰感。' },
+        { id: 'wanjudian', image: 'assets/moments/m11.jpg', label: '玩具店',
+          text: '一看见玩具店就走不动道、嘴角下不来之人，最熟悉高达/小车/乐高之人。' },
+        { id: 'gaoda', image: 'assets/moments/m12.jpg', label: '高达',
+          text: '但是也是和我弟最有共同话题之人，感觉我弟已对弯处心生仰慕之情。' },
+        { id: 'shuangying', image: 'assets/moments/m13.jpg', label: '双影奇境', fit: 'contain',
+          text: '爽玩双影奇境！' },
+        { id: 'pindou', image: 'assets/moments/m14.jpg', label: '爽拼拼豆',
+          text: '爽拼半天豆，好爽好爽' },
+        { id: 'wuzi', image: 'assets/moments/m15.jpg', label: '天神下凡',
+          text: '弯处帮我从国内带到新加坡的物资、月饼，对于留子（体验期限四个月）完全是天神下凡' }
+    ];
+
     function clampN(v, a, b) { return Math.min(b, Math.max(a, v)); }
     function pad2(n) { return n < 10 ? '0' + n : String(n); }
 
     if (plRoot && journeyStageEl) {
-        var N = journey.length;
+        var N = moments.length;
         var plCardsEl = document.getElementById('plCards');
         var plPathEl = document.getElementById('plStringPath');
         var plCapEl = document.getElementById('plCap');
@@ -1570,7 +1611,7 @@
         var journeyFooterEl = document.querySelector('.footer');
         var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        var CFG = { cardWidth: 300, sag: 46, spacing: 1.06, spring: 62, swing: 1 };
+        var CFG = { cardWidth: 300, cardRatio: 0.75, sag: 46, spacing: 1.06, spring: 62, swing: 1 };
 
         /* --- Painted photographs -----------------------------------------
            Places we have no photo of yet get a painted landscape instead, so
@@ -1713,43 +1754,58 @@
             return c.toDataURL('image/jpeg', 0.86);
         }
 
-        /* --- Build the prints ------------------------------------------- */
+        /* --- Build the prints -------------------------------------------
+           Prints are not links any more — this page is just photos plus a
+           thought, so clicking one only slides it to the centre.
+           To drop in a real photo: give the entry an `image`
+           (`journey[i].image = 'assets/moments/xxx.jpg'`); anything without
+           one keeps the painted placeholder below. */
         var cards = [];
-        journey.forEach(function (loc, i) {
-            var shot = loc.image
-                ? '<img src="' + loc.image + '" alt="' + loc.place + '" draggable="false" />'
-                : '';
-            var card = document.createElement('a');
-            card.className = 'pl-card';
-            card.href = 'place.html?place=' + loc.id;
+        moments.forEach(function (m, i) {
+            var media = '';
+            if (m.video) {
+                media = '<video src="' + m.video + '"' +
+                    (m.image ? ' poster="' + m.image + '"' : '') +
+                    ' muted loop playsinline preload="none"></video>';
+            } else if (m.image) {
+                media = '<img src="' + m.image + '" alt="' + m.label + '" draggable="false" />';
+            }
+            // blurred backdrop for the photos that are shown whole
+            if (m.fit === 'contain' && m.image) {
+                media = '<i class="pl-shot-bg" style="background-image:url(\'' +
+                    m.image + '\')"></i>' + media;
+            }
+            var card = document.createElement('div');
+            card.className = 'pl-card' + (m.video ? ' is-video' : '');
             card.setAttribute('data-i', i);
             card.setAttribute('data-on', i === 0 ? '1' : '0');
+            card.setAttribute('data-fit', m.fit === 'contain' ? 'contain' : 'cover');
             card.setAttribute('aria-hidden', i === 0 ? 'false' : 'true');
             card.style.setProperty('--i', i);
             card.innerHTML =
                 '<div class="pl-print">' +
-                    '<div class="pl-shot">' + shot + '</div>' +
-                    '<div class="pl-note">' + loc.place + ' &middot; ' + loc.date + '</div>' +
+                    '<div class="pl-shot">' + media + '</div>' +
+                    '<div class="pl-note">' + m.label + '</div>' +
                 '</div>' +
                 '<div class="pl-peg"></div>';
             plCardsEl.appendChild(card);
             cards.push(card);
         });
 
-        // Paint the missing photographs, one per frame, so first paint stays fast.
+        // Paint stand-ins for any moment without a photo, one per frame.
         (function paintQueue() {
             var queue = [];
-            for (var q = 0; q < journey.length; q++) if (!journey[q].image) queue.push(q);
+            for (var q = 0; q < moments.length; q++) if (!moments[q].image) queue.push(q);
             (function next() {
                 if (!queue.length) return;
                 var i = queue.shift();
-                var look = PHOTO_LOOK[journey[i].id] || { palette: 'dawn', seed: i + 3 };
-                var url = paintLandscape(look.seed, look.palette, 1200, 750);
+                var look = PHOTO_LOOK[moments[i].id] || { palette: 'dawn', seed: i + 3 };
+                var url = paintLandscape(look.seed, look.palette, 900, 1200);
                 var shot = cards[i] && cards[i].querySelector('.pl-shot');
                 if (url && shot) {
                     var img = document.createElement('img');
                     img.src = url;
-                    img.alt = journey[i].place;
+                    img.alt = moments[i].label;
                     img.draggable = false;
                     shot.appendChild(img);
                 }
@@ -1763,17 +1819,23 @@
         var spacing = 318;
         var active = 0;
         var idle = true;
+        var lineOn = false;   // the line is faded in far enough to run video
 
         function measure() {
             var w = window.innerWidth;
             var h = window.innerHeight;
             var narrow = w < 700;
-            var bottomReserve = narrow ? 178 : 168;   // caption bar + railway bar
+            // caption bar + railway bar. Raised for the FangSong captions: the
+            // face runs wider per character at the same size, so the longest
+            // thought needs an extra line or two than the old sans did.
+            var bottomReserve = narrow ? 200 : 190;
             var y0 = Math.round(clampN(h * 0.17, 84, 148));
             var sag = Math.round(Math.min(CFG.sag, h * 0.075));
+            // print height = cw / ratio (photo) + 64 (margins + note), so the
+            // width budget has to be worked out from the height budget.
             var avail = h - y0 - sag - bottomReserve;
             var cw = Math.round(clampN(
-                Math.min(CFG.cardWidth, w * (narrow ? 0.64 : 0.42), avail - 44),
+                Math.min(CFG.cardWidth, w * (narrow ? 0.54 : 0.42), (avail - 70) * CFG.cardRatio),
                 140, CFG.cardWidth));
             size = { w: w, h: h, cw: cw, y0: y0, sag: sag };
             spacing = cw * CFG.spacing;
@@ -1849,20 +1911,33 @@
         }
 
         function renderActive() {
-            var loc = journey[active];
-            if (!loc) return;
+            var m = moments[active];
+            if (!m) return;
             for (var i = 0; i < cards.length; i++) {
                 cards[i].setAttribute('data-on', i === active ? '1' : '0');
                 cards[i].setAttribute('aria-hidden', i === active ? 'false' : 'true');
+                var v = cards[i].querySelector('video');
+                if (!v) continue;
+                // only the centred clip runs, and only while the line is on screen
+                if (i === active && lineOn) {
+                    var pr = v.play();
+                    if (pr && pr.catch) pr.catch(function () {});
+                } else {
+                    v.pause();
+                }
             }
             if (plCapEl) {
-                plCapEl.innerHTML =
-                    '<span class="pl-title">' + loc.place + '</span>' +
-                    '<span class="pl-sub">' + loc.date + ' &middot; ' + loc.city +
-                    ' &mdash; ' + loc.memory + '</span>';
+                plCapEl.innerHTML = '<span class="pl-sub">' + m.text + '</span>';
             }
             if (plCountEl) plCountEl.innerHTML = '<b>' + pad2(active + 1) + '</b> / ' + pad2(N);
-            if (plSrEl) plSrEl.textContent = '第 ' + (active + 1) + ' 站，共 ' + N + ' 站：' + loc.place;
+            if (plSrEl) plSrEl.textContent = '第 ' + (active + 1) + ' 张，共 ' + N + ' 张：' + m.label;
+        }
+
+        function pauseVideos() {
+            for (var i = 0; i < cards.length; i++) {
+                var v = cards[i].querySelector('video');
+                if (v) v.pause();
+            }
         }
 
         /* --- Scroll is the driver ---------------------------------------- */
@@ -1882,6 +1957,10 @@
             if (!ready && op > 0.25) {
                 ready = true;
                 plRoot.setAttribute('data-ready', '1');   // starts the drop-in
+            }
+            if (lineOn !== op > 0.3) {
+                lineOn = op > 0.3;
+                if (lineOn) renderActive(); else pauseVideos();
             }
 
             if (journeyHintEl) journeyHintEl.classList.toggle('hidden', js > 0.12);
@@ -1973,14 +2052,11 @@
         window.addEventListener('pointerup', endDrag);
         window.addEventListener('pointercancel', endDrag);
 
-        /* --- Click a print: off-centre centres it, the centre opens it ---- */
+        /* --- Click a print: slides it to the centre (no navigation) ------ */
         cards.forEach(function (card, i) {
-            card.addEventListener('click', function (e) {
-                if (performance.now() - lastDragEnd < 320) { e.preventDefault(); return; }
-                if (i !== active) {
-                    e.preventDefault();
-                    scrollToIndex(i);
-                }
+            card.addEventListener('click', function () {
+                if (performance.now() - lastDragEnd < 320) return;
+                scrollToIndex(i);
             });
         });
 

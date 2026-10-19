@@ -996,3 +996,29 @@
   font-display:swap;
   src:url(../assets/fonts/ximai-xinmai.woff2) format('woff2');
 }
+
+/* 不寐仿宋 Insomnia FangSong v0.102 — https://github.com/InkPantherType/InsomniaFangsong
+   X11 许可（带字体嵌入例外）+ GlyphWiki 自由许可，可嵌入网页与商用。
+   上游：HZ 宋朝（MihailJP）／字形维基 GlyphWiki／Computer Modern Unicode（拉丁）／M+ fonts。
+   此处仅做子集化（按 moments 页实际用字取 474 字）并去掉竖排特性，字形未作改动；
+   字体名称与上游声明均按许可要求保留。若 moments 文案改动后出现缺字（会回退系统黑体），
+   重跑 .workbuddy/tmp/subset_insomnia.py 即可重新生成。
+   unicode-range 把字体限定在汉字与中文标点上：拉丁字母与数字仍走页面的
+   Bricolage / Archivo，中英混排各归各位。 */
+@font-face{
+  font-family:'Insomnia FangSong';
+  font-style:normal;
+  font-weight:400;
+  font-display:swap;
+  src:url(../assets/fonts/insomnia-fangsong-book.woff2) format('woff2');
+  unicode-range:U+00B7,U+2014-2015,U+2018-2019,U+201C-201D,U+2026,U+3000-303F,U+4E00-9FFF,U+FF01-FF60;
+}
+
+@font-face{
+  font-family:'Insomnia FangSong';
+  font-style:normal;
+  font-weight:600;
+  font-display:swap;
+  src:url(../assets/fonts/insomnia-fangsong-demi.woff2) format('woff2');
+  unicode-range:U+00B7,U+2014-2015,U+2018-2019,U+201C-201D,U+2026,U+3000-303F,U+4E00-9FFF,U+FF01-FF60;
+}

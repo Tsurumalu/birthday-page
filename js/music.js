@@ -597,10 +597,12 @@
                 el.style.setProperty('--tape-ink', t.ink);
                 el.setAttribute('aria-label', 'Insert tape: ' + t.title);
                 el.innerHTML =
-                    '<span class="spine-brand">' + (t.kind === 'video' ? 'VHS' : 'FY') + '</span>' +
-                    '<span class="spine-title">' + t.title + '</span>' +
-                    '<span class="spine-no">' + pad2(i + 1) + '</span>' +
-                    '<span class="spine-led"></span>';
+                    '<span class="spine-top">' +
+                        '<span class="spine-brand">' + (t.kind === 'video' ? 'VHS' : 'FY') + '</span>' +
+                        '<span class="spine-no">' + pad2(i + 1) + '</span>' +
+                        '<span class="spine-led"></span>' +
+                    '</span>' +
+                    '<span class="spine-title">' + t.title + '</span>';
                 el.addEventListener('click', function () { insertFromLibrary(i, el); });
                 col.appendChild(el);
             });
@@ -625,7 +627,6 @@
             setTimeout(function () { srcEl.classList.remove('is-pulling'); srcEl.classList.add('hidden-slot'); }, 240);
         }
         btnEject.disabled = false;
-        var wasPlaying = playing;
         pause();
         current = i;
         simTime = 0;
@@ -639,7 +640,7 @@
         syncSpines();
         syncHasTape();
         setScene(TRACKS[i].scene, false);
-        if (wasPlaying) play();
+        play();   // tape in → music on, no extra press needed
     }
 
     function syncRackSlot() {

@@ -29,6 +29,7 @@
     /* below this scale the pixel chrome turns to mush on small windows —
        font sizes get compensated back up (see fitDesktop) */
     var MIN_READ = 0.62;
+    var FS_FLOOR = 1.3;  /* desktop boost — user asked for larger type on big screens */
     var FS_MAX = 1.35;
 
     /* ============================================================
@@ -330,22 +331,9 @@
         {
             id: 'letter', label: '\u4FE1\u4EF6', type: 'letter', title: '\u4FE1\u4EF6 \u2014 \u672A\u542F\u5C01',
             icon: ICONS.letter, w: 700, h: 470, locked: true,
-            render: renderLetterApp
-        },
-        {
-            id: 'arcade', label: '\u8857\u673A', type: 'placeholder', title: '\u8857\u673A',
-            icon: ICONS.arcade, w: 560, h: 320,
-            note: '\u7559\u7ED9\u4E00\u4E2A\u5C0F\u6E38\u620F\u3002',
-            detail: '\u4EE5\u540E\u53EF\u4EE5\u628A\u6E38\u620F\u653E\u8FDB\u6765\uFF1A\u5728 <code>js/letter.js</code> \u91CC\u7528 <code>type:"minigame"</code> \u52A0\u4E00\u4E2A <code>mount(el)</code> \u51FD\u6570\u6CE8\u518C app\u2014\u2014\u7A97\u53E3\u5916\u58F3\u5DF2\u7ECF\u73B0\u6210\u3002',
-            tip: '\u70B9\u5B50\uFF1A\u8D2A\u5403\u86C7\u30012048\u3001\u7528\u6211\u4EEC\u7684\u7167\u7247\u73A9\u8BB0\u5FC6\u914D\u5BF9\u3002'
-        },
-        {
-            id: 'links', label: '\u94FE\u63A5', type: 'links', title: '\u94FE\u63A5',
-            icon: ICONS.links, w: 620, h: 360
-        },
-        {
-            id: 'notes', label: '\u4FBF\u7B7E', type: 'notes', title: '\u4FBF\u7B7E',
-            icon: ICONS.notes, w: 520, h: 330
+            render: renderLetterApp,
+            /* closing the letter (locked or opened) invites the quiz */
+            onClose: function () { queueQuiz(900); }
         },
         {
             id: 'trash', label: '\u5E9F\u7EB8\u7BD3', type: 'placeholder', title: '\u5E9F\u7EB8\u7BD3',
@@ -356,19 +344,14 @@
         },
         {
             id: 'welcome', label: '\u6B22\u8FCE', type: 'welcome', title: '\u6B22\u8FCE\u4F7F\u7528 TY-OS',
-            hidden: true, w: 640, h: 330, render: renderWelcomeApp
+            hidden: true, w: 640, h: 330, render: renderWelcomeApp,
+            /* whatever the visitor does with this window — closing it,
+               "later", or opening the letter — the quiz steps in next */
+            onClose: function () { queueQuiz(620); }
         }
     ];
 
-    /* hyperlinks — add { label, url } entries and Links.app lists them */
-    var LINKS = [];
-
-    /* short notes shown in Notes.app */
-    var NOTES = [
-        { h: '01', t: '\u518D\u4E70\u4E00\u6C93\u4FBF\u5229\u8D34' },
-        { h: '02', t: '\u8F66\u724C\u4E0D\u662F\u4EC0\u4E48\u79D8\u5BC6' },
-        { h: '03', t: '\u95EE\u95EE\u5979\u90A3\u9996 1:04 \u7684\u6B4C' }
-    ];
+    /* hyperlinks & notes were removed with their desktop apps */
 
     var MENUS = [
         { id: 'logo', label: '\u273F', items: [
@@ -381,7 +364,6 @@
         ] },
         { id: 'file', label: '\u6587\u4EF6', items: [
             { label: '\u6253\u5F00\u4FE1\u4EF6', act: function () { openApp('letter'); } },
-            { label: '\u65B0\u5EFA\u4FBF\u7B7E', act: function () { openApp('notes'); } },
             { sep: true },
             { label: '\u5173\u95ED\u7A97\u53E3', act: closeTop }
         ] },
@@ -423,8 +405,9 @@
         /* the screen shrinks with the window, but the pixel chrome and the
            quiz text must stay legible — scale fonts back up (capped at
            FS_MAX) instead of letting them shrink with everything else.
-           Letter prose keeps its own tighter scale via .wz/.lock overrides. */
-        var fs = Math.min(FS_MAX, Math.max(1, MIN_READ / s));
+           FS_FLOOR keeps desktop text ~30% larger than the raw design
+           size; the phone layout (≤900px) overrides --ui-fs back to 1. */
+        var fs = Math.min(FS_MAX, Math.max(FS_FLOOR, MIN_READ / s));
         scrUi.style.setProperty('--ui-fs', fs.toFixed(3));
     }
 
@@ -590,11 +573,16 @@
 
     function closeWindow(win) {
         if (!win) return;
-        if (win.dataset.app) delete openWins[win.dataset.app];
+        var id = win.dataset.app;
+        if (id) delete openWins[id];
         win.classList.add('is-closing');
         setTimeout(function () {
             if (win.parentNode) win.parentNode.removeChild(win);
         }, 200);
+        if (id) {
+            var app = findApp(id);
+            if (app && typeof app.onClose === 'function') app.onClose();
+        }
     }
 
     function closeAll() {
@@ -695,6 +683,29 @@
 
     /* ---------- app renderers ---------- */
 
+    /* the quiz (js/quiz.js) registers itself at runtime, so only queue it
+       once it exists — and only once per visit, so closing it doesn't
+       drag it back. */
+    var quizQueued = false;
+
+    /* is somebody in the middle of the letter? (window or the big paper) */
+    function deskBusy() {
+        return !!(openWins.letter || (letterFloat && !letterFloat.hidden));
+    }
+
+    function queueQuiz(delay) {
+        if (quizQueued || openWins.quiz) return;
+        if (!findApp('quiz')) return;
+        quizQueued = true;
+        setTimeout(function () {
+            if (openWins.quiz || !findApp('quiz')) { quizQueued = false; return; }
+            /* never cover the letter — hand the flag back and wait for
+               the letter itself to trigger the next pass */
+            if (deskBusy()) { quizQueued = false; return; }
+            openApp('quiz');
+        }, delay || 620);
+    }
+
     function renderWelcomeApp(body, win) {
         win.querySelector('.ui-win-title').textContent = '\u6B22\u8FCE\u4F7F\u7528 TY-OS';
         body.innerHTML =
@@ -703,7 +714,7 @@
                 '<div class="wz-text">' +
                     '<div class="wz-h">\u6B22\u8FCE\u4F7F\u7528 TY-OS\u3002</div>' +
                     '<p>\u8FD9\u53F0\u673A\u5668\u4E0A\u53EA\u6709\u4E00\u4EF6\u8981\u7D27\u7684\u4E8B\uFF1A<strong>\u4FE1\u4EF6</strong>\u91CC\u7684\u90A3\u4E2A\u4FE1\u5C01\u3002\u5B83\u5C01\u7740\uFF0C\u7B54\u5BF9\u5361\u7247\u4E0A\u7684\u95EE\u9898\u624D\u4F1A\u6253\u5F00\u3002</p>' +
-                    '<p class="ui-tip">\u70B9\u684C\u9762\u4E0A\u7684\u56FE\u6807\u5C31\u80FD\u6253\u5F00\uFF0C\u6807\u9898\u680F\u53EF\u4EE5\u62D6\u7740\u8D70\u3002\u5176\u4ED6\u7684\u90FD\u53EA\u662F\u7559\u7ED9\u4EE5\u540E\u7684\u5360\u4F4D\u7B26\u3002</p>' +
+                    '<p class="ui-tip">\u70B9\u684C\u9762\u4E0A\u7684\u56FE\u6807\u5C31\u80FD\u6253\u5F00\uFF0C\u6807\u9898\u680F\u53EF\u4EE5\u62D6\u7740\u8D70\u3002\u5173\u6389\u8FD9\u4E2A\u7A97\u53E3\uFF0C\u95EE\u5377\u4F1A\u81EA\u5DF1\u8DD1\u51FA\u6765\u3002</p>' +
                     '<div class="wz-actions">' +
                         '<button class="ui-btn is-primary" type="button" data-act="open-letter">\u6253\u5F00\u4FE1\u4EF6</button>' +
                         '<button class="ui-btn" type="button" data-act="later">\u5F85\u4E00\u4F1A\u513F</button>' +
@@ -712,9 +723,11 @@
             '</div>';
         body.querySelector('[data-act="open-letter"]').addEventListener('click', function () {
             openApp('letter');
+            queueQuiz(1500);   /* held back while they read — see deskBusy() */
         });
         body.querySelector('[data-act="later"]').addEventListener('click', function () {
             closeWindow(win);
+            queueQuiz(620);
         });
     }
 
@@ -829,31 +842,6 @@
         body.querySelector('[data-act="close"]').addEventListener('click', function () { closeWindow(win); });
     }
 
-    function renderLinksApp(body, win) {
-        if (!LINKS.length) {
-            body.innerHTML =
-                '<div class="wz-h">\u8FD8\u6CA1\u6709\u94FE\u63A5\u3002</div>' +
-                '<p>\u8FD9\u4E2A\u7A97\u53E3\u662F\u4E00\u4E2A\u771F\u6B63\u7684\u8D85\u94FE\u63A5\u5217\u8868\u2014\u2014\u53EA\u5DEE\u5185\u5BB9\u3002</p>' +
-                '<p class="ui-tip">\u5728 <code class="ui-code">js/letter.js</code> \u91CC\u52A0\uFF1A' +
-                '<code class="ui-code">LINKS = [{ label: "\u6211\u4EEC\u7684\u6B4C\u5355", url: "https://\u2026" }]</code></p>';
-            return;
-        }
-        body.innerHTML = '<div class="wz-h">Links</div><div class="ui-linklist">' +
-            LINKS.map(function (l, i) {
-                return '<a class="ui-link" href="' + l.url + '" target="_blank" rel="noopener">' +
-                    (i + 1) + '. ' + l.label + '</a>';
-            }).join('') + '</div>';
-    }
-
-    function renderNotesApp(body, win) {
-        body.innerHTML = '<div class="wz-h">\u5199\u7ED9\u81EA\u5DF1</div><div class="ui-notelist">' +
-            NOTES.map(function (n) {
-                return '<div class="ui-note"><span class="ui-note-h">' + n.h + '</span>' +
-                    '<span class="ui-note-t">' + n.t + '</span></div>';
-            }).join('') + '</div>' +
-            '<p class="ui-tip">\u5728 js/letter.js \u91CC\u7F16\u8F91 <code class="ui-code">NOTES</code>\u3002</p>';
-    }
-
     /* ---------- clock + toast ---------- */
 
     function tickClock() {
@@ -899,7 +887,12 @@
 
         setTimeout(function () {
             if (bootEl) bootEl.classList.add('is-done');
-            setTimeout(function () { openApp('welcome'); }, 480);
+            setTimeout(function () {
+                /* the quiz is the front door now — the welcome window only
+                   shows up if js/quiz.js failed to register its app */
+                if (findApp('quiz')) openApp('quiz');
+                else openApp('welcome');
+            }, 480);
         }, 2400);
     }
 
@@ -934,6 +927,7 @@
         setTimeout(function () {
             letterFloat.hidden = true;
             resetLines();
+            queueQuiz(900);   /* letter put away → quiz steps in */
         }, 1000);
     }
 
@@ -1022,8 +1016,6 @@
     window.LetterDesk = {
         apps: DESKTOP_APPS,
         books: BOOKS,
-        links: LINKS,
-        notes: NOTES,
         password: PASSWORD,
         isUnlocked: function () { return unlocked; },
         openApp: openApp,
@@ -1046,9 +1038,6 @@
             DESKTOP_APPS.splice(DESKTOP_APPS.indexOf(app), 1);
             var icon = iconsLayer && iconsLayer.querySelector('[data-app="' + id + '"]');
             if (icon) icon.parentNode.removeChild(icon);
-        },
-        addLink: function (label, url) {
-            LINKS.push({ label: label, url: url });
         }
     };
 })();

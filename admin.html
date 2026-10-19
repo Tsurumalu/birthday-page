@@ -209,7 +209,7 @@
         );
       });
     } else {
-      thead = '<tr><th>时间</th><th>名字</th><th>分数</th><th>正确率</th><th>档位</th><th>最高连对</th><th>用时</th><th></th></tr>';
+      thead = '<tr><th>时间</th><th>名字</th><th>分数</th><th>正确率</th><th>档位</th><th>最高连对</th><th>用时</th><th>称呼</th><th></th></tr>';
       quiz.forEach(function (e) {
         if (kw && (e.name || '').toLowerCase().indexOf(kw) < 0) return;
         rows.push(
@@ -221,6 +221,7 @@
           '<td>' + esc(e.tier || '—') + '</td>' +
           '<td class="num">' + esc(e.best) + '</td>' +
           '<td class="num">' + fmtMs(e.ms) + '</td>' +
+          '<td>' + esc(e.nick || '—') + '</td>' +
           '<td><button class="del" data-kind="quiz" data-id="' + esc(e.id) + '">删除</button></td>' +
           '</tr>'
         );

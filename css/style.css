@@ -201,6 +201,64 @@
        PP Neue Montreal (neo-grotesque, w700)             -> Archivo */
     --font-display: 'Bricolage Grotesque', 'Archivo', sans-serif;
     --font-body: 'Archivo', 'Inter', sans-serif;
+    /* 不寐仿宋 — 只接管汉字（fonts.css 里用 unicode-range 限定），
+       拉丁与数字继续走上面的 Bricolage / Archivo。 */
+    --font-cjk: 'Insomnia FangSong', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', serif;
+}
+
+/* 汉字一律走仿宋：标题与背景巨字用 Demi(600)，正文感想用 Book(400)。
+   仿宋的字面比黑体小、笔画细，所以原先把字号/字距按黑体调的值要往回调：
+   字号抬一档、颜色加深、字距放开，否则小字会糊成一片灰。 */
+.theme-stamp .stamp-title {
+    font-family: var(--font-cjk);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.theme-stamp .stamp-subtitle {
+    font-family: var(--font-cjk);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: #4a4339;
+}
+
+.theme-stamp .journey-poster-line {
+    font-family: var(--font-cjk);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.theme-stamp .pl-note {
+    font-family: var(--font-cjk);
+    font-style: normal;      /* 中文不用合成斜体，仿宋本身的倾斜感足够 */
+    font-weight: 600;        /* Demi — the label reads like printed ink */
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    color: #3d372e;
+}
+
+.theme-stamp .pl-title,
+.theme-stamp .pl-sub {
+    font-family: var(--font-cjk);
+    font-weight: 400;
+    letter-spacing: 0.03em;
+}
+
+.theme-stamp .pl-sub {
+    font-size: clamp(15px, 1.2vw, 17.5px);
+    line-height: 1.75;
+    color: #3f382f;
+    /* `ch` is measured on the zero glyph — in a CJK face that is roughly half
+       an em, so 64ch collapsed to ~32 characters and wrapped mid-sentence.
+       Size the measure in em instead, and let it use the full row when the
+       thought is long (a 126-character one still fits on two lines). */
+    max-width: 62em;
+}
+
+.theme-stamp .footer-text {
+    font-family: var(--font-cjk);
+    font-weight: 400;
+    letter-spacing: 0.06em;
 }
 
 .theme-postcard {
@@ -2234,6 +2292,14 @@ body.nav-compact .back-btn {
     white-space: nowrap;
 }
 
+/* The Latin line of the poster ("OUR · MOMENTS") keeps the display sans —
+   仿宋 has no Latin glyphs in this subset, so it would fall back to a system face. */
+.theme-stamp .journey-poster-line-alt {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
 .journey-poster-line-alt {
     color: var(--theme-primary);
     opacity: 0.1;
@@ -2423,14 +2489,35 @@ body.nav-compact .back-btn {
     to   { transform: none; opacity: 1; }
 }
 
+/* Instax-mini proportions: most of the photos are tall, so the frame is too. */
 .pl-shot {
     position: relative;
-    aspect-ratio: 1;
+    aspect-ratio: 3 / 4;
     overflow: hidden;
     background: var(--bg-tertiary);
 }
 
-.pl-shot img {
+/* Photos whose shape fights the frame (very tall, or landscape) are shown
+   whole over a blurred copy of themselves instead of being cropped. The
+   backdrop is a real element, not a custom property: a url() inside a
+   var() resolves against the stylesheet, not the page. */
+.pl-shot-bg {
+    position: absolute;
+    inset: -10%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(20px) saturate(1.15);
+    transform: scale(1.12);
+    display: none;
+}
+
+.pl-card[data-fit='contain'] .pl-shot-bg { display: block; }
+
+.pl-card[data-fit='contain'] .pl-shot img,
+.pl-card[data-fit='contain'] .pl-shot video { object-fit: contain; }
+
+.pl-shot img,
+.pl-shot video {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -2440,6 +2527,23 @@ body.nav-compact .back-btn {
     display: block;
     pointer-events: none;
 }
+
+/* A quiet play mark on the one clip; it disappears once it is running. */
+.pl-card.is-video .pl-shot::after {
+    content: '';
+    position: absolute;
+    right: 9px;
+    bottom: 9px;
+    width: 0;
+    height: 0;
+    border-left: 12px solid rgba(255, 252, 244, 0.92);
+    border-top: 7.5px solid transparent;
+    border-bottom: 7.5px solid transparent;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.45));
+    transition: opacity 0.3s ease;
+}
+
+.pl-card.is-video[data-on='1'] .pl-shot::after { opacity: 0; }
 
 .pl-note {
     height: 44px;
@@ -2517,13 +2621,15 @@ body.nav-compact .back-btn {
     text-overflow: ellipsis;
 }
 
+/* The thought itself — the only text under the line, so it carries the row. */
 .pl-sub {
     margin-top: 4px;
-    font-family: var(--font-body);
+    font-family: var(--cjk), var(--font-body);
     font-weight: 400;
-    font-size: 12.5px;
-    line-height: 1.5;
+    font-size: clamp(13px, 1.05vw, 15.5px);
+    line-height: 1.65;
     color: var(--text-secondary);
+    max-width: 64ch;
 }
 
 .pl-count {
@@ -2574,8 +2680,17 @@ body.nav-compact .back-btn {
 }
 
 @media (max-width: 640px) {
-    .pl-sub { font-size: 11.5px; }
+    /* Give the thought the full width and drop the controls to their own row,
+       otherwise a long sentence is squeezed into a 200px column. */
+    .pl-bar { flex-wrap: wrap; row-gap: 10px; }
+    .pl-cap { flex: 1 0 100%; order: -1; }
+    .pl-sub { font-size: 12.5px; line-height: 1.6; }
     .pl-btn { width: 34px; height: 34px; }
+
+    /* 仿宋 saturates smaller than the sans it replaced — keep it readable but
+       one notch tighter so a 126-character thought stays clear of the print. */
+    .theme-stamp .pl-sub { font-size: 13px; line-height: 1.65; letter-spacing: 0.01em; }
+    .theme-stamp .pl-note { font-size: 14px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3543,7 +3658,9 @@ body.theme-postcard::before {
 }
 
 .stamp-hero-compact .stamp-subtitle {
-    font-size: 0.85rem;
+    /* Bumped from 0.85rem: 不寐仿宋 has a smaller face and finer strokes than
+       the sans this used to be, and at 13.6px it read as grey haze. */
+    font-size: 0.98rem;
 }
 
 .stamp-hero-compact .stamp-subtitle br {
@@ -3630,7 +3747,7 @@ body.theme-postcard::before {
     }
 
     .stamp-subtitle {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
     }
 
     .railway-sticky {
@@ -6195,7 +6312,7 @@ body.page-island3d .theme-bg {
     left: 50%;
     top: 6%;
     transform: translateX(-50%);
-    width: clamp(330px, 37vw, 580px);
+    width: clamp(330px, 35.5vw, 580px);
     z-index: 29;
     display: flex;
     flex-direction: column;
@@ -6587,7 +6704,7 @@ body.page-island3d .theme-bg {
     color: var(--tape-ink);
     font-family: 'Archivo', sans-serif;
     font-weight: 700;
-    font-size: clamp(6px, 0.55vw, 8px);
+    font-size: clamp(8px, 0.72vw, 11px);
     letter-spacing: 0.18em;
     display: flex;
     align-items: center;
@@ -6986,10 +7103,10 @@ body.page-island3d .theme-bg {
 .rack-wrap {
     position: absolute;
     left: 50%;
-    bottom: 1.8%;
+    bottom: 1.2%;
     transform: translateX(-50%);
     z-index: 28;
-    padding: 14px 18px 16px;
+    padding: 10px 16px 12px;
     border-radius: 18px;
     background: linear-gradient(180deg, rgba(12, 9, 14, 0.72) 0%, rgba(6, 5, 9, 0.85) 100%);
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -7008,7 +7125,7 @@ body.page-island3d .theme-bg {
     --tape-ink: #222;
     --tape-label: #ddd;
     position: relative;
-    width: clamp(96px, 10.6vw, 142px);
+    width: clamp(112px, 12.4vw, 168px);
     aspect-ratio: 100 / 62;
     border: none;
     border-radius: 6px;
@@ -7070,15 +7187,15 @@ body.page-island3d .theme-bg {
 .cas-label b {
     font-family: 'Archivo', var(--cjk), sans-serif;
     font-weight: 700;
-    font-size: clamp(8.5px, 0.78vw, 11.5px);
-    letter-spacing: 0.14em;
+    font-size: clamp(12.5px, 1.2vw, 18px);
+    letter-spacing: 0.08em;
     white-space: nowrap;
 }
 
 .cas-label i {
     font-style: normal;
     font-family: var(--mono);
-    font-size: clamp(6.5px, 0.55vw, 8.5px);
+    font-size: clamp(9px, 0.75vw, 12px);
     letter-spacing: 0.14em;
     opacity: 0.72;
     white-space: nowrap;
@@ -7186,9 +7303,9 @@ body.page-island3d .theme-bg {
     .windshield { top: 7%; height: 42%; left: 4%; right: 4%; }
     .sun-visor { display: none; }
 
-    .center-stack { width: min(92vw, 400px); top: 6%; gap: 8px; }
+    .center-stack { width: min(92vw, 400px); top: 4%; gap: 8px; }
     .hu-main { min-height: 0; }
-    .hu-art { width: 74px; }
+    .hu-art { width: 58px; }
     .hu-title { font-size: 14px; }
 
     .deck-brand { display: none; }
@@ -7199,12 +7316,21 @@ body.page-island3d .theme-bg {
     .wheel-zone { left: -18%; bottom: -40%; width: 200px; opacity: 0.55; }
     .door-left, .seat-passenger { display: none; }
 
-    .rack-wrap { padding: 8px 10px 10px; bottom: 1.6%; }
-    .rack { gap: 6px; }
-    .cassette { width: calc(25% - 5px); min-width: 0; }
-    .rack { width: min(92vw, 420px); }
-    .cas-label b { font-size: 6px; }
-    .cas-label i { display: none; }
+    .rack-wrap { padding: 8px 10px 10px; bottom: 1.2%; }
+    /* one scrollable row — three wrapped rows used to cover the play controls */
+    .rack {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        gap: 7px;
+        width: min(92vw, 430px);
+        overflow-x: auto;
+        padding-bottom: 3px;
+        scrollbar-width: none;
+    }
+    .rack::-webkit-scrollbar { display: none; }
+    .cassette { width: 104px; flex: 0 0 auto; min-width: 0; }
+    .cas-label b { font-size: 10.5px; }
+    .cas-label i { display: block; font-size: 8.5px; }
 
     .music-corner { display: none; }
 }
@@ -7227,18 +7353,26 @@ body.page-island3d .theme-bg {
 
 .spine-col {
     position: absolute;
-    top: 10%;
-    bottom: 22%;
-    width: clamp(96px, 10.6vw, 152px);
+    top: 4%;
+    bottom: 30%;
+    width: clamp(108px, 11.8vw, 172px);
     z-index: 27;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: clamp(3px, 0.42vh, 6px);
+    gap: clamp(3px, 0.45vh, 7px);
     pointer-events: none;
 }
 
 .spine-col .spine { pointer-events: auto; }
+
+.spine-top {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    line-height: 1;
+}
 
 .spine-left { left: clamp(190px, 24.2vw, 376px); }
 .spine-right { right: clamp(190px, 24.2vw, 376px); }
@@ -7246,10 +7380,12 @@ body.page-island3d .theme-bg {
 .spine {
     position: relative;
     display: flex;
-    align-items: center;
-    gap: 8px;
-    height: clamp(18px, 2.6vh, 26px);
-    padding: 0 10px 0 8px;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 3px;
+    height: clamp(38px, 4.6vh, 48px);
+    padding: 0 12px 0 10px;
     border: none;
     border-radius: 5px;
     background: linear-gradient(180deg,
@@ -7283,21 +7419,23 @@ body.page-island3d .theme-bg {
 .spine-brand {
     flex: 0 0 auto;
     font-family: 'Share Tech Mono', monospace;
-    font-size: clamp(7px, 0.6vw, 9px);
+    font-size: clamp(10px, 0.82vw, 12.5px);
     letter-spacing: 0.06em;
-    padding: 1.5px 4px;
+    padding: 1px 4px;
     border: 1px solid currentColor;
     border-radius: 3px;
     opacity: 0.75;
 }
 
 .spine-title {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     min-width: 0;
     font-family: 'Archivo', var(--cjk), sans-serif;
     font-weight: 700;
-    font-size: clamp(9.5px, 0.92vw, 13px);
-    letter-spacing: 0.05em;
+    font-size: clamp(13.5px, 1.22vw, 18px);
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -7305,17 +7443,17 @@ body.page-island3d .theme-bg {
 
 .spine-no {
     flex: 0 0 auto;
+    margin-left: auto;
     font-family: 'Share Tech Mono', monospace;
-    font-size: clamp(7px, 0.6vw, 9px);
+    font-size: clamp(10px, 0.82vw, 12.5px);
     opacity: 0.65;
 }
 
 .spine-led {
-    position: absolute;
-    right: 4px;
-    top: 4px;
-    width: 5px;
-    height: 5px;
+    flex: 0 0 auto;
+    margin-left: 6px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: rgba(0, 0, 0, 0.25);
     transition: background 0.25s ease, box-shadow 0.25s ease;
@@ -7442,9 +7580,9 @@ body.page-island3d .theme-bg {
 /* ---------- responsive ---------- */
 
 @media (max-width: 1250px) {
-    .spine-left { left: clamp(158px, 21vw, 320px); }
-    .spine-right { right: clamp(158px, 21vw, 320px); }
-    .spine-col { width: clamp(80px, 8.4vw, 110px); }
+    .spine-left { left: clamp(150px, 20vw, 308px); }
+    .spine-right { right: clamp(150px, 20vw, 308px); }
+    .spine-col { width: clamp(112px, 12.6vw, 172px); }
 }
 
 @media (max-width: 1100px) {
@@ -7532,7 +7670,9 @@ body.page-island3d .theme-bg {
 
     /* One knob drives the whole monitor */
     /* the screen tracks BOTH axes: vh keeps it big, vw stops it
-       outgrowing a narrow window (monitor = glass-w + 68px) */
+       outgrowing a narrow window (monitor = glass-w + 68px).
+       Geometry stays as-is (monitor already fills the wall up to the
+       fixed top nav); text legibility is handled by --ui-fs instead. */
     --glass-h: clamp(280px, min(calc(74vh - 232px), calc((55vw - 60px) / 1.6)), 640px);
     --glass-w: calc(var(--glass-h) * 1.6);
     --mon-w: calc(var(--glass-w) + 68px);
@@ -9284,10 +9424,10 @@ body.page-island3d .theme-bg {
 .ui-win-body {
     padding: 18px 20px 20px;
     font-family: var(--term);
-    font-size: 17px;
+    font-size: calc(17px * var(--ui-fs, 1));
     line-height: 1.5;
     color: var(--ui-ink);
-    overflow: hidden;
+    overflow-y: auto;
 }
 
 .ui-win-body p { margin-bottom: 10px; }
@@ -9343,14 +9483,14 @@ body.page-island3d .theme-bg {
 
 .wz-art svg { width: 100%; height: auto; }
 .wz-text { flex: 1 1 auto; }
-.wz-h { font-family: var(--px); font-size: 13px; line-height: 1.6; margin-bottom: 12px; }
+.wz-h { font-family: var(--px); font-size: calc(13px * var(--ui-fs, 1)); line-height: 1.6; margin-bottom: 12px; }
 .wz-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
 
 .ui-btn {
     border: 2px solid var(--ui-ink);
     background: var(--ui-cream);
     font-family: var(--term);
-    font-size: 16px;
+    font-size: calc(16px * var(--ui-fs, 1));
     color: var(--ui-ink);
     padding: 8px 14px;
     border-radius: 3px;
@@ -9381,7 +9521,7 @@ body.page-island3d .theme-bg {
     /* Chinese-led sentence — lead with the CJK bold so the latin bit ("ty")
        doesn't switch to the pixel face mid-sentence */
     font-family: var(--cjk);
-    font-size: 17px;
+    font-size: calc(17px * var(--ui-fs, 1));
     font-weight: 700;
     line-height: 1.85;
     color: var(--ui-ink);
@@ -9399,7 +9539,7 @@ body.page-island3d .theme-bg {
 .lock-input {
     width: 200px;
     font-family: var(--term);
-    font-size: 22px;
+    font-size: calc(22px * var(--ui-fs, 1));
     letter-spacing: 0.22em;
     text-align: center;
     text-transform: uppercase;
@@ -9428,7 +9568,7 @@ body.page-island3d .theme-bg {
     margin-top: 14px;
     text-align: center;
     font-family: var(--cjk);
-    font-size: 15px;
+    font-size: calc(15px * var(--ui-fs, 1));
     font-weight: 700;
     color: #6f7780;
 }
@@ -9443,7 +9583,7 @@ body.page-island3d .theme-bg {
     background: none;
     padding: 0;
     font-family: var(--cjk);
-    font-size: 15px;
+    font-size: calc(15px * var(--ui-fs, 1));
     font-weight: 700;
     color: var(--ui-teal-deep);
     text-decoration: underline;
@@ -9452,7 +9592,7 @@ body.page-island3d .theme-bg {
 
 .lock-hint-line {
     font-family: var(--cjk);
-    font-size: 15px;
+    font-size: calc(15px * var(--ui-fs, 1));
     font-weight: 700;
     color: #6f7780;
     margin-top: 6px;
@@ -9705,20 +9845,20 @@ body.page-island3d .theme-bg {
 
 .ui-code {
     font-family: var(--term);
-    font-size: 14px;
+    font-size: calc(14px * var(--ui-fs, 1));
     background: rgba(38, 41, 46, 0.08);
     padding: 1px 5px;
     border-radius: 2px;
     white-space: nowrap;
 }
 
-.ui-tip { font-size: 15px; color: var(--ui-ink-soft); }
+.ui-tip { font-size: calc(15px * var(--ui-fs, 1)); color: var(--ui-ink-soft); }
 
 .ui-linklist { display: flex; flex-direction: column; gap: 6px; }
 
 .ui-link {
     font-family: var(--term);
-    font-size: 17px;
+    font-size: calc(17px * var(--ui-fs, 1));
     color: var(--ui-teal-deep);
     text-decoration: underline;
     text-underline-offset: 3px;
@@ -10195,6 +10335,49 @@ body.page-island3d .theme-bg {
 
 .qz-opt-t { flex: 1 1 auto; }
 
+/* picture options — 2-up grid instead of a text list */
+.qz-opts.is-pics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.qz-opts.is-pics .qz-opt {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 8px;
+}
+
+.qz-opts.is-pics .qz-key { align-self: flex-start; }
+.qz-opts.is-pics .qz-opt-t { text-align: center; }
+
+.qz-opt-img { display: block; }
+.qz-opt-img img {
+    display: block;
+    width: 100%;
+    height: 88px;
+    object-fit: contain;
+    background: #f5f2e8;
+    border: 1px solid rgba(38, 41, 46, 0.14);
+    border-radius: 2px;
+}
+
+/* the same art shrunk for the reveal line / review rows */
+.qz-opt-img.is-sm { display: inline-flex; vertical-align: middle; margin-right: 6px; }
+.qz-opt-img.is-sm img { width: 34px; height: 34px; }
+
+/* free-text option */
+.qz-opt.is-sel { box-shadow: inset 0 0 0 3px var(--ui-teal); }
+
+.qz-fill { display: none; gap: 8px; margin-top: 10px; align-items: center; }
+.qz-fill.is-on { display: flex; }
+.qz-fill-input { flex: 1 1 auto; width: auto; min-width: 0; }
+
+/* the un-scored last question reads as a note, not a miss */
+.qz-row.is-fun .qz-row-mark { color: #d2504b; }
+.qz-row.is-fun .qz-row-a { font-weight: 700; }
+
 .qz-opt.is-ok {
     background: var(--ui-teal);
     border-color: var(--ui-teal-deep);
@@ -10567,7 +10750,7 @@ body.page-island3d .theme-bg {
     letter-spacing: 0.04em;
 }
 
-.spine.is-video .spine-title { font-size: clamp(9px, 0.78vw, 11.5px); font-weight: 700; }
+.spine.is-video .spine-title { font-size: clamp(13.5px, 1.2vw, 17.5px); font-weight: 700; }
 
 .cassette.is-video .cas-window { opacity: 0.35; }
 
@@ -10575,7 +10758,7 @@ body.page-island3d .theme-bg {
 
 /* on narrow screens the walls hide, so the rack holds everything in rows */
 @media (max-width: 1100px) {
-    .rack { flex-wrap: wrap; justify-content: center; width: min(88vw, 460px); }
+    .rack { flex-wrap: wrap; justify-content: center; width: min(92vw, 520px); }
     .cassette { width: calc(25% - 8px); }
 }
 
@@ -10773,4 +10956,23 @@ body.page-island3d .theme-bg {
 .page-sub.theme-music,
 .page-sub.theme-music *:not(svg):not(svg *) {
     font-family: 'Ximai', 'PingFang SC', 'Microsoft YaHei', sans-serif !important;
+}
+
+/* music page mobile: single scroll row must win over the v2 wrap rule
+   above (same specificity, later block wins) */
+@media (max-width: 620px) {
+    .rack {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        gap: 7px;
+        width: min(92vw, 430px);
+        overflow-x: auto;
+        padding-bottom: 3px;
+        scrollbar-width: none;
+    }
+    .rack::-webkit-scrollbar { display: none; }
+    .cassette { width: 104px; flex: 0 0 auto; min-width: 0; }
+    .cas-label b { font-size: 10.5px; }
+    .cas-label i { display: block; font-size: 8.5px; }
+    .rack-wrap { padding: 8px 10px 10px; bottom: 1.2%; }
 }
