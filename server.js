@@ -36,7 +36,12 @@ function loadCards() {
     try {
         const raw = fs.readFileSync(DATA_FILE, 'utf8');
         const arr = JSON.parse(raw);
-        return Array.isArray(arr) ? arr : [];
+        if (!Array.isArray(arr)) return [];
+        // Heal any legacy rows whose avatar got truncated to "assets/c".
+        arr.forEach(function (c) {
+            if (c && typeof c === 'object') c.avatar = normalizeAvatar(c.avatar);
+        });
+        return arr;
     } catch (e) {
         return [];
     }
@@ -74,6 +79,22 @@ function broadcast(obj) {
 }
 function escapeStr(v, max) {
     return String(v == null ? '' : v).slice(0, max);
+}
+
+// Avatar is a controlled value: either one of our local PNG paths
+// (e.g. "assets/cards/avatars/ava-01.png") or a short emoji. It must NOT be
+// truncated — a short slice like "assets/c" makes the <img src> 404 and the
+// avatar silently disappears after reload. Older rows that were saved with the
+// 8-char truncation are healed back to the default avatar on load.
+const DEFAULT_AVATAR = 'assets/cards/avatars/ava-01.png';
+function normalizeAvatar(av) {
+    if (!av) return DEFAULT_AVATAR;
+    // Valid image path we serve: contains "avatars/" and ends in an image ext.
+    if (av.indexOf('avatars/') !== -1 && /\.(png|jpe?g|webp|gif)$/i.test(av)) return av;
+    // Emoji / short token (no slash) — keep as-is.
+    if (av.indexOf('/') === -1) return av;
+    // Anything else (e.g. truncated "assets/c") — fall back to default.
+    return DEFAULT_AVATAR;
 }
 
 const MIME = {
@@ -126,7 +147,7 @@ const server = http.createServer(function (req, res) {
             try { d = JSON.parse(body); } catch (e) { res.writeHead(400); res.end('bad json'); return; }
             const card = {
                 id: 'c' + Date.now() + Math.random().toString(36).slice(2, 7),
-                avatar: escapeStr(d.avatar, 8) || '🦊',
+                avatar: normalizeAvatar(escapeStr(d.avatar, 256)),
                 name: escapeStr(d.name, 40),
                 message: escapeStr(d.message, 400),
                 sticker: escapeStr(d.sticker, 20),
