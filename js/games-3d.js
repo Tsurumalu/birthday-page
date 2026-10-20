@@ -541,13 +541,118 @@
     // 底座/传送门的统一基调色：暖砂岩。据点自己的颜色只轻微染一点，
     // 让六个 VALORANT 据点看起来是一套，而不是六种互不相干的塑料。
     var BASE_STONE = new THREE.Color(0xa59074);
+    /* --------------------------------------------
+       国内镜像 + 停滞自动转移（20261020）
+
+       站点静态部分挂在 GitHub Pages 上。国内访问 Pages 拉大模型
+       （六张地图 24MB、DUST II 单文件 20MB）时经常下到一半就卡住 ——
+       既不触发 error 也不会完成，页面就一直挂着水晶。所以这里做两件事：
+
+         ① 盯字节进展：超过 STALL_MS 没有新字节进来就判定这个源已死；
+         ② 换源重取：改从已备案的腾讯云镜像（lzteddy.cn）取同一路径。
+
+       主源始终是页面同域 —— 海外照旧吃 Pages 的 CDN，只有卡住/失败才
+       动用镜像。一旦有模型卡过一次，后续模型直接先走镜像（preferMirror），
+       免得每张地图都先白等一轮超时。
+       -------------------------------------------- */
+    // ?mirror=1 强制开启（本地验证用）；?mirror=<url> 可指定别的镜像基址
+    var MIRROR_ARG = decodeURIComponent((location.search.match(/[?&]mirror=([^&]*)/) || [])[1] || '');
+    var MIRROR_BASE = (/^https?:\/\//i.test(MIRROR_ARG))
+        ? MIRROR_ARG.replace(/\/+$/, '')
+        : 'https://lzteddy.cn';
+    var STALL_MS = 10000;        // 多久没有新字节算卡死
+    var TICK_MS = 2000;          // 盯进度的时间片
+    var MIRROR_ON = !!MIRROR_ARG ||
+                    (location.protocol === 'https:' && location.hostname.indexOf('lzteddy.cn') < 0);
+    var preferMirror = false;    // 卡过一次之后，后续优先走镜像
+
+    function mirrorOf(url) {
+        if (!MIRROR_ON) return null;
+        if (/^https?:/i.test(url) || /^\/\//.test(url)) return null;   // 已经是绝对地址
+        return MIRROR_BASE + '/' + String(url).replace(/^\.?\/*/, '');
+    }
+
+    /** 按当前偏好排出候选源（镜像优先或主源优先）。 */
+    function sourceList(url) {
+        var m = mirrorOf(url);
+        if (!m) return [url];
+        return preferMirror ? [m, url] : [url, m];
+    }
+
+    /**
+     * 取模型字节：主源卡住或失败就换下一个源。
+     * onDone(bytes|null, usedUrl) —— bytes 为 null 表示所有源都失败了。
+     */
+    function fetchAny(url, onDone, onProgress) {
+        var urls = sourceList(url);
+
+        function attempt(i) {
+            if (i >= urls.length) { onDone(null, url); return; }
+            var u = urls[i];
+            var xhr = new XMLHttpRequest();
+            var settled = false;
+            var lastTick = Date.now();
+
+            var timer = setInterval(function () {
+                if (settled || Date.now() - lastTick < STALL_MS) return;
+                settled = true;
+                clearInterval(timer);
+                try { xhr.abort(); } catch (e) {}
+                preferMirror = true;                 // 这一轮已经证明主源不行了
+                if (window.console) console.warn('[island] 下载停滞，转镜像: ' + u);
+                if (onProgress) onProgress(-1);       // -1 = 换源重来，进度归零
+                attempt(i + 1);
+            }, TICK_MS);
+
+            try { xhr.open('GET', u, true); } catch (e) { clearInterval(timer); attempt(i + 1); return; }
+            xhr.responseType = 'arraybuffer';
+
+            xhr.addEventListener('progress', function (e) {
+                lastTick = Date.now();
+                if (onProgress && e.lengthComputable && e.total) onProgress(e.loaded / e.total);
+            });
+            xhr.addEventListener('load', function () {
+                if (settled) return;
+                settled = true; clearInterval(timer);
+                var ok = xhr.status >= 200 && xhr.status < 400 &&
+                         xhr.response && xhr.response.byteLength > 0;
+                if (ok) { onDone(xhr.response, u); return; }
+                preferMirror = true;
+                if (onProgress) onProgress(-1);
+                attempt(i + 1);
+            });
+            var fail = function () {
+                if (settled) return;
+                settled = true; clearInterval(timer);
+                preferMirror = true;
+                if (onProgress) onProgress(-1);
+                attempt(i + 1);
+            };
+            xhr.addEventListener('error', fail);
+            xhr.addEventListener('abort', fail);
+            xhr.addEventListener('timeout', fail);
+            xhr.send();
+        }
+        attempt(0);
+    }
+
     // GLTF 加载器：接上 Draco 解码器（地图 GLB 已用 Draco 压缩，不接则加载失败）。
     // 非 Draco 的模型（如王者英雄 / 岛屿地皮）也能正常加载，DRACOLoader 是叠加的。
-    var dracoLoader = (typeof THREE.DRACOLoader === 'function')
-        ? new THREE.DRACOLoader().setDecoderPath('assets/vendor/draco/')
-        : null;
-    var modelLoader = (typeof THREE.GLTFLoader === 'function') ? new THREE.GLTFLoader() : null;
-    if (modelLoader && dracoLoader) modelLoader.setDRACOLoader(dracoLoader);
+    function makeLoader(decoderPath) {
+        if (typeof THREE.GLTFLoader !== 'function') return null;
+        var l = new THREE.GLTFLoader();
+        if (typeof THREE.DRACOLoader === 'function') {
+            l.setDRACOLoader(new THREE.DRACOLoader().setDecoderPath(decoderPath));
+        }
+        return l;
+    }
+    var modelLoader = makeLoader('assets/vendor/draco/');
+    // 解码器本身也可能取不到：备一台指向镜像解码器的加载器，解析失败时重试用
+    var mirrorLoader = null;
+    function getMirrorLoader() {
+        if (!mirrorLoader) mirrorLoader = makeLoader(MIRROR_BASE + '/assets/vendor/draco/');
+        return mirrorLoader;
+    }
 
     // 换了整岛模型后，程序化地形高度不再可靠：
     // 在 spot 上直接写 y: <高度> 即可手动对齐平台位置
@@ -872,14 +977,34 @@
         };
         var onFail = function () { finish(); /* 没有这个文件 — 保留水晶 */ };
 
-        // 已经预取到 ArrayBuffer 就不用再走一遍网络了
-        if (prefetched && modelLoader.parse) {
-            try {
-                modelLoader.parse(prefetched, '', run, onFail);
-                return;
-            } catch (e) { /* parse 失败就退回常规下载 */ }
+        // 解析 GLB。Draco 解码器本身也可能取不到（尤其国内），
+        // 失败一次就换指向镜像解码器的加载器再解一遍。
+        function parseBuf(loader, buf, tried) {
+            if (!loader || !loader.parse) { finish(); return; }
+            var onParseFail = function () {
+                if (!tried) {
+                    var ml = getMirrorLoader();
+                    if (ml && ml !== loader) { parseBuf(ml, buf, 1); return; }
+                }
+                finish();
+            };
+            try { loader.parse(buf, '', run, onParseFail); }
+            catch (e) { onParseFail(); }
         }
-        modelLoader.load(url, run, onProgress, onFail);
+
+        // 已经预取到 ArrayBuffer 就不用再走一遍网络了
+        if (prefetched) { parseBuf(modelLoader, prefetched, 0); return; }
+        // 预取阶段已经把主源和镜像都试过了 —— 不要再等一轮超时
+        if (s.fetchTried) { finish(); return; }
+
+        // 其余据点小模型自己取字节，同样带镜像转移
+        fetchAny(url, function (buf, usedUrl) {
+            if (buf) { parseBuf(modelLoader, buf, 0); return; }
+            modelLoader.load(usedUrl || url, run, onProgress, onFail);   // 兜底：走一次常规下载
+        }, s.bigModel ? function (p) {
+            bigParts[s.id] = p < 0 ? 0 : Math.min(0.99, p);
+            showMapLoad(s.name, bigProgress());
+        } : null);
     }
 
     /* --------------------------------------------
@@ -925,21 +1050,14 @@
     }
 
     function fetchModel(s, cb) {
-        var xhr = new XMLHttpRequest();
-        try { xhr.open('GET', s.model, true); } catch (e) { cb(null); return; }
-        xhr.responseType = 'arraybuffer';
-        var done = function (buf) { delete bigParts[s.id]; cb(buf || null); };
-        xhr.addEventListener('progress', function (e) {
-            if (!e.lengthComputable) return;
-            bigParts[s.id] = Math.min(0.99, e.loaded / e.total);
+        fetchAny(s.model, function (buf) {
+            delete bigParts[s.id];
+            s.fetchTried = true;              // 所有源都试过了，别在 installModel 里再来一轮
+            cb(buf || null);
+        }, function (p) {
+            bigParts[s.id] = p < 0 ? 0 : Math.min(0.99, p);
             showMapLoad(s.name, bigProgress());
         });
-        xhr.addEventListener('load', function () {
-            done(xhr.status >= 200 && xhr.status < 400 ? xhr.response : null);
-        });
-        xhr.addEventListener('error', function () { done(null); });
-        xhr.addEventListener('abort', function () { done(null); });
-        xhr.send();
     }
 
     function pumpModels() {
@@ -1299,8 +1417,40 @@
         function next() {
             if (i >= list.length) { done(); return; }
             var isl = list[i++];
-            modelLoader.load(isl.model, function (gltf) {
-                var obj = gltf.scene || (gltf.scenes && gltf.scenes[0]);
+            var url = isl.model;
+
+            // 文件缺失 / 全部源都失败 → 退化成程序化小岛
+            var degrade = function () {
+                isl.model = null;
+                if (isl.h === undefined) isl.h = 5.2;
+                if (isl.nseed === undefined) isl.nseed = 57.9;
+                buildProceduralIsland(isl);
+                if (window.console) console.warn('[island] 模型缺失，退化成程序化小岛: ' + isl.id);
+                next();
+            };
+            // 解码器取不到时换镜像解码器重试一次
+            var tryParse = function (loader, buf, tried) {
+                if (!loader || !loader.parse) { degrade(); return; }
+                var onErr = function () {
+                    if (!tried) {
+                        var ml = getMirrorLoader();
+                        if (ml && ml !== loader) { tryParse(ml, buf, 1); return; }
+                    }
+                    degrade();
+                };
+                try {
+                    loader.parse(buf, '', function (gltf) { landed(gltf); }, onErr);
+                } catch (e) { onErr(); }
+            };
+
+            // 走 fetchAny：主源卡住就自动转镜像
+            fetchAny(url, function (buf) {
+                if (!buf) { degrade(); return; }
+                tryParse(modelLoader, buf, 0);
+            });
+
+            function landed(gltf) {
+            var obj = gltf && (gltf.scene || (gltf.scenes && gltf.scenes[0]));
             if (!obj) { next(); return; }              // 空场景也要续上，别把后面几座岛卡死
             killModelLights(obj);
             tuneMaterials(obj, isl.tint ? new THREE.Color(isl.tint[0], isl.tint[1], isl.tint[2]) : null);
@@ -1323,19 +1473,11 @@
                 settleSpots(isl);
 
                 if (window.console) {
-                    console.info('[island] 整岛模型已载入: ' + isl.model +
+                    console.info('[island] 整岛模型已载入: ' + url +
                                  '（' + Math.round(size.x) + '×' + Math.round(size.z) + ' → ' + Math.round(span * k) + '）');
                 }
                 next();
-            }, undefined, function () {
-                // 文件缺失 → 退化成程序化小岛
-                isl.model = null;
-                if (isl.h === undefined) isl.h = 5.2;
-                if (isl.nseed === undefined) isl.nseed = 57.9;
-                buildProceduralIsland(isl);
-                if (window.console) console.warn('[island] 模型缺失，退化成程序化小岛: ' + isl.id);
-                next();
-            });
+            }
         }
         next();
     }
