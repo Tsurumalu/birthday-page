@@ -61,6 +61,18 @@
        theme-games 等页 var(--font-display) 解析为空、整条声明失效回退继承值 */
     --font-display: 'Bricolage Grotesque', 'Archivo', sans-serif;
     --font-body: 'Archivo', 'Inter', sans-serif;
+    /* 同样的坑：像素 / 终端 / 手写 / 中文这几组字族原先只写在单个主题块里
+       （--px/--term/--hand/--serif2/--cjk 在 .theme-letter，--font-hand-cn 在
+       .theme-postcard）。跨页引用时 var() 解析为空，整条 font-family 声明在计算值
+       阶段失效、回退到继承来的 Inter/Archivo；拉丁字体没有汉字字形，中文便落到
+       系统默认黑体——表现就是「有的地方字体是对的，有的地方变默认字体」。
+       这里统一给出全局默认值，各主题块仍可按需覆盖。 */
+    --px: 'Silkscreen', 'Ark Pixel', 'Press Start 2P', 'Share Tech Mono', monospace;
+    --term: 'Share Tech Mono', 'Ark Pixel', 'Courier New', monospace;
+    --serif2: 'Cormorant Garamond', Georgia, serif;
+    --hand: 'Caveat', 'Ma Shan Zheng', cursive;
+    --cjk: 'Ark Pixel', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    --font-hand-cn: 'Ma Shan Zheng', 'Caveat', cursive;
 
     /* Transitions */
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
