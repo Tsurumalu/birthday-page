@@ -28,3 +28,11 @@ build/
 # Logs
 *.log
 npm-debug.log*
+
+# Miora 素材画布（AI 生成工作台文件，不属于站点）
+*.miora
+vhs-song-tapes_assets/
+car-player-assets_assets/
+
+# 设计过程稿
+cards-page-design.png

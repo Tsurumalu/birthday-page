@@ -29,6 +29,12 @@
     var isMobile = window.matchMedia('(max-width: 820px)').matches ||
                    (navigator.maxTouchPoints || 0) > 1;
 
+    // 触屏没有滚轮：提示文案换成双指缩放
+    var hintEl = document.getElementById('world3dHint');
+    if (hintEl && (navigator.maxTouchPoints || 0) > 1) {
+        hintEl.textContent = '✦ 拖动环绕 · 双指缩放 · 点击圆圈看集锦';
+    }
+
     /* --------------------------------------------
        Game spots — x/z are island coordinates
 

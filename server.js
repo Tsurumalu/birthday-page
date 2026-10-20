@@ -134,7 +134,11 @@ const server = http.createServer(function (req, res) {
 
     /* ---------------- API ---------------- */
     if (pathname === '/api/cards' && req.method === 'GET') {
-        res.writeHead(200, { 'Content-Type': MIME['.json'] });
+        res.writeHead(200, {
+            'Content-Type': MIME['.json'],
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+        });
         res.end(JSON.stringify(cards));
         return;
     }

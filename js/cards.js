@@ -486,13 +486,26 @@
 
     function initCloud() {
         // Pull existing cards so the board is populated on load.
+        // Retry a few times — transient network/TLS blips should not blank the board.
+        loadCardsWithRetry(3, 400);
+    }
+
+    function loadCardsWithRetry(attempts, delay) {
         fetch(apiUrl('/api/cards'))
             .then(function (r) { if (!r.ok) throw new Error('no server'); return r.json(); })
             .then(function (list) {
                 (list || []).forEach(function (card) { renderCard(card); });
                 openStream();
             })
-            .catch(function () { /* static file mode — no persistence */ });
+            .catch(function () {
+                if (attempts > 1) {
+                    setTimeout(function () { loadCardsWithRetry(attempts - 1, delay * 2); }, delay);
+                } else {
+                    // Final fallback: still open the realtime stream so newly added
+                    // cards can backfill; don't silently pretend we're in static mode.
+                    openStream();
+                }
+            });
     }
 
     function openStream() {

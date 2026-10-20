@@ -3613,6 +3613,75 @@ body.theme-postcard::before {
     }
 }
 
+/* Phone dial de-clutter: the SVG scales down but its line count doesn't, so
+   the tick grilles stack under the HTML labels. Soften every hairline, drop
+   the dense inner tick band entirely, and shrink label type a notch. */
+@media (max-width: 540px) {
+    .dial-tick:not(.dial-tick--major) {
+        display: none;
+    }
+
+    .dial-tick--major {
+        stroke: rgba(255, 255, 255, 0.26);
+    }
+
+    .dial-ring {
+        stroke: rgba(255, 255, 255, 0.11);
+    }
+
+    .dial-ring--faint {
+        stroke: rgba(255, 255, 255, 0.05);
+    }
+
+    .dial-segment {
+        stroke: transparent;
+        fill-opacity: 0.07;
+    }
+
+    .dial-segment-glow {
+        stroke: rgba(255, 255, 255, 0.12);
+    }
+
+    .etch-ring {
+        stroke: rgba(255, 255, 255, 0.08);
+    }
+
+    .etch-ring--faint {
+        stroke: rgba(255, 255, 255, 0.04);
+    }
+
+    .etch-text {
+        fill: rgba(245, 240, 232, 0.3);
+        font-size: 10.5px;
+    }
+
+    /* Top etch arc sits under the active wedge label on phones — drop it,
+       keep the bottom「生日快乐」arc which has the space to itself. */
+    .dial-etch text.etch-text:not(.etch-text--cn) {
+        display: none;
+    }
+
+    .dial-label {
+        gap: 0.22rem;
+    }
+
+    .dial-label-icon {
+        width: 21px;
+        height: 21px;
+        font-size: 0.8rem;
+    }
+
+    .dial-label-text {
+        font-size: 0.54rem;
+        letter-spacing: 0.16em;
+    }
+
+    .dial-label-cn {
+        font-size: 0.5rem;
+        letter-spacing: 0.2em;
+    }
+}
+
 /* Short viewports (laptops held sideways, small windows) */
 @media (max-height: 780px) and (min-width: 901px) {
     .home {
@@ -5765,7 +5834,9 @@ body.page-island3d .theme-bg {
     .world3d-hint {
         font-size: 0.62rem;
         padding: 0.4rem 0.85rem;
-        bottom: 14px;
+        /* 悬在小岛导航条上方，别跟它叠在同一条线上（桌面端导航条在 bottom:0.9rem，
+           移动端同理——横幅提到 3.4rem，正好落在导航条上面留出一道缝） */
+        bottom: 3.4rem;
     }
 
     .world3d-controls button {
