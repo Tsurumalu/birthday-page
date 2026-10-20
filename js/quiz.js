@@ -102,7 +102,9 @@
         '</svg>';
 
     var STORE_KEY = 'tyquiz.v1';
-    var NET = { timeout: 1800 };
+    /* 超时：跨域一次请求要走 DNS + TCP + TLS + OPTIONS 预检 + 实际请求，
+       1.8s 在手机网络下必超时（表现为「只存在本机」）。读快写慢，POST 再重试一次。 */
+    var NET = { timeout: 5000, postTimeout: 12000, retry: 1 };
 
     /* API 归属解析：
        - GitHub Pages（https 且不在服务器域名下）→ 'https://lzteddy.cn'（跨域，服务端已开 CORS）
@@ -235,15 +237,33 @@
 
     function api(method, payload, done) {
         if (!window.fetch) { done(null); return; }
-        var opts = { method: method, headers: { 'Content-Type': 'application/json' } };
-        if (payload) opts.body = JSON.stringify(payload);
-        var ctrl = window.AbortController ? new AbortController() : null;
-        if (ctrl) opts.signal = ctrl.signal;
-        var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, NET.timeout);
-        fetch(apiUrl('/api/quiz'), opts)
-            .then(function (r) { return r.ok ? r.json() : null; })
-            .then(function (j) { clearTimeout(timer); done(j); })
-            .catch(function () { clearTimeout(timer); done(null); });
+        var isPost = method === 'POST';
+        var ms = isPost ? NET.postTimeout : NET.timeout;
+        var attempt = 0;
+
+        (function go() {
+            attempt++;
+            var opts = { method: method, headers: { 'Content-Type': 'application/json' } };
+            if (payload) opts.body = JSON.stringify(payload);
+            var ctrl = window.AbortController ? new AbortController() : null;
+            if (ctrl) opts.signal = ctrl.signal;
+            var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, ms);
+            /* canRetry: only the write needs a second chance, and only once */
+            var canRetry = isPost && attempt <= NET.retry;
+
+            fetch(apiUrl('/api/quiz'), opts)
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (j) {
+                    clearTimeout(timer);
+                    if (j || !canRetry) { done(j); return; }
+                    go();
+                })
+                .catch(function () {
+                    clearTimeout(timer);
+                    if (!canRetry) { done(null); return; }
+                    go();
+                });
+        })();
     }
 
     /* best entry per name, sorted for the board */
