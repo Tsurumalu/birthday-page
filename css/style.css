@@ -228,15 +228,6 @@
     letter-spacing: 0.02em;
 }
 
-.theme-stamp .pl-note {
-    font-family: var(--font-cjk);
-    font-style: normal;      /* 中文不用合成斜体，仿宋本身的倾斜感足够 */
-    font-weight: 600;        /* Demi — the label reads like printed ink */
-    font-size: 15px;
-    letter-spacing: 0.08em;
-    color: #3d372e;
-}
-
 .theme-stamp .pl-title,
 .theme-stamp .pl-sub {
     font-family: var(--font-cjk);
@@ -2457,7 +2448,9 @@ body.nav-compact .back-btn {
 .pl-print {
     margin-top: 10px;
     background: #fdfbf5;
-    padding: 10px 10px 0;
+    /* 相纸底部留白（拍立得的宽下边）。原先这里放一行手写标签，现已去掉文字，
+       只留白边；高度与标签行一致，卡片尺寸不用重算。 */
+    padding: 10px 10px 32px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 18px 30px -16px rgba(90, 75, 55, 0.45);
     transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1),
                 filter 0.5s ease,
@@ -2544,22 +2537,6 @@ body.nav-compact .back-btn {
 }
 
 .pl-card.is-video[data-on='1'] .pl-shot::after { opacity: 0; }
-
-.pl-note {
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 8px;
-    font-family: var(--cjk), ui-serif, Georgia, 'Times New Roman', serif;
-    font-style: italic;
-    font-size: 13px;
-    line-height: 1.1;
-    color: #5b5449;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
 
 .pl-peg {
     position: absolute;
@@ -2690,7 +2667,6 @@ body.nav-compact .back-btn {
     /* 仿宋 saturates smaller than the sans it replaced — keep it readable but
        one notch tighter so a 126-character thought stays clear of the print. */
     .theme-stamp .pl-sub { font-size: 13px; line-height: 1.65; letter-spacing: 0.01em; }
-    .theme-stamp .pl-note { font-size: 14px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

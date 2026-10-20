@@ -1785,7 +1785,6 @@
             card.innerHTML =
                 '<div class="pl-print">' +
                     '<div class="pl-shot">' + media + '</div>' +
-                    '<div class="pl-note">' + m.label + '</div>' +
                 '</div>' +
                 '<div class="pl-peg"></div>';
             plCardsEl.appendChild(card);
