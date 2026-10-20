@@ -235,6 +235,11 @@
         try { localStorage.setItem(STORE_KEY, JSON.stringify(arr)); } catch (e) { /* full? ignore */ }
     }
 
+    /* 见 cards.js 同名注释：iOS 微信的 WKWebView 在跨域预检（OPTIONS 204）之后
+       不发真实 POST。这里统一走 CORS 简单请求避免触发预检 —— 服务端不校验
+       Content-Type，body 仍是 JSON 字符串，完全兼容。 */
+    var SIMPLE_CT = 'text/plain;charset=UTF-8';
+
     function api(method, payload, done) {
         if (!window.fetch) { done(null); return; }
         var isPost = method === 'POST';
@@ -243,7 +248,7 @@
 
         (function go() {
             attempt++;
-            var opts = { method: method, headers: { 'Content-Type': 'application/json' } };
+            var opts = { method: method, headers: { 'Content-Type': SIMPLE_CT } };
             if (payload) opts.body = JSON.stringify(payload);
             var ctrl = window.AbortController ? new AbortController() : null;
             if (ctrl) opts.signal = ctrl.signal;

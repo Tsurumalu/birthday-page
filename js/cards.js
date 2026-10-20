@@ -557,6 +557,15 @@
             });
     }
 
+    /* iOS 微信的 WKWebView 有个坑：跨域 POST 的预检（OPTIONS）虽然拿到 204，
+       但真实 POST 永远不会发出去 —— 服务端只见 OPTIONS，一条 POST 都没有。
+       同一台 iPhone 上用 Chrome 就正常，因为那是标准 WKWebView 配置。
+
+       解法：绕开预检。CORS「简单请求」不会触发 OPTIONS，条件之一是
+       Content-Type 只能取 text/plain（body 照旧是 JSON 字符串）。
+       服务端是 req.on('data') + JSON.parse，不校验 Content-Type，天然兼容。 */
+    var SIMPLE_CT = 'text/plain;charset=UTF-8';
+
     // 带超时 + 一次重试的 POST；跨域首包慢时不要轻易判死。
     function postWithRetry(payload, retriesLeft) {
         return new Promise(function (resolve, reject) {
@@ -581,9 +590,10 @@
                 }
             }
 
+            // 见 SIMPLE_CT 注释：必须是 text/plain，写成 application/json 会触发预检，iOS 微信就传不上去。
             var opts = {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': SIMPLE_CT },
                 body: payload
             };
             if (ctl) { opts.signal = ctl.signal; }
