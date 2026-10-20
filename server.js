@@ -220,8 +220,21 @@ const server = http.createServer(function (req, res) {
                     return Number.isFinite(n) && n >= 0 && n < 8 ? n : -1;
                 })
                 : [];
+            /* 幂等键：前端提交超时会重试一次，若第一次其实已写库、
+               只是响应没赶上超时，重试就会让排行榜多出一条重复成绩。
+               带上 sid（= 前端本地生成的 entry.id），重试即命中已有记录。 */
+            const sid = escapeStr(d.sid, 64);
+            if (sid) {
+                const dup = quiz.filter(function (e) { return e.sid === sid; })[0];
+                if (dup) {
+                    res.writeHead(200, { 'Content-Type': MIME['.json'] });
+                    res.end(JSON.stringify(dup));
+                    return;
+                }
+            }
             const entry = {
                 id: 'q' + Date.now() + Math.random().toString(36).slice(2, 7),
+                sid: sid,
                 name: escapeStr(d.name, 40) || 'a mystery guest',
                 score: clampNum(d.score, 0, 100000, 0),
                 acc: clampNum(d.acc, 0, 1, 0),

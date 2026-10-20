@@ -314,8 +314,11 @@
     }
 
     function saveEntry(done) {
+        // sid 与本地 id 同源：超时重试时复用同一份 payload，服务端据此去重。
+        var eid = 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
         var entry = {
-            id: 'q' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+            id: eid,
+            sid: eid,
             name: (S.name || '\u795E\u79D8\u8DEF\u4EBA').slice(0, 40),
             score: S.score,
             acc: Math.round(accuracy() * 1000) / 1000,
