@@ -662,16 +662,18 @@
        Naming: <spot id>.glb   (e.g. cs2.glb, valorant.glb)
        Missing files are silently ignored: the totem stays.
        -------------------------------------------- */
-    function installModel(s, onDone) {
+    function installModel(s, onDone, prefetched) {
         var holder = s.holder;
         var placeholder = s.placeholder || [];
         var finish = function () { if (onDone) onDone(); };
+        if (s.modelTried) { finish(); return; }        // 兜底定时器可能重复触发，别装两遍
+        s.modelTried = true;
         if (!modelLoader) { finish(); return; }
         if (location.protocol === 'file:') return;   // file:// blocks XHR — keep totems
         var url = s.model || (MODEL_DIR + s.id + '.glb');
 
-        modelLoader.load(url, function (gltf) {
-            var obj = gltf.scene || (gltf.scenes && gltf.scenes[0]);
+        var run = function (gltf) {
+            var obj = gltf && (gltf.scene || (gltf.scenes && gltf.scenes[0]));
             if (!obj) { finish(); return; }
 
             // rip 自带的灯一律禁用（平行光是全局的，一盏就白幕全岛）
@@ -860,11 +862,24 @@
             }
             if (window.console) console.info('[island] 模型已载入: ' + url);
             finish();
-        }, function (xhr) {
+        };
+
+        var onProgress = function (xhr) {
             if (!s.bigModel || !xhr || !xhr.total) return;
             var p = Math.min(0.99, xhr.loaded / xhr.total);
-            showMapLoad(s.name, (bigDone + p) / bigTotal);
-        }, function () { finish(); /* 没有这个文件 — 保留水晶 */ });
+            bigParts[s.id] = p;
+            showMapLoad(s.name, bigProgress());
+        };
+        var onFail = function () { finish(); /* 没有这个文件 — 保留水晶 */ };
+
+        // 已经预取到 ArrayBuffer 就不用再走一遍网络了
+        if (prefetched && modelLoader.parse) {
+            try {
+                modelLoader.parse(prefetched, '', run, onFail);
+                return;
+            } catch (e) { /* parse 失败就退回常规下载 */ }
+        }
+        modelLoader.load(url, run, onProgress, onFail);
     }
 
     /* --------------------------------------------
@@ -877,20 +892,86 @@
     var bigQueue = [];
     var bigTotal = 1;
     var bigDone = 0;
+    var bigPrefetching = false;
+    var bigParts = {};        // 预取阶段各张的进度（0~1）
+
+    // 下载 / 解包分离（20261020）：
+    // 旧流程是「下载一张 → 解包进场 → 再拉下一张」的严格串行，
+    // 实测两张之间白白空转 30 秒 —— CPU 在解包贴图时网络闲着，
+    // 网络在下载时 CPU 又闲着。现在：
+    //   ① 六张同时 XHR 拉到内存（进度条前半段）
+    //   ② 再一张张 parse 进场（后半段）
+    // 两个阶段彻底重叠，总耗时约等于「纯下载 + 一次解包」。
+    var PREFETCH_PHASE = 0.55;   // 下载占进度条的比例
+
+    function settleModelLoad() {
+        if (bigDone) flashMapLoad(bigDone + ' / ' + bigTotal + ' 沙盘已就位');
+        else hideMapLoad();
+        // 主岛六张全部落地 → 稍歇一口气，再在后台补齐其余各岛
+        if (!isMobile && bigQueue.length && bigDone >= bigTotal) {
+            setTimeout(startBackgroundLoad, 1500);
+        }
+    }
+
+    function bigProgress() {
+        if (bigPrefetching) {
+            var extra = 0, k;
+            for (k in bigParts) {
+                if (Object.prototype.hasOwnProperty.call(bigParts, k)) extra += bigParts[k];
+            }
+            return Math.min(0.99, extra / bigTotal) * PREFETCH_PHASE;
+        }
+        return PREFETCH_PHASE + (1 - PREFETCH_PHASE) * Math.min(1, bigDone / bigTotal);
+    }
+
+    function fetchModel(s, cb) {
+        var xhr = new XMLHttpRequest();
+        try { xhr.open('GET', s.model, true); } catch (e) { cb(null); return; }
+        xhr.responseType = 'arraybuffer';
+        var done = function (buf) { delete bigParts[s.id]; cb(buf || null); };
+        xhr.addEventListener('progress', function (e) {
+            if (!e.lengthComputable) return;
+            bigParts[s.id] = Math.min(0.99, e.loaded / e.total);
+            showMapLoad(s.name, bigProgress());
+        });
+        xhr.addEventListener('load', function () {
+            done(xhr.status >= 200 && xhr.status < 400 ? xhr.response : null);
+        });
+        xhr.addEventListener('error', function () { done(null); });
+        xhr.addEventListener('abort', function () { done(null); });
+        xhr.send();
+    }
 
     function pumpModels() {
-        if (!bigQueue.length) {
-            if (bigDone) flashMapLoad(bigDone + ' / ' + bigTotal + ' 沙盘已就位');
-            else hideMapLoad();
-            return;
-        }
-        var s = bigQueue.shift();
-        showMapLoad(s.name, bigDone / bigTotal);
-        installModel(s, function () {
-            bigDone++;
-            // 让出一帧再拉下一张：解码贴图的空档里页面还能拖动
-            requestAnimationFrame(function () { setTimeout(pumpModels, 60); });
+        if (!bigQueue.length) { settleModelLoad(); return; }
+        var pending = bigQueue.length;
+        bigPrefetching = true;
+        showMapLoad(bigQueue[0].name, 0.01);
+        bigQueue.forEach(function (s) {
+            fetchModel(s, function (buf) {
+                s.prefetched = buf;
+                pending--;
+                showMapLoad(s.name, bigProgress());
+                if (pending <= 0) startInstalls();
+            });
         });
+    }
+
+    function startInstalls() {
+        bigPrefetching = false;
+        var i = 0;
+        function step() {
+            if (i >= bigQueue.length) { settleModelLoad(); return; }
+            var s = bigQueue[i++];
+            installModel(s, function () {
+                bigDone++;
+                s.prefetched = null;                 // 解析完就把 ArrayBuffer 放掉
+                showMapLoad(s.name, bigProgress());
+                // 让出一帧再补下一张：解码贴图的空档里页面还能拖动
+                requestAnimationFrame(function () { setTimeout(step, 60); });
+            }, s.prefetched);
+        }
+        step();
     }
 
     // 地图 rip 常带 AssetRipper 残留的退化网格（单顶点、线段），
@@ -1209,13 +1290,18 @@
         });
     }
 
-    function loadIslandModels() {
-        if (!modelLoader || location.protocol === 'file:') return;
-        islands.forEach(function (isl) {
-            if (!isl.model) return;
+    function loadIslandModels(onAllDone) {
+        var done = function () { if (onAllDone) onAllDone(); };
+        if (!modelLoader || location.protocol === 'file:') { done(); return; }
+        var list = islands.filter(function (isl) { return !!isl.model; });
+        var i = 0;
+        // 串行加载：整岛 GLB 一个 10~20MB，并行解析会把主线程卡成一坨
+        function next() {
+            if (i >= list.length) { done(); return; }
+            var isl = list[i++];
             modelLoader.load(isl.model, function (gltf) {
                 var obj = gltf.scene || (gltf.scenes && gltf.scenes[0]);
-            if (!obj) return;
+            if (!obj) { next(); return; }              // 空场景也要续上，别把后面几座岛卡死
             killModelLights(obj);
             tuneMaterials(obj, isl.tint ? new THREE.Color(isl.tint[0], isl.tint[1], isl.tint[2]) : null);
 
@@ -1240,6 +1326,7 @@
                     console.info('[island] 整岛模型已载入: ' + isl.model +
                                  '（' + Math.round(size.x) + '×' + Math.round(size.z) + ' → ' + Math.round(span * k) + '）');
                 }
+                next();
             }, undefined, function () {
                 // 文件缺失 → 退化成程序化小岛
                 isl.model = null;
@@ -1247,10 +1334,11 @@
                 if (isl.nseed === undefined) isl.nseed = 57.9;
                 buildProceduralIsland(isl);
                 if (window.console) console.warn('[island] 模型缺失，退化成程序化小岛: ' + isl.id);
+                next();
             });
-        });
+        }
+        next();
     }
-    loadIslandModels();
 
     /* --------------------------------------------
        Camera control (custom orbit + damping)
@@ -1448,12 +1536,37 @@
     });
 
     // 图钉都建好了再开始拉模型：markDivePin 要给对应的图钉挂上「进入地图」按钮
+    // 两阶段加载（20261020）：首屏只拉主岛六张地图（~23MB），其余 60MB
+    // （三座整岛 GLB + 王者/PUBG/REPO 据点模型）等地图就位后在后台慢慢补，
+    // 别让还没点开的岛拖慢第一眼。
+    var idleSpots = [];
     spots.forEach(function (s) {
         if (s.bigModel) { if (!isMobile) bigQueue.push(s); }
-        else installModel(s);
+        else if (isMobile) installModel(s);          // 手机不摆沙盘，小模型照旧立即装
+        else idleSpots.push(s);
     });
     bigTotal = Math.max(1, bigQueue.length);
+
+    var bgStarted = false;
+    function startBackgroundLoad() {
+        if (bgStarted) return;
+        bgStarted = true;
+        // 先整岛（大块头，串行逐座），再据点小模型。
+        // tail 只跑一次；另挂一枚 90 秒的兜底定时器 —— 整岛链万一卡住
+        // （网络中断、某个 GLB 解不出场景），据点模型也不能跟着一起悬着。
+        var tailFired = false;
+        var tail = function () {
+            if (tailFired) return;
+            tailFired = true;
+            idleSpots.forEach(function (s) { installModel(s); });
+        };
+        loadIslandModels(tail);
+        setTimeout(tail, 90000);
+    }
+
     if (bigQueue.length) pumpModels();
+    else if (isMobile) loadIslandModels();           // 手机没有地图队列，整岛照旧立即拉
+    else startBackgroundLoad();                      // 桌面没有地图队列（极端情况）就直接补
 
     var projected = new THREE.Vector3();
     var camDir = new THREE.Vector3();
