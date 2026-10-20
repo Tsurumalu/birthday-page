@@ -358,7 +358,7 @@
     function paintStart(root) {
         root.appendChild(make('div', 'qz-kicker', 'TY-OS &rsaquo; \u6E38\u5BA2\u7968'));
 
-        var h = make('h3', 'qz-title', '\u4F60\u6709\u591A\u61C2 TY\uFF1F');
+        var h = make('h3', 'qz-title', '\u4F60\u6709\u591A\u61C2 SJY\uFF1F');
         root.appendChild(h);
         root.appendChild(make('p', 'qz-sub',
             '\u5341\u9053\u5173\u4E8E\u4ED6\u7684\u9898\uFF0C\u5916\u52A0\u4E00\u9053\u4E0D\u7B97\u5206\u7684\u3002' +
@@ -721,7 +721,7 @@
 
     function paintBoard(root) {
         root.appendChild(make('div', 'qz-kicker', 'TY-OS &rsaquo; \u6392\u884C\u699C'));
-        root.appendChild(make('h3', 'qz-title is-sm', '\u8C01\u6700\u61C2 TY'));
+        root.appendChild(make('h3', 'qz-title is-sm', '\u8C01\u6700\u61C2 SJY'));
 
         var rows = boardRows(S.entries || []);
         var list = make('div', 'qz-board');
