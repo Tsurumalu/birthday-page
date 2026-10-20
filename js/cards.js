@@ -21,6 +21,7 @@
     var printBtn = document.getElementById('printBtn');
     var tabletDot = document.getElementById('tabletDot');
     var printerOutput = document.getElementById('printerOutput');
+    var pinHint = document.getElementById('pinHint');
     var printedCard = document.getElementById('printedCard');
     var printedAvatar = document.getElementById('printedAvatar');
     var printedBody = document.getElementById('printedBody');
@@ -159,7 +160,27 @@
             state.isPrinted = true;
             printBtn.disabled = false;
             printBtn.textContent = '再打印一张';
+
+            // 出纸动画（0.75s）跑完后再放开裁切，并把卡片带进视野。
+            // 手机/平板上卡片经常停在首屏下方，用户看不见卡片和图钉，
+            // 就会以为「打印没反应」，纸条自然也传不上来。
+            setTimeout(function () {
+                printerOutput.classList.add('is-open');
+                if (pinHint) pinHint.hidden = false;
+                revealPrintedCard();
+            }, 780);
         }, 900);
+    }
+
+    // 卡片若不在视野内，轻轻滚过去 —— 已经在视野里就不打扰用户。
+    function revealPrintedCard() {
+        try {
+            var r = printedCard.getBoundingClientRect();
+            var vh = window.innerHeight || document.documentElement.clientHeight;
+            if (r.top < 8 || r.bottom > vh - 8) {
+                printedCard.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            }
+        } catch (_) { /* 老浏览器不支持带参数的 scrollIntoView，忽略即可 */ }
     }
 
     /* ---------- Pin the printed card to the board ---------- */
@@ -194,6 +215,8 @@
     function resetPrinter() {
         printedCard.classList.remove('printed');
         printedCard.hidden = true;
+        printerOutput.classList.remove('is-open');
+        if (pinHint) pinHint.hidden = true;
         state.isPrinted = false;
         printBtn.textContent = '打印我的贺卡';
         // Keep the name + avatar for the next card; clear message.

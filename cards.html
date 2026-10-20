@@ -397,6 +397,13 @@
             pointer-events: none;
         }
 
+        /* 出纸期间必须 hidden（纸是从缝里滑出来的），但出完之后要放开：
+           否则卡片右上角的图钉（-10px）会被出纸口切掉上半截，
+           留言写长了的卡片底部也会被一起截断。 */
+        .printer-output.is-open {
+            overflow: visible;
+        }
+
         .paper-slot {
             position: absolute;
             top: 0;
@@ -525,6 +532,24 @@
         .pin-it-btn:hover {
             background: #a9583d;
             transform: scale(1.1) !important;
+        }
+
+        /* 只在卡片出纸后短暂出现的一句操作提示 —— 手机用户不看字
+           很难猜到那个 📌 是干什么的。 */
+        .pin-hint {
+            margin: 0.55rem auto 0;
+            text-align: center;
+            font-size: 0.72rem;
+            letter-spacing: 0.02em;
+            color: var(--text-secondary);
+            animation: hintIn 0.35s var(--ease-out) both;
+        }
+
+        .pin-hint[hidden] { display: none; }
+
+        @keyframes hintIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         .tablet-dot.blink {
@@ -1310,6 +1335,8 @@
                     </div>
                 </div>
 
+                <p class="pin-hint" id="pinHint" hidden>点卡片右上角的 &#128204; 把它钉到墙上</p>
+
             </section>
 
             <!-- Right: cork board -->
@@ -1419,7 +1446,7 @@
     <script src="js/tracks-core.js?v=20261017a"></script>
     <script src="js/mini-player.js?v=20261017c"></script>
     <script src="js/main.js?v=20261020a"></script>
-    <script src="js/cards.js?v=20261017i"></script>
+    <script src="js/cards.js?v=20261020c"></script>
     <script src="js/cursor-trail.js?v=20261013b"></script>
 </body>
 </html>
