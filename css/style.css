@@ -9345,6 +9345,27 @@ body.page-island3d .theme-bg {
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
 }
 
+/* a not-written-yet app: still on the desk, just not openable */
+.ui-icon.is-soon { cursor: default; }
+.ui-icon.is-soon:hover { background: none; }
+.ui-icon.is-soon .ui-icon-art,
+.ui-icon.is-soon .ui-icon-label { opacity: 0.42; }
+
+.ui-icon-tag {
+    position: absolute;
+    top: 1px;
+    right: 10px;
+    padding: 1px 4px;
+    border-radius: 2px;
+    background: #7a8b8a;
+    color: #fbf7ef;
+    font-family: var(--cjk);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1.5;
+}
+
 /* windows */
 
 .ui-wins {

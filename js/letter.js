@@ -37,6 +37,12 @@
        ============================================================ */
 
     var PASSWORD = 'TS669';
+
+    /* the letter is still being written. flip this to true when it's
+       ready and every door into it opens again at once: the desktop
+       icon, both menu items, the lock window and the big paper. */
+    var LETTER_LIVE = false;
+    var LETTER_SOON = '\u4FE1\u8FD8\u5728\u5199\u2026\u5199\u5B8C\u4E86\u5C31\u653E\u5728\u8FD9\u513F\u3002';
     var QUESTION = '\u5982\u679C\u53EF\u4EE5\u81EA\u5DF1\u6311\u9009\u8F66\u724C\uFF0Cty \u4F1A\u6311\u9009\u4EC0\u4E48\uFF1F';
     var HINTS = [
         '\u4E24\u4E2A\u5B57\u6BCD\uFF0C\u4E09\u4E2A\u6570\u5B57\u3002\u5B57\u6BCD\u662F\u4F60\u523B\u5728\u5FC3\u91CC\u7684\u90A3\u4E2A\u4EBA\u3002',
@@ -331,6 +337,7 @@
         {
             id: 'letter', label: '\u4FE1\u4EF6', type: 'letter', title: '\u4FE1\u4EF6 \u2014 \u672A\u542F\u5C01',
             icon: ICONS.letter, w: 700, h: 470, locked: true,
+            soon: !LETTER_LIVE,
             render: renderLetterApp,
             /* closing the letter (locked or opened) invites the quiz */
             onClose: function () { queueQuiz(900); }
@@ -357,13 +364,13 @@
         { id: 'logo', label: '\u273F', items: [
             { label: '\u5173\u4E8E TY-OS\u2026', act: showAbout },
             { sep: true },
-            { label: '\u6253\u5F00\u4FE1\u4EF6', act: function () { openApp('letter'); } },
+            { label: '\u6253\u5F00\u4FE1\u4EF6', disabled: !LETTER_LIVE, act: function () { openApp('letter'); } },
             { label: '\u663E\u793A\u684C\u9762', act: closeAll },
             { sep: true },
             { label: '\u5173\u673A', act: powerOff }
         ] },
         { id: 'file', label: '\u6587\u4EF6', items: [
-            { label: '\u6253\u5F00\u4FE1\u4EF6', act: function () { openApp('letter'); } },
+            { label: '\u6253\u5F00\u4FE1\u4EF6', disabled: !LETTER_LIVE, act: function () { openApp('letter'); } },
             { sep: true },
             { label: '\u5173\u95ED\u7A97\u53E3', act: closeTop }
         ] },
@@ -419,7 +426,9 @@
         el.dataset.app = app.id;
         el.innerHTML = '<span class="ui-icon-art">' + app.icon + '</span>' +
             '<span class="ui-icon-label">' + app.label + '</span>' +
-            (app.locked ? '<span class="ui-icon-badge"></span>' : '');
+            (app.soon ? '<span class="ui-icon-tag">\u672A\u5B8C</span>' : '') +
+            (app.locked && !app.soon ? '<span class="ui-icon-badge"></span>' : '');
+        if (app.soon) el.classList.add('is-soon');
         el.addEventListener('click', function () {
             selectIcon(el);
             openApp(app.id);
@@ -608,6 +617,8 @@
     }
 
     function openApp(id) {
+        /* the letter is not written yet — it stays shut everywhere */
+        if (id === 'letter' && !LETTER_LIVE) { toast(LETTER_SOON); return null; }
         var app = findApp(id);
         if (!app) return null;
         if (openWins[id]) { bringToFront(openWins[id]); return openWins[id]; }
@@ -905,6 +916,7 @@
     var lineTimers = [];
 
     function openLetter() {
+        if (!LETTER_LIVE) { toast(LETTER_SOON); return; }
         if (!unlocked) { openApp('letter'); return; }
         if (!letterFloat.hidden) return;
 
