@@ -157,6 +157,10 @@ const server = http.createServer(function (req, res) {
                 sticker: escapeStr(d.sticker, 20),
                 x: Number.isFinite(d.x) ? Math.round(d.x) : null,
                 y: Number.isFinite(d.y) ? Math.round(d.y) : null,
+                // 百分比坐标：板宽是流式的（桌面 956px / 手机 330px），
+                // 只有按比例存，换设备/转屏才不会把卡片甩到板外。
+                xp: Number.isFinite(d.xp) ? Math.round(d.xp * 100) / 100 : null,
+                yp: Number.isFinite(d.yp) ? Math.round(d.yp * 100) / 100 : null,
                 clientId: escapeStr(d.clientId, 40),
                 createdAt: Date.now()
             };
@@ -180,6 +184,8 @@ const server = http.createServer(function (req, res) {
             if (!card) { res.writeHead(404); res.end('not found'); return; }
             if (Number.isFinite(d.x)) card.x = Math.round(d.x);
             if (Number.isFinite(d.y)) card.y = Math.round(d.y);
+            if (Number.isFinite(d.xp)) card.xp = Math.round(d.xp * 100) / 100;
+            if (Number.isFinite(d.yp)) card.yp = Math.round(d.yp * 100) / 100;
             saveCards();
             broadcast({ type: 'update', card: card });
             res.writeHead(200, { 'Content-Type': MIME['.json'] });

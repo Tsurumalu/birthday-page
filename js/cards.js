@@ -2,9 +2,11 @@
    The Cards — guestbook / scrapboard interactions
    Pick an avatar, write a note, hit "Print my card" and the
    card slides out of the tablet's paper slot (with a blinking
-   status dot). From there you can drag it onto the cork board
-   or tap the 📌 button to pin it. Already-pinned cards can be
-   dragged around with a mouse to rearrange the board.
+   status dot). From there:
+     · desktop — drag it onto the cork board or tap 📌 to pin it;
+       already-pinned cards can be dragged around to rearrange.
+     · mobile — it lands on the board by itself right after
+       printing (touch has no hover and dragging is disabled).
 
    Persistence + realtime: pinned cards are written to the local
    backend (server.js). On load we pull existing cards, and an
@@ -161,15 +163,34 @@
             printBtn.disabled = false;
             printBtn.textContent = '再打印一张';
 
-            // 出纸动画（0.75s）跑完后再放开裁切，并把卡片带进视野。
-            // 手机/平板上卡片经常停在首屏下方，用户看不见卡片和图钉，
-            // 就会以为「打印没反应」，纸条自然也传不上来。
+            // 出纸动画（0.75s）跑完后再放开裁切，随后分设备走两条路：
+            //   · 手机/平板：没有 hover、拖拽也被禁用，卡片滑出后直接落到墙上，
+            //     不要求用户再去找那个 📌 按钮（微信里经常点不到）。
+            //   · 桌面：保持原样 —— 卡片停在出纸口，提示用户点 📌 钉上墙。
             setTimeout(function () {
                 printerOutput.classList.add('is-open');
-                if (pinHint) pinHint.hidden = false;
-                revealPrintedCard();
+                if (isMobileView()) {
+                    setTimeout(function () {
+                        if (state.isPrinted) pinToBoard();
+                        revealBoard();
+                    }, 620);
+                } else {
+                    if (pinHint) pinHint.hidden = false;
+                    revealPrintedCard();
+                }
             }, 780);
         }, 900);
+    }
+
+    // 移动端自动钉上后，把板子带进视野，让用户看到纸条落在哪。
+    function revealBoard() {
+        try {
+            var r = boardCork.getBoundingClientRect();
+            var vh = window.innerHeight || document.documentElement.clientHeight;
+            if (r.top < 8 || r.bottom > vh - 8) {
+                boardCork.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            }
+        } catch (_) { /* 老浏览器忽略 */ }
     }
 
     // 卡片若不在视野内，轻轻滚过去 —— 已经在视野里就不打扰用户。
@@ -183,32 +204,104 @@
         } catch (_) { /* 老浏览器不支持带参数的 scrollIntoView，忽略即可 */ }
     }
 
+    /* ---------- Coordinate space: 百分比（响应式） ----------
+       板子是流式的：桌面约 956px 宽，手机上只有 330px（差近 3 倍）。
+       早先坐标存的是绝对像素，于是「在电脑上钉下的卡片」到了手机上
+       整块落到板子右侧之外，又被 .board-cork 的 overflow:hidden 裁干净
+       —— 这就是「手机上有些卡片看不到 / 微信里提交了却不显示」的根因。
+       现在一律以「相对板子的百分比 (xp/yp)」为准，渲染时换算回当前
+       板尺寸的像素，并夹进板内，保证任何视口下都看得见。 */
+    var REF_BOARD_W = 956;   // 1440 视口下 #boardCork 实测宽度（折算旧像素数据用）
+    var REF_BOARD_H = 700;   // 同上，实测高度
+    var BOARD_PAD = 12;
+
+    function storedToPct(card) {
+        if (Number.isFinite(card.xp) && Number.isFinite(card.yp)) {
+            return { x: clamp(card.xp, 0, 100), y: clamp(card.yp, 0, 100) };
+        }
+        // 旧数据：像素 → 百分比
+        if (Number.isFinite(card.x) && Number.isFinite(card.y)) {
+            return {
+                x: clamp((card.x / REF_BOARD_W) * 100, 0, 100),
+                y: clamp((card.y / REF_BOARD_H) * 100, 0, 100)
+            };
+        }
+        return { x: 42, y: 38 };
+    }
+
+    // 按每张纸条自己的百分比，落到当前板尺寸上，并夹进板内（扣掉卡片自身宽高）。
+    function layoutNotes() {
+        try {
+            var b = boardCork.getBoundingClientRect();
+            if (!b.width || !b.height) return;
+            var notes = boardCork.querySelectorAll('.board-note');
+            for (var i = 0; i < notes.length; i++) {
+                var note = notes[i];
+                if (state.isDragging && note === state.dragEl) continue;
+                var xp = parseFloat(note.dataset.xp);
+                var yp = parseFloat(note.dataset.yp);
+                if (!isFinite(xp)) xp = 42;
+                if (!isFinite(yp)) yp = 38;
+                var w = note.offsetWidth || 150;
+                var h = note.offsetHeight || 130;
+                var maxX = Math.max(BOARD_PAD, b.width - w - BOARD_PAD);
+                var maxY = Math.max(BOARD_PAD, b.height - h - BOARD_PAD);
+                note.style.left = clamp((xp / 100) * b.width, BOARD_PAD, maxX) + 'px';
+                note.style.top = clamp((yp / 100) * b.height, BOARD_PAD, maxY) + 'px';
+            }
+        } catch (_) { /* 拿不到布局时保持原样 */ }
+    }
+
+    var relayoutTimer = null;
+    function scheduleLayout() {
+        if (relayoutTimer) clearTimeout(relayoutTimer);
+        relayoutTimer = setTimeout(function () {
+            relayoutTimer = null;
+            layoutNotes();
+        }, 150);
+    }
+    window.addEventListener('resize', scheduleLayout);
+    window.addEventListener('orientationchange', scheduleLayout);
+
+    // 手机 / 平板：没有 hover，触摸拖拽也是禁用的（见 startDrag）。
+    var mobileMQ = null;
+    try { mobileMQ = window.matchMedia('(max-width: 900px)'); } catch (_) {}
+    function isMobileView() {
+        if (mobileMQ) return mobileMQ.matches;
+        return ('ontouchstart' in window);
+    }
+
+    // 新钉的卡片尽量不叠在一起：按当前张数做黄金角散布。
+    function scatterPct(i) {
+        var GOLD = 0.6180339887;
+        return {
+            x: 5 + ((i * GOLD) % 1) * 76,
+            y: 5 + ((i * GOLD * 1.7) % 1) * 74
+        };
+    }
+
     /* ---------- Pin the printed card to the board ---------- */
     function pinToBoard() {
         if (!state.isPrinted) return;
-        var boardRect = boardCork.getBoundingClientRect();
-        var baseX = boardRect.width / 2 - 80;
-        var baseY = boardRect.height / 2 - 60;
-        var offsetX = (state.noteCount % 3) * 22;
-        var offsetY = Math.floor(state.noteCount / 3) * 22;
-        var x = clamp(baseX + offsetX, 12, boardRect.width - 170);
-        var y = clamp(baseY + offsetY, 12, boardRect.height - 130);
-        commitCard(x, y);
+        var p = scatterPct(boardCork.querySelectorAll('.board-note').length);
+        commitCard(+p.x.toFixed(2), +p.y.toFixed(2));
     }
 
     // Build the note from the printed card, drop it on the board, sync to backend.
-    function commitCard(x, y) {
+    // x / y 均为百分比。
+    function commitCard(xp, yp) {
         var data = {
             avatar: state.avatar,
             name: nameFromAuthor(printedAuthor.textContent),
             message: printedBody.textContent
         };
-        var note = createBoardNote(data, x, y, null);
+        var note = createBoardNote(data, xp, yp, null);
         boardCork.appendChild(note);
         setupBoardNoteDrag(note, false);
+        layoutNotes();
         state.noteCount++;
         updateWallCount();
-        syncCardToServer(note, x, y, data);
+        syncCardToServer(note, xp, yp, data);
         resetPrinter();
     }
 
@@ -355,7 +448,10 @@
             if (overBoard) {
                 var nx = e.clientX - boardRect.left - state.dragOffsetX;
                 var ny = e.clientY - boardRect.top - state.dragOffsetY;
-                commitCard(nx, ny);
+                commitCard(
+                    +(boardRect.width ? (nx / boardRect.width) * 100 : 42).toFixed(2),
+                    +(boardRect.height ? (ny / boardRect.height) * 100 : 38).toFixed(2)
+                );
             } else {
                 // Not dropped on the board — slide it back into the slot.
                 el.setAttribute('style', state.dragOriginStyle);
@@ -366,14 +462,17 @@
             if (overBoard) {
                 var nx2 = e.clientX - boardRect.left - state.dragOffsetX;
                 var ny2 = e.clientY - boardRect.top - state.dragOffsetY;
+                var pxp = +(boardRect.width ? (nx2 / boardRect.width) * 100 : 42).toFixed(2);
+                var pyp = +(boardRect.height ? (ny2 / boardRect.height) * 100 : 38).toFixed(2);
+                el.dataset.xp = String(pxp);
+                el.dataset.yp = String(pyp);
                 el.style.position = 'absolute';
-                el.style.left = nx2 + 'px';
-                el.style.top = ny2 + 'px';
                 el.style.width = '';
                 el.style.margin = '';
                 el.style.transform = '';
                 boardCork.appendChild(el);
-                if (el.dataset.cardId) updateCardPosition(el.dataset.cardId, nx2, ny2);
+                layoutNotes();
+                if (el.dataset.cardId) updateCardPosition(el.dataset.cardId, pxp, pyp);
             } else {
                 el.setAttribute('style', state.dragOriginStyle);
                 el.style.transform = '';
@@ -393,12 +492,13 @@
     /* ---------- Build a board note ---------- */
     var NOTE_COLORS = ['note-warm', 'note-yellow', 'note-pink', 'note-blue', 'note-mint', 'note-lavender', 'note-coral', 'note-peach'];
 
+    // x / y 为百分比；真正写 px 的活交给 layoutNotes()，尺寸变了能跟着换算。
     function createBoardNote(data, x, y, id) {
         var note = document.createElement('article');
         var colorCls = NOTE_COLORS[Math.floor(Math.random() * NOTE_COLORS.length)];
         note.className = 'board-note ' + colorCls + ' note-enter';
-        note.style.left = x + 'px';
-        note.style.top = y + 'px';
+        note.dataset.xp = String(x);
+        note.dataset.yp = String(y);
         note.style.setProperty('--rot', (Math.random() * 6 - 3).toFixed(1) + 'deg');
         if (id) {
             note.dataset.cardId = id;
@@ -423,38 +523,93 @@
     }
 
     /* ---------- Backend sync (persistence + realtime) ---------- */
-    function syncCardToServer(note, x, y, data) {
+    // xp / yp 为百分比（渲染权威值）；x / y 同时带上当前像素，便于管理面板查看。
+    var POST_TIMEOUT = 12000;
+
+    function syncCardToServer(note, xp, yp, data) {
         var clientId = 'local-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
         note.dataset.clientId = clientId;
         renderedCardIds['client:' + clientId] = true;
+        var b = boardCork.getBoundingClientRect();
 
-        fetch(apiUrl('/api/cards'), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                avatar: data.avatar,
-                name: data.name,
-                message: data.message,
-                x: x,
-                y: y,
-                clientId: clientId
-            })
-        })
-            .then(function (r) { return r.json(); })
+        var payload = JSON.stringify({
+            avatar: data.avatar,
+            name: data.name,
+            message: data.message,
+            xp: xp,
+            yp: yp,
+            x: Math.round((xp / 100) * (b.width || REF_BOARD_W)),
+            y: Math.round((yp / 100) * (b.height || REF_BOARD_H)),
+            clientId: clientId
+        });
+
+        postWithRetry(payload, 1)
             .then(function (card) {
                 if (card && card.id) {
                     note.dataset.cardId = card.id;
                     renderedCardIds[card.id] = true;
                 }
             })
-            .catch(function () { /* no backend — card stays local only */ });
+            .catch(function () {
+                // 微信等环境里网络被拦时 previously 是完全静默的，用户以为传上去了。
+                // 这里给一句明确提示，纸条仍留在墙上（本地可见）。
+                showPinHint('纸条没传上去，检查下网络再试一次');
+            });
     }
 
-    function updateCardPosition(id, x, y) {
+    // 带超时 + 一次重试的 POST；跨域首包慢时不要轻易判死。
+    function postWithRetry(payload, retriesLeft) {
+        return new Promise(function (resolve, reject) {
+            var done = false;
+            var ctl = null;
+            if (typeof AbortController !== 'undefined') { ctl = new AbortController(); }
+            var timer = setTimeout(function () {
+                if (!done) { done = true; if (ctl) { try { ctl.abort(); } catch (_) {} } trigger(); }
+            }, POST_TIMEOUT);
+
+            function finish(fn, v) {
+                if (done) return;
+                done = true;
+                clearTimeout(timer);
+                fn(v);
+            }
+            function trigger() {
+                if (retriesLeft > 0) {
+                    postWithRetry(payload, retriesLeft - 1).then(resolve, reject);
+                } else {
+                    reject(new Error('post failed'));
+                }
+            }
+
+            var opts = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: payload
+            };
+            if (ctl) { opts.signal = ctl.signal; }
+
+            fetch(apiUrl('/api/cards'), opts)
+                .then(function (r) { return r.json().catch(function () { return null; }); })
+                .then(function (card) {
+                    if (card && card.id) { finish(resolve, card); }
+                    else { finish(function () { trigger(); }); }
+                })
+                .catch(function () { finish(function () { trigger(); }); });
+        });
+    }
+
+    function showPinHint(text) {
+        if (!pinHint) return;
+        pinHint.textContent = text;
+        pinHint.hidden = false;
+    }
+
+    // 位置同步同样以百分比为准（拖拽排布后换设备/转屏都不会跑出板外）。
+    function updateCardPosition(id, xp, yp) {
         fetch(apiUrl('/api/cards/' + encodeURIComponent(id)), {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ x: x, y: y })
+            body: JSON.stringify({ xp: xp, yp: yp })
         }).catch(function () { /* ignore */ });
     }
 
@@ -472,27 +627,27 @@
             return;
         }
 
-        var boardRect = boardCork.getBoundingClientRect();
-        var x = (card.x != null) ? card.x : (boardRect.width / 2 - 80);
-        var y = (card.y != null) ? card.y : (boardRect.height / 2 - 60);
         var data = {
             avatar: card.avatar || 'assets/cards/avatars/ava-01.png',
             name: card.name || '',
             message: card.message || ''
         };
-        var note = createBoardNote(data, x, y, card.id);
+        var p = storedToPct(card);
+        var note = createBoardNote(data, +p.x.toFixed(2), +p.y.toFixed(2), card.id);
         boardCork.appendChild(note);
         setupBoardNoteDrag(note, false);
+        layoutNotes();
         updateWallCount();
     }
 
     function moveCard(card) {
         if (!card.id) return;
         var note = boardCork.querySelector('[data-card-id="' + card.id + '"]');
-        if (note && card.x != null && card.y != null) {
-            note.style.left = card.x + 'px';
-            note.style.top = card.y + 'px';
-        }
+        if (!note) return;
+        var p = storedToPct(card);
+        note.dataset.xp = String(+p.x.toFixed(2));
+        note.dataset.yp = String(+p.y.toFixed(2));
+        layoutNotes();
     }
 
     function deleteCardById(id) {
@@ -532,8 +687,9 @@
     }
 
     function openStream() {
+        var es = null;
         try {
-            var es = new EventSource(apiUrl('/api/cards/stream'));
+            es = new EventSource(apiUrl('/api/cards/stream'));
             es.onmessage = function (e) {
                 try {
                     var msg = JSON.parse(e.data);
@@ -542,8 +698,39 @@
                     else if (msg.type === 'delete' && msg.id) deleteCardById(msg.id);
                 } catch (_) { /* ignore malformed */ }
             };
-            es.onerror = function () { /* SSE retries automatically */ };
-        } catch (_) { /* EventSource unsupported — cards still work locally */ }
+            es.onerror = function () {
+                // 微信内置浏览器会静默吞掉 SSE —— 线上日志里 iPhone 微信只发过
+                // GET /api/cards，从来没有 /api/cards/stream。真连不上就退化轮询，
+                // 别让页面看起来像坏掉了。
+                if (es && es.readyState === 2) startPolling();
+            };
+        } catch (_) {
+            startPolling();
+            return;
+        }
+        // 4 秒内还没 OPEN，当作不支持，上轮询兜底。
+        setTimeout(function () {
+            if (!es || es.readyState !== 1) startPolling();   // 1 = OPEN
+        }, 4000);
+    }
+
+    /* ---------- SSE 兜底：轮询 ----------
+       只在 SSE 用不了时启动（老浏览器 / 微信内核 / 代理掐长连接）。
+       renderCard 自带 id 去重，重复拉不会多画卡片。 */
+    var pollTimer = null;
+
+    function startPolling() {
+        if (pollTimer) return;
+        var tick = function () {
+            fetch(apiUrl('/api/cards'))
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (list) {
+                    (list || []).forEach(function (card) { renderCard(card); });
+                })
+                .catch(function () { /* 离线时静默，等下一轮 */ });
+        };
+        tick();
+        pollTimer = setInterval(tick, 8000);
     }
 
     // Sync badge count with the actual template notes on load.
@@ -555,6 +742,10 @@
     // Decorative stickers can be dragged around; restore any saved positions.
     initStickerDrag();
     restoreStickerPositions();
+
+    // 字体 / 头像图片到位后卡片尺寸会变，等它们落地再排一次版。
+    layoutNotes();
+    window.addEventListener('load', scheduleLayout);
 
     /* ---------- Utilities ---------- */
     function updateWallCount() {
